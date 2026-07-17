@@ -33,7 +33,7 @@ const LOADER_KEYFRAMES = `
       rgb(161 161 170) 100%
     );
     background-size: 200% auto;
-    animation: textShimmer 4s ease-in-out infinite;
+    animation: textShimmer 7s ease-in-out infinite;
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -90,7 +90,7 @@ const Loader = React.forwardRef<SVGSVGElement, LoaderProps>(
           } as React.CSSProperties : undefined}
           className={cn(
             "transition-opacity duration-300",
-            isReady ? "opacity-100 animate-[drawStroke_5s_infinite]" : "opacity-0"
+            isReady ? "opacity-100 animate-[drawStroke_8s_infinite]" : "opacity-0"
           )}
         />
       </svg>
