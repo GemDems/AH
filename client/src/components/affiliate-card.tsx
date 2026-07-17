@@ -192,7 +192,7 @@ export default function AffiliateCard({ link }: AffiliateCardProps) {
 
   return (
     <>
-      <Card className="bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-[1.02] border-2 border-gray-100 hover:border-conversion-blue/30 overflow-hidden group relative backdrop-blur-sm" style={{ ['--tw-shadow-colored' as any]: '0 25px 50px -12px rgba(249,115,22,0.05)' }} onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 20px 40px -8px rgba(0,0,0,0.18), 0 8px 20px -4px rgba(249,115,22,0.05)')} onMouseLeave={e => (e.currentTarget.style.boxShadow = '')}>
+      <Card className="bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-[box-shadow,transform,border-color,opacity] duration-500 transform hover:-translate-y-2 hover:scale-[1.02] border-2 border-gray-100 hover:border-conversion-blue/30 overflow-hidden group relative backdrop-blur-sm" style={{ ['--tw-shadow-colored' as any]: '0 25px 50px -12px rgba(249,115,22,0.05)' }} onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 20px 40px -8px rgba(0,0,0,0.18), 0 8px 20px -4px rgba(249,115,22,0.05)')} onMouseLeave={e => (e.currentTarget.style.boxShadow = '')}>
         <div className="absolute inset-0 pointer-events-none z-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" style={{ backgroundColor: 'rgba(0,0,139,0.011)' }} />
 
         <div className="absolute top-2 right-2 z-30" style={{ opacity: 0, visibility: 'hidden' }}>
