@@ -7,6 +7,7 @@ This is a full-stack affiliate link management platform built with React, Expres
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+User's name: Gabe. Start every response with "Gabe,".
 
 ## Recent Changes (July 2025)
 
