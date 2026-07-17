@@ -2023,7 +2023,13 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
               </div>
               {/* LoadingBreadcrumb — separate below the bubble */}
               <LoadingBreadcrumb
-                text="Locking in your perfect deal"
+                texts={[
+                  "Locking in your perfect deal",
+                  "Scanning exclusive offers",
+                  "Hunting the best price for you",
+                  "Securing your offer now",
+                  "This one was made for you",
+                ]}
                 onClick={() => setShowAgentBadge(v => !v)}
                 className="ml-1"
               />
@@ -2050,7 +2056,13 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
               </div>
               {/* LoadingBreadcrumb — separate below the bubble */}
               <LoadingBreadcrumb
-                text="Reading your mind"
+                texts={[
+                  "Reading your mind",
+                  "Finding your perfect match",
+                  "Your deal is almost here",
+                  "Almost ready for you",
+                  "Worth the wait — promise",
+                ]}
                 onClick={() => setShowAgentBadge(v => !v)}
                 className="ml-1"
               />

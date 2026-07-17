@@ -102,11 +102,28 @@ Loader.displayName = "Loader";
 
 interface LoadingBreadcrumbProps {
   text?: string;
+  texts?: string[];
   className?: string;
   onClick?: () => void;
 }
 
-export function LoadingBreadcrumb({ text = "Thinking", className, onClick }: LoadingBreadcrumbProps) {
+export function LoadingBreadcrumb({ text = "Thinking", texts, className, onClick }: LoadingBreadcrumbProps) {
+  const list = texts && texts.length > 0 ? texts : [text];
+  const [index, setIndex] = useState(0);
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    if (list.length <= 1) return;
+    const cycle = setInterval(() => {
+      setVisible(false);
+      setTimeout(() => {
+        setIndex(i => (i + 1) % list.length);
+        setVisible(true);
+      }, 600);
+    }, 3500);
+    return () => clearInterval(cycle);
+  }, [list.length]);
+
   return (
     <div
       onClick={onClick}
@@ -117,7 +134,12 @@ export function LoadingBreadcrumb({ text = "Thinking", className, onClick }: Loa
       )}
     >
       <Loader size={16} strokeWidth={2.5} className="text-zinc-300" />
-      <span className="lb-shimmer-text">{text}</span>
+      <span
+        className="lb-shimmer-text transition-opacity duration-500"
+        style={{ opacity: visible ? 1 : 0 }}
+      >
+        {list[index]}
+      </span>
       <ChevronRight size={13} className="text-zinc-500" />
     </div>
   );
