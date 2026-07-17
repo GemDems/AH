@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
+import AnimatedGenerateButton from "@/components/ui/animated-generate-button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -274,20 +274,14 @@ export default function IdeaSubmission() {
               </div>
             </div>
             
-            <Button 
-              type="submit" 
+            <AnimatedGenerateButton
+              type="submit"
               disabled={submitIdeaMutation.isPending}
-              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
-            >
-              {submitIdeaMutation.isPending ? (
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                  Submitting...
-                </div>
-              ) : (
-                "Submit Idea ✨"
-              )}
-            </Button>
+              generating={submitIdeaMutation.isPending}
+              labelIdle="Submit Idea ✨"
+              labelActive="Submitting..."
+              highlightHueDeg={280}
+            />
           </form>
           
           <p className="text-xs text-gray-500 text-center mt-3">
