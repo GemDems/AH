@@ -1,0 +1,198 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0d0f1a; }
+  .page { background: #0d0f1a; color: #fff; font-family: var(--font-sans, system-ui, sans-serif); width: 100%; overflow: hidden; }
+  .ticker { background: linear-gradient(90deg, #e63946, #9b2dca); padding: 10px; text-align: center; font-size: 13px; font-weight: 500; letter-spacing: 0.04em; }
+  .ticker span { color: #fff; }
+  .hero { text-align: center; padding: 48px 24px 24px; }
+  .hero-eyebrow { font-size: 12px; font-weight: 500; letter-spacing: 0.15em; color: #9b8fcb; margin-bottom: 12px; }
+  .hero-title { font-size: clamp(42px, 8vw, 76px); font-weight: 800; color: #fff; line-height: 1; letter-spacing: -0.02em; }
+  .hero-title span { color: #7c3aed; }
+  .hero-sub { font-size: 16px; letter-spacing: 0.18em; color: #9ca3af; margin-top: 10px; font-weight: 400; }
+  .trust-pills { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; margin: 20px auto 0; max-width: 600px; }
+  .pill { padding: 5px 14px; border-radius: 100px; font-size: 12px; font-weight: 500; border: 1px solid; }
+  .pill-amber { background: rgba(251,191,36,0.1); border-color: rgba(251,191,36,0.3); color: #fbbf24; }
+  .pill-green { background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.3); color: #22c55e; }
+  .pill-blue { background: rgba(96,165,250,0.1); border-color: rgba(96,165,250,0.3); color: #60a5fa; }
+  .urgency-box { margin: 28px auto; max-width: 560px; background: rgba(220,38,38,0.12); border: 1px solid rgba(220,38,38,0.4); border-radius: 12px; padding: 16px 20px; display: flex; align-items: center; justify-content: center; gap: 14px; }
+  .urgency-dot { width: 10px; height: 10px; border-radius: 50%; background: #ef4444; flex-shrink: 0; animation: pulse 1.4s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.6;transform:scale(1.3)} }
+  .urgency-text { font-size: 14px; color: #fca5a5; font-weight: 500; }
+  .urgency-text strong { color: #fff; font-size: 15px; }
+  .timer-wrap { display: flex; gap: 6px; align-items: center; }
+  .timer-block { background: #1e0a0a; border: 1px solid rgba(220,38,38,0.5); border-radius: 6px; padding: 4px 10px; text-align: center; }
+  .timer-num { display: block; font-size: 22px; font-weight: 700; color: #f87171; line-height: 1; }
+  .timer-label { display: block; font-size: 9px; color: #9ca3af; letter-spacing: 0.08em; margin-top: 1px; }
+  .timer-sep { font-size: 20px; font-weight: 700; color: #ef4444; margin-top: -6px; }
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; max-width: 760px; margin: 0 auto; padding: 0 20px; }
+  .stat-card { background: #151929; border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 18px 12px; text-align: center; }
+  .stat-icon { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 20px; }
+  .ic-green { background: rgba(34,197,94,0.15); }
+  .ic-amber { background: rgba(251,191,36,0.15); }
+  .ic-purple { background: rgba(139,92,246,0.15); }
+  .ic-blue { background: rgba(96,165,250,0.15); }
+  .stat-value { font-size: 15px; font-weight: 700; margin-bottom: 3px; }
+  .stat-value.green { color: #4ade80; }
+  .stat-value.amber { color: #fbbf24; }
+  .stat-value.purple { color: #a78bfa; }
+  .stat-value.blue { color: #60a5fa; }
+  .stat-desc { font-size: 11px; color: #6b7280; }
+  .live-bar { max-width: 560px; margin: 20px auto; background: #151929; border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 14px 20px; display: flex; justify-content: space-around; align-items: center; }
+  .live-item { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+  .live-dot-green { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; animation: pulse 1.8s infinite; }
+  .live-dot-blue { width: 8px; height: 8px; border-radius: 50%; background: #60a5fa; animation: pulse 2s infinite 0.4s; }
+  .live-num { font-weight: 700; font-size: 15px; color: #fff; }
+  .live-txt { color: #9ca3af; }
+  .divider { border: none; border-top: 1px solid rgba(255,255,255,0.05); max-width: 600px; margin: 4px auto; }
+  .cta-section { text-align: center; padding: 24px 20px 0; }
+  .savings-badge { display: inline-block; background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.3); color: #4ade80; font-size: 28px; font-weight: 800; padding: 10px 28px; border-radius: 12px; margin-bottom: 6px; }
+  .savings-sub { font-size: 13px; color: #6b7280; margin-bottom: 24px; }
+  .cta-btn { display: inline-block; background: linear-gradient(135deg, #7c3aed, #4f46e5); color: #fff; font-size: 18px; font-weight: 700; padding: 18px 52px; border-radius: 100px; border: none; cursor: pointer; letter-spacing: 0.02em; position: relative; transition: transform 0.15s; text-decoration: none; animation: ctapulse 2.5s infinite; }
+  @keyframes ctapulse { 0%,100%{box-shadow:0 0 0 0 rgba(124,58,237,0.5)} 50%{box-shadow:0 0 0 14px rgba(124,58,237,0)} }
+  .cta-btn:hover { transform: scale(1.03); }
+  .cta-micro { font-size: 12px; color: #6b7280; margin-top: 10px; }
+  .cta-micro span { color: #4ade80; }
+  .guarantee { max-width: 520px; margin: 24px auto; background: rgba(251,191,36,0.06); border: 1px solid rgba(251,191,36,0.2); border-radius: 12px; padding: 16px 20px; display: flex; gap: 14px; align-items: flex-start; }
+  .guarantee-icon { font-size: 28px; flex-shrink: 0; margin-top: 2px; }
+  .guarantee-title { font-size: 14px; font-weight: 700; color: #fbbf24; margin-bottom: 4px; }
+  .guarantee-text { font-size: 12px; color: #9ca3af; line-height: 1.5; }
+  .social-proof { max-width: 680px; margin: 20px auto; padding: 0 16px; }
+  .reviews-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .review-card { background: #151929; border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 14px; }
+  .review-stars { color: #fbbf24; font-size: 12px; margin-bottom: 6px; }
+  .review-text { font-size: 12px; color: #d1d5db; line-height: 1.5; margin-bottom: 8px; }
+  .review-author { font-size: 11px; color: #6b7280; font-weight: 500; }
+  .footer-strip { background: #0a0c14; border-top: 1px solid rgba(255,255,255,0.05); padding: 14px; text-align: center; font-size: 12px; color: #4b5563; margin-top: 28px; }
+  .footer-strip span { color: #22c55e; margin-right: 4px; }
+  @media (max-width: 500px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .reviews-row { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="page">
+  <div class="ticker"><span>&#9889; FLASH SALE ENDING SOON — 1,247 MEMBERS JOINED TODAY &nbsp;|&nbsp; SPOTS FILLING FAST &#9889;</span></div>
+
+  <div class="hero">
+    <div class="hero-eyebrow">THE #1 PREMIUM MARKETPLACE</div>
+    <div class="hero-title">ELITE<br><span>DEALS</span></div>
+    <div class="hero-sub">PREMIUM MARKETPLACE</div>
+    <div class="trust-pills">
+      <span class="pill pill-amber">Curated by experts</span>
+      <span class="pill pill-green">Verified authentic</span>
+      <span class="pill pill-blue">Trusted by thousands</span>
+    </div>
+  </div>
+
+  <div class="urgency-box" style="max-width:560px; margin: 20px auto;">
+    <div class="urgency-dot"></div>
+    <div>
+      <div class="urgency-text"><strong>Limited access — offer expires in:</strong></div>
+      <div class="timer-wrap" style="margin-top:8px;">
+        <div class="timer-block"><span class="timer-num" id="th">01</span><span class="timer-label">HRS</span></div>
+        <div class="timer-sep">:</div>
+        <div class="timer-block"><span class="timer-num" id="tm">47</span><span class="timer-label">MIN</span></div>
+        <div class="timer-sep">:</div>
+        <div class="timer-block"><span class="timer-num" id="ts">33</span><span class="timer-label">SEC</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon ic-green"><i class="ti ti-shield-check" style="color:#4ade80;font-size:22px;" aria-hidden="true"></i></div>
+      <div class="stat-value green">Verified</div>
+      <div class="stat-desc">Every product vetted</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon ic-amber"><i class="ti ti-star-filled" style="color:#fbbf24;font-size:22px;" aria-hidden="true"></i></div>
+      <div class="stat-value amber">4.9/5 Rating</div>
+      <div class="stat-desc">78K+ reviews</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon ic-purple"><i class="ti ti-trophy" style="color:#a78bfa;font-size:22px;" aria-hidden="true"></i></div>
+      <div class="stat-value purple">#1 Marketplace</div>
+      <div class="stat-desc">Industry leader</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon ic-blue"><i class="ti ti-lock" style="color:#60a5fa;font-size:22px;" aria-hidden="true"></i></div>
+      <div class="stat-value blue">Bank-Level</div>
+      <div class="stat-desc">256-bit encryption</div>
+    </div>
+  </div>
+
+  <div class="live-bar" style="max-width:560px; margin: 18px auto;">
+    <div class="live-item"><div class="live-dot-green"></div><span class="live-num" id="viewers">1,035</span>&nbsp;<span class="live-txt">live viewers</span></div>
+    <div style="width:1px; background:rgba(255,255,255,0.07); height:28px;"></div>
+    <div class="live-item"><div class="live-dot-blue"></div><span class="live-num" id="orders">708</span>&nbsp;<span class="live-txt">orders this hour</span></div>
+  </div>
+
+  <div class="cta-section">
+    <div class="savings-badge">$6.2M+ SAVED</div>
+    <div class="savings-sub">by our members this month alone</div>
+    <div>
+      <button class="cta-btn" onclick="sendPrompt('I want to join Elite Deals — what do I get?')">
+        CLAIM MY EXCLUSIVE ACCESS &rarr;
+      </button>
+    </div>
+    <div class="cta-micro">
+      <span>98.7%</span> of members got more than they expected &nbsp;|&nbsp; No credit card required to start
+    </div>
+  </div>
+
+  <div class="guarantee">
+    <div class="guarantee-icon"><i class="ti ti-award" style="color:#fbbf24;font-size:28px;" aria-hidden="true"></i></div>
+    <div>
+      <div class="guarantee-title">100% Satisfaction Guarantee</div>
+      <div class="guarantee-text">Not happy? We'll make it right — full refund, zero questions asked. We're so confident in Elite Deals that we take on all the risk so you don't have to.</div>
+    </div>
+  </div>
+
+  <div class="social-proof">
+    <div class="reviews-row">
+      <div class="review-card">
+        <div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <div class="review-text">"Saved $340 on my first order. I was skeptical but this is the real deal — everything arrived exactly as described."</div>
+        <div class="review-author">James T. — Verified Buyer</div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <div class="review-text">"Best marketplace I've used. The curation is insane — every deal is actually worth it. My friends all joined after I told them."</div>
+        <div class="review-author">Priya M. — Member since 2024</div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <div class="review-text">"Legit saved over $1,200 this year. The security and authenticity checks give me total peace of mind. 10/10 would recommend."</div>
+        <div class="review-author">Marcus R. — Elite Member</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-strip"><span>&#10003;</span> Every Deal Verified &nbsp;&bull;&nbsp; No Fake Offers &nbsp;&bull;&nbsp; Secure Checkout &nbsp;&bull;&nbsp; 24/7 Support</div>
+</div>
+
+<script>
+  let total = (1 * 3600) + (47 * 60) + 33;
+  function tick() {
+    if (total <= 0) { total = (2 * 3600); return; }
+    total--;
+    const h = Math.floor(total / 3600);
+    const m = Math.floor((total % 3600) / 60);
+    const s = total % 60;
+    document.getElementById('th').textContent = String(h).padStart(2,'0');
+    document.getElementById('tm').textContent = String(m).padStart(2,'0');
+    document.getElementById('ts').textContent = String(s).padStart(2,'0');
+  }
+  setInterval(tick, 1000);
+
+  let v = 1035, o = 708;
+  setInterval(() => {
+    v += Math.floor(Math.random() * 5) - 2;
+    o += Math.floor(Math.random() * 3) - 1;
+    v = Math.max(980, Math.min(1200, v));
+    o = Math.max(650, Math.min(820, o));
+    document.getElementById('viewers').textContent = v.toLocaleString();
+    document.getElementById('orders').textContent = o.toLocaleString();
+  }, 3500);
+</script>

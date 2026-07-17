@@ -1,0 +1,16 @@
+---
+name: Pasted reference component ports
+description: How to handle user-pasted React reference components (e.g. from 21st.dev/uiverse-style libraries) when asked for an "exact 1:1 replica"
+---
+
+When a user pastes a reference component and asks for an exact, unedited replica:
+
+- Only change what is strictly required to run in this stack: swap `motion/react` (Next.js-only package name) for `framer-motion` (the installed package), and convert `style jsx` (styled-jsx, Next.js-only) to a plain `<style>` tag. Nothing else.
+- Do NOT "optimize" the animation logic (e.g. replacing a `motion.radialGradient`/`animate` keyframe approach with a manual `setInterval` + state hack) even if it seems more efficient or safer. Users notice and consider this "editing" the component, which is exactly what they're asking you not to do — even if it was originally done to fix a console error.
+- framer-motion (v11) cannot cleanly interpolate non-standard SVG attributes like `gradientTransform` (an array of transform-function strings). Animating it produces repeated harmless console errors ("Expected transform function, undefined") but does NOT crash the app or break the visual render — the component still displays correctly.
+- **Why:** the user previously asked for a "liquid" gradient button; the agent proactively simplified the animation to avoid the console error, and the user considered that an unwanted deviation, explicitly demanding a from-scratch exact replica.
+- **How to apply:** When user says "1:1 replica, don't edit a single part," ship the literal port with only the mandatory import/syntax fixes, verify visually via screenshot, and only mention the harmless console warnings if the user asks — don't preemptively rewrite around them.
+- Some pasted references (often generated against React 19) declare a component as `function Foo({ ref, ...props })` — treating `ref` as a plain prop. On this project's React 18, that throws "Function components cannot be given refs" at runtime. This one DOES need a mandatory fix: wrap the component in `React.forwardRef` and move `ref` to the second callback argument, keeping props/behavior otherwise identical — it's a required-to-run adaptation, not an optional edit.
+- Story/carousel-ring components with SVG arc math for "segmented progress ring" thumbnails often have a degenerate-arc edge case: when the item count is exactly 1, the arc's start/end angle are mathematically identical, so the `<path>` draws a zero-length arc (renders as a tiny dot with `strokeLinecap="round"`, not a ring). This is a bug in the reference math itself (its own demo data never uses 1-item sets), not something introduced by porting it.
+- **Why:** when a user complains a "ring" thumbnail looks like "just a dot," check the segment-count math before assuming CSS/Tailwind is broken — verify with the actual angle formula (e.g. via a quick script) before touching any file.
+- **How to apply:** fix it one layer up, in the data/wrapper file that supplies the items array (never in the pasted reference component) — e.g. pad a single-item array to 2 items (duplicating the sole item) so segment math stays non-degenerate. This satisfies "don't edit the reference" because the reference file itself is untouched.

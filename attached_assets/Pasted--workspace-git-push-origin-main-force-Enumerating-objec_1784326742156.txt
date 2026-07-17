@@ -1,0 +1,339 @@
+~/workspace$ git push origin main --force
+Enumerating objects: 835, done.
+Counting objects: 100% (835/835), done.
+Delta compression using up to 2 threads
+Compressing objects: 100% (797/797), done.
+Writing objects: 100% (802/802), 5.19 MiB | 11.60 MiB/s, done.
+Total 802 (delta 617), reused 32 (delta 0), pack-reused 0 (from 0)
+remote: Resolving deltas: 100% (617/617), completed with 23 local objects.
+remote: fatal: did not receive expected object d1797d578db93ff7d35e833c9adcb5c2c9018e1a
+error: remote unpack failed: index-pack failed
+To https://github.com/GemDems/AH
+ ! [remote rejected] main -> main (failed)
+error: failed to push some refs to 'https://github.com/GemDems/AH'
+~/workspace$ ~/workspace$ git push origin main --force
+Enumerating objects: 835, done.
+Counting objects: 100% (835/835), done.
+Delta compression using up to 2 threads
+Compressing objects: 100% (797/797), done.
+Writing objects: 100% (802/802), 5.19 MiB | 11.60 MiB/s, done.
+Total 802 (delta 617), reused 32 (delta 0), pack-reused 0 (from 0)
+remote: Resolving deltas: 100% (617/617), completed with 23 local objects.
+remote: fatal: did not receive expected object d1797d578db93ff7d35e833c9adcb5c2c9018e1a
+error: remote unpack failed: index-pack failed
+To https://github.com/GemDems/AH
+ ! [remote rejected] main -> main (failed)
+error: failed to push some refs to 'https://github.com/GemDems/AH'
+~/workspace$
+bash: /home/runner/workspace$: No such file or directory
+bash: Enumerating: command not found
+bash: syntax error near unexpected token `('
+bash: Delta: command not found
+bash: syntax error near unexpected token `('
+bash: syntax error near unexpected token `('
+bash: syntax error near unexpected token `('
+bash: syntax error near unexpected token `('
+bash: remote:: command not found
+bash: error:: command not found
+bash: To: command not found
+bash: syntax error near unexpected token `('
+bash: error:: command not found
+bash: /home/runner/workspace$: No such file or directory
+~/workspace$ git checkout --orphan fresh-main
+Switched to a new branch 'fresh-main'
+~/workspace$ git add -A
+~/workspace$ git commit -m "Elite Deals Hub - current version"
+[fresh-main (root-commit) cbf9dc5] Elite Deals Hub - current version
+ 269 files changed, 58208 insertions(+)
+ create mode 100644 .agents/agent_assets_metadata.toml
+ create mode 100644 .agents/memory/MEMORY.md
+ create mode 100644 .agents/memory/base64-image-console-logging.md
+ create mode 100644 .agents/memory/conic-glow-layer-sizing.md
+ create mode 100644 .agents/memory/express-error-handler-crash.md
+ create mode 100644 .agents/memory/liquid-badge-border.md
+ create mode 100644 .agents/memory/overflow-hidden-clips-blur.md
+ create mode 100644 .agents/memory/reference-component-ports.md
+ create mode 100644 .agents/memory/tailwind-before-transition.md
+ create mode 100644 .canvas/assets/ai-video-1fb99d64-5b45-4dbd-9a9b-50591e7aeb13-1.mp4
+ create mode 100644 .gitignore
+ create mode 100644 .replit
+ create mode 100644 attached_assets/IMG_4046_1752502936216.jpeg
+ create mode 100644 attached_assets/IMG_4115_1753230867382.png
+ create mode 100644 "attached_assets/Image 7-18-25 at 10.42\342\200\257PM_1752903768613.jpeg"
+ create mode 100644 attached_assets/Image_6-9-26_at_4.11_PM_1781046734125.jpeg
+ create mode 100644 attached_assets/Image_6-9-26_at_4.11_PM_1781051688590.jpeg
+ create mode 100644 attached_assets/Image_6-9-26_at_4.12_PM_1781047000883.jpeg
+ create mode 100644 attached_assets/Image_6-9-26_at_4.12_PM_1781051688595.jpeg
+ create mode 100644 attached_assets/Image_6-9-26_at_4.12_PM_1781058286619.jpeg
+ create mode 100644 attached_assets/Image_6-9-26_at_5.54_PM_1781057306498.jpeg
+ create mode 100644 attached_assets/Image_6-9-26_at_9.40_PM_1781066432191.jpeg
+ create mode 100644 attached_assets/Image_6-9-26_at_9.45_PM_(1)_1781067513735.jpeg
+ create mode 100644 attached_assets/Image_7-10-26_at_10.42_PM_1783748533384.jpeg
+ create mode 100644 attached_assets/Image_7-10-26_at_3.02_PM_1783720946473.jpeg
+ create mode 100644 attached_assets/Pasted--Component-import-React-CSSProperties-ReactNode-HTMLAtt_1783218083737.txt
+ create mode 100644 attached_assets/Pasted--Component-import-React-CSSProperties-ReactNode-HTMLAtt_1783218084458.txt
+ create mode 100644 attached_assets/Pasted--Component-import-React-from-react-const-SearchComponen_1783055761899.txt
+ create mode 100644 attached_assets/Pasted--Component-import-React-from-react-const-SearchComponen_1783712434859.txt
+ create mode 100644 attached_assets/Pasted--Component-import-React-from-react-const-SearchComponen_1783712435266.txt
+ create mode 100644 attached_assets/Pasted--Component-import-React-from-react-const-SearchComponen_1783712468099.txt
+ create mode 100644 attached_assets/Pasted--Component-import-React-from-react-const-SearchComponen_1783712468679.txt
+ create mode 100644 attached_assets/Pasted--Component-import-React-from-react-const-SearchComponen_1783712933921.txt
+ create mode 100644 attached_assets/Pasted--Component-import-React-from-react-const-SearchComponen_1783712934301.txt
+ create mode 100644 attached_assets/Pasted--Component-import-React-from-react-const-SearchComponen_1783714825091.txt
+ create mode 100644 attached_assets/Pasted--Component-import-React-from-react-const-SearchComponen_1783714825303.txt
+ create mode 100644 attached_assets/Pasted--Component-import-React-from-react-const-SearchComponen_1783719789390.txt
+ create mode 100644 attached_assets/Pasted--Component-import-React-from-react-const-SearchComponen_1783719789533.txt
+ create mode 100644 attached_assets/Pasted--Component-import-React-from-react-const-SearchComponen_1783719790326.txt
+ create mode 100644 attached_assets/Pasted--Component-import-React-from-react-const-SearchComponen_1783720257444.txt
+ create mode 100644 attached_assets/Pasted--Component-import-React-from-react-const-SearchComponen_1783720258765.txt
+ create mode 100644 attached_assets/Pasted--Component-import-React-useEffect-useRef-ReactNode-from_1783218421655.txt
+ create mode 100644 attached_assets/Pasted--Component-import-React-useEffect-useRef-ReactNode-from_1783218421983.txt
+ create mode 100644 attached_assets/Pasted--Component-import-React-useEffect-useRef-ReactNode-from_1783218422792.txt
+ create mode 100644 attached_assets/Pasted--Component-import-React-useEffect-useRef-from-react-con_1783216495941.txt
+ create mode 100644 attached_assets/Pasted--Component-import-as-React-from-react-import-cva-type-V_1783805446181.txt
+ create mode 100644 attached_assets/Pasted--Component-import-as-React-from-react-import-cva-type-V_1783805446701.txt
+ create mode 100644 attached_assets/Pasted--Component-import-as-React-from-react-import-cva-type-V_1783805446976.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-Required-for-state-and-event-hand_1783216655285.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-React-from-react-import-cx_1783219875178.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-React-from-react-import-cx_1783219954844.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-React-from-react-import-cx_1783219955191.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-animate-motion-useInView-u_1783055616137.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-as-React-from-react-import_1783217289562.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-as-React-from-react-import_1783217523778.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-as-React-from-react-import_1783217524119.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-as-React-from-react-import_1783217524419.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-as-React-from-react-import_1783217569198.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-as-React-from-react-import_1783217569667.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-as-React-from-react-import_1783217569967.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-as-React-from-react-import_1783219810444.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-as-React-from-react-import_1783219810790.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-as-React-from-react-import_1783219812215.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-as-React-from-react-import_1783220010039.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-as-React-from-react-import_1783220010359.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-as-React-from-react-import_1783222685382.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-as-React-from-react-import_1783222685988.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-as-React-from-react-import_1783807608184.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-as-React-from-react-import_1783807608392.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-as-React-from-react-import_1783807608579.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-motion-AnimatePresence-fro_1783218553717.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-motion-AnimatePresence-fro_1783218554080.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-motion-AnimatePresence-fro_1783218554258.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-motion-AnimatePresence-fro_1783218748895.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-motion-AnimatePresence-fro_1783218800285.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-motion-AnimatePresence-fro_1783218800695.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-motion-AnimatePresence-fro_1783218900735.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-motion-AnimatePresence-fro_1783218900920.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-motion-AnimatePresence-fro_1783218901162.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-motion-AnimatePresence-fro_1783219086105.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-motion-AnimatePresence-fro_1783219086515.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-motion-AnimatePresence-fro_1783712420585.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-motion-AnimatePresence-fro_1783712421182.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-motion-AnimatePresence-fro_1783712980663.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-motion-AnimatePresence-fro_1783712981099.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-motion-AnimatePresence-fro_1783731889373.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-motion-AnimatePresence-fro_1783733962825.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-motion-AnimatePresence-fro_1783733963338.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-motion-AnimatePresence-fro_1783733963607.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-motion-AnimatePresence-fro_1783741564626.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-motion-AnimatePresence-fro_1783741564758.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-motion-AnimatePresence-fro_1783741565691.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-motion-AnimatePresence-fro_1783741565991.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-motion-AnimatePresence-fro_1783748737503.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-motion-AnimatePresence-fro_1783748945114.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-motion-AnimatePresence-fro_1783748946866.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-motion-AnimatePresence-fro_1783749092181.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-motion-AnimatePresence-fro_1783749092573.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-motion-AnimatePresence-fro_1783749093193.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-type-React-from-react-inte_1783055337222.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-type-React-from-react-inte_1783055337804.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-type-React-from-react-inte_1783055338185.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-type-React-from-react-inte_1783055475244.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-type-React-from-react-inte_1783218953047.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-type-React-from-react-inte_1783218953489.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-type-React-from-react-inte_1783218953823.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-useState-from-react-import_1783652103538.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-useState-from-react-import_1783652112606.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-useState-from-react-import_1783652114132.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-useState-from-react-import_1783653447796.txt
+ create mode 100644 attached_assets/Pasted--Component-use-client-import-useState-from-react-import_1783653448496.txt
+ create mode 100644 attached_assets/Pasted--THE-1-UNSTOPPABLE-ULTRA-PERFECT-SALESMAN-IN-ALL-OF-EXISTENCE-Name-Zero-Doubt-Za-1752982697703_1752982697703.txt
+ create mode 100644 attached_assets/Pasted-Problems-reducing-trust-98-7-who-got-more-than-they-exp_1781044726821.txt
+ create mode 100644 attached_assets/Pasted-Website-affiliate-link-funnel-ai-chatbot-FOR-SITE-PPLACEMENT-CREATE-A-LITTLE-chat-bubble-small-p-1752898075823_1752898075823.txt
+ create mode 100644 attached_assets/Pasted-Website-affiliate-link-funnel-ai-chatbot-FOR-SITE-PPLACEMENT-CREATE-A-LITTLE-chat-bubble-small-p-1752898201764_1752898201765.txt
+ create mode 100644 attached_assets/Pasted-Website-affiliate-link-funnel-ai-chatbot-FOR-SITE-PPLACEMENT-CREATE-A-LITTLE-chat-bubble-small-p-1752898601811_1752898601813.txt
+ create mode 100644 attached_assets/Pasted-Website-affiliate-link-funnel-ai-chatbot-FOR-SITE-PPLACEMENT-CREATE-A-LITTLE-chat-bubble-small-p-1752898955872_1752898955873.txt
+ create mode 100644 attached_assets/Screenshot_2026-06-09_at_3.14.14_PM_1781043256099.png
+ create mode 100644 attached_assets/Screenshot_2026-06-09_at_3.28.43_PM_1781044127381.png
+ create mode 100644 attached_assets/Screenshot_2026-06-09_at_7.58.40_PM_1781060322693.png
+ create mode 100644 attached_assets/Screenshot_2026-06-12_at_4.26.56_PM_1781306819037.png
+ create mode 100644 attached_assets/Screenshot_2026-07-02_at_10.19.06_PM_1783055948891.png
+ create mode 100644 attached_assets/Screenshot_2026-07-02_at_10.19.06_PM_1783055948892.png
+ create mode 100644 attached_assets/Screenshot_2026-07-10_at_10.43.12_PM_1783748594651.png
+ create mode 100644 attached_assets/Screenshot_2026-07-10_at_10.43.12_PM_1783748594652.png
+ create mode 100644 attached_assets/Screenshot_2026-07-10_at_2.42.32_PM_1783719754917.png
+ create mode 100644 attached_assets/Screenshot_2026-07-10_at_2.42.32_PM_1783719754918.png
+ create mode 100644 attached_assets/Screenshot_2026-07-10_at_2.42.45_PM_1783719768069.png
+ create mode 100644 attached_assets/Screenshot_2026-07-10_at_2.50.36_PM_1783720239175.png
+ create mode 100644 attached_assets/Screenshot_2026-07-10_at_2.50.36_PM_1783720239177.png
+ create mode 100644 attached_assets/Screenshot_2026-07-10_at_2.50.45_PM_1783720247527.png
+ create mode 100644 attached_assets/Screenshot_2026-07-10_at_2.59.10_PM_1783720752846.png
+ create mode 100644 attached_assets/Screenshot_2026-07-10_at_2.59.10_PM_1783720752847.png
+ create mode 100644 attached_assets/content-1752919959716.md
+ create mode 100644 attached_assets/elite_deals_cro_landing_1781044770071.html
+ create mode 100644 attached_assets/image_1783748718778.png
+ create mode 100644 attached_assets/image_1783748718780.png
+ create mode 100644 attached_assets/screenshot-1752919955230.png
+ create mode 100644 attached_assets/targeted_element_1781043217980.png
+ create mode 100644 attached_assets/targeted_element_1781043233738.png
+ create mode 100644 attached_assets/targeted_element_1781044771941.png
+ create mode 100644 attached_assets/targeted_element_1781057010561.png
+ create mode 100644 attached_assets/targeted_element_1783219441422.png
+ create mode 100644 client/index.html
+ create mode 100644 client/public/logos/bloomberg.png
+ create mode 100644 client/public/logos/bloomberg.svg
+ create mode 100644 client/public/logos/business-insider.png
+ create mode 100644 client/public/logos/business-insider.svg
+ create mode 100644 client/public/logos/cnn.png
+ create mode 100644 client/public/logos/cnn.svg
+ create mode 100644 client/public/logos/forbes.png
+ create mode 100644 client/public/logos/techcrunch.png
+ create mode 100644 client/public/logos/techcrunch.svg
+ create mode 100644 client/public/logos/wsj.png
+ create mode 100644 client/public/logos/wsj.svg
+ create mode 100644 client/src/App.tsx
+ create mode 100644 client/src/components/admin-panel.tsx
+ create mode 100644 client/src/components/affiliate-card.tsx
+ create mode 100644 client/src/components/ai-chatbot.tsx
+ create mode 100644 client/src/components/animated-message.tsx
+ create mode 100644 client/src/components/category-filter.tsx
+ create mode 100644 client/src/components/contact-popup.tsx
+ create mode 100644 client/src/components/floating-testimonials.tsx
+ create mode 100644 client/src/components/header.tsx
+ create mode 100644 client/src/components/idea-submission.tsx
+ create mode 100644 client/src/components/leaderboard.tsx
+ create mode 100644 client/src/components/live-feed.tsx
+ create mode 100644 client/src/components/live-visitor-counter.tsx
+ create mode 100644 client/src/components/photo-carousel.tsx
+ create mode 100644 client/src/components/product-stories.tsx
+ create mode 100644 client/src/components/referral-system.tsx
+ create mode 100644 client/src/components/review-carousel.tsx
+ create mode 100644 client/src/components/savings-progress.tsx
+ create mode 100644 client/src/components/scroll-menu.tsx
+ create mode 100644 client/src/components/search-bar.tsx
+ create mode 100644 client/src/components/sms-preferences.tsx
+ create mode 100644 client/src/components/sort-toolbar.tsx
+ create mode 100644 client/src/components/stats-bar.tsx
+ create mode 100644 client/src/components/trust-indicators.tsx
+ create mode 100644 client/src/components/ui/accordion.tsx
+ create mode 100644 client/src/components/ui/ai-input.tsx
+ create mode 100644 client/src/components/ui/alert-dialog.tsx
+ create mode 100644 client/src/components/ui/alert.tsx
+ create mode 100644 client/src/components/ui/animated-glowing-search-bar.tsx
+ create mode 100644 client/src/components/ui/animated-gradient-border.tsx
+ create mode 100644 client/src/components/ui/aspect-ratio.tsx
+ create mode 100644 client/src/components/ui/avatar.tsx
+ create mode 100644 client/src/components/ui/badge.tsx
+ create mode 100644 client/src/components/ui/breadcrumb.tsx
+ create mode 100644 client/src/components/ui/button.tsx
+ create mode 100644 client/src/components/ui/calendar.tsx
+ create mode 100644 client/src/components/ui/card.tsx
+ create mode 100644 client/src/components/ui/carousel.tsx
+ create mode 100644 client/src/components/ui/chart.tsx
+ create mode 100644 client/src/components/ui/checkbox.tsx
+ create mode 100644 client/src/components/ui/collapsible.tsx
+ create mode 100644 client/src/components/ui/command.tsx
+ create mode 100644 client/src/components/ui/context-menu.tsx
+ create mode 100644 client/src/components/ui/dialog.tsx
+ create mode 100644 client/src/components/ui/discover-button.tsx
+ create mode 100644 client/src/components/ui/drawer.tsx
+ create mode 100644 client/src/components/ui/dropdown-menu.tsx
+ create mode 100644 client/src/components/ui/form.tsx
+ create mode 100644 client/src/components/ui/hover-card.tsx
+ create mode 100644 client/src/components/ui/input-otp.tsx
+ create mode 100644 client/src/components/ui/input.tsx
+ create mode 100644 client/src/components/ui/interactive-product-popup.tsx
+ create mode 100644 client/src/components/ui/label.tsx
+ create mode 100644 client/src/components/ui/liquid-badge.tsx
+ create mode 100644 client/src/components/ui/menubar.tsx
+ create mode 100644 client/src/components/ui/navigation-menu.tsx
+ create mode 100644 client/src/components/ui/number-ticker.tsx
+ create mode 100644 client/src/components/ui/pagination.tsx
+ create mode 100644 client/src/components/ui/popover.tsx
+ create mode 100644 client/src/components/ui/product-card-images.tsx
+ create mode 100644 client/src/components/ui/product-highlight-card.tsx
+ create mode 100644 client/src/components/ui/progress.tsx
+ create mode 100644 client/src/components/ui/radio-group.tsx
+ create mode 100644 client/src/components/ui/resizable.tsx
+ create mode 100644 client/src/components/ui/scroll-area.tsx
+ create mode 100644 client/src/components/ui/select.tsx
+ create mode 100644 client/src/components/ui/separator.tsx
+ create mode 100644 client/src/components/ui/service-card.tsx
+ create mode 100644 client/src/components/ui/sheet.tsx
+ create mode 100644 client/src/components/ui/shiny-button.tsx
+ create mode 100644 client/src/components/ui/sidebar.tsx
+ create mode 100644 client/src/components/ui/skeleton.tsx
+ create mode 100644 client/src/components/ui/slider.tsx
+ create mode 100644 client/src/components/ui/spotlight-card.tsx
+ create mode 100644 client/src/components/ui/story-viewer.tsx
+ create mode 100644 client/src/components/ui/switch.tsx
+ create mode 100644 client/src/components/ui/table.tsx
+ create mode 100644 client/src/components/ui/tabs.tsx
+ create mode 100644 client/src/components/ui/textarea.tsx
+ create mode 100644 client/src/components/ui/toast.tsx
+ create mode 100644 client/src/components/ui/toaster.tsx
+ create mode 100644 client/src/components/ui/toggle-group.tsx
+ create mode 100644 client/src/components/ui/toggle.tsx
+ create mode 100644 client/src/components/ui/tooltip.tsx
+ create mode 100644 client/src/components/username-modal.tsx
+ create mode 100644 client/src/components/wishlist-section.tsx
+ create mode 100644 client/src/hooks/use-mobile.tsx
+ create mode 100644 client/src/hooks/use-toast.ts
+ create mode 100644 client/src/index.css
+ create mode 100644 client/src/lib/queryClient.ts
+ create mode 100644 client/src/lib/utils.ts
+ create mode 100644 client/src/main.tsx
+ create mode 100644 client/src/pages/about.tsx
+ create mode 100644 client/src/pages/home.tsx
+ create mode 100644 client/src/pages/not-found.tsx
+ create mode 100644 components.json
+ create mode 100644 drizzle.config.ts
+ create mode 100644 marketplace-ambient.wav
+ create mode 100644 package-lock.json
+ create mode 100644 package.json
+ create mode 100644 postcss.config.js
+ create mode 100644 replit.md
+ create mode 100644 scripts/post-merge.sh
+ create mode 100644 server/cohere-service.ts
+ create mode 100644 server/db.ts
+ create mode 100644 server/index.ts
+ create mode 100644 server/routes.ts
+ create mode 100644 server/sms-service.ts
+ create mode 100644 server/storage.ts
+ create mode 100644 server/vite.ts
+ create mode 100644 shared/schema.ts
+ create mode 100644 tailwind.config.ts
+ create mode 100644 tsconfig.json
+ create mode 100644 vite.config.ts
+~/workspace$ git push origin fresh-main:main --force --no-thin
+Enumerating objects: 141, done.
+Counting objects: 100% (141/141), done.
+Delta compression using up to 2 threads
+Compressing objects: 100% (104/104), done.
+Writing objects: 100% (109/109), 5.05 MiB | 12.00 MiB/s, done.
+Total 109 (delta 23), reused 27 (delta 0), pack-reused 0 (from 0)
+remote: Resolving deltas: 100% (23/23), completed with 22 local objects.
+To https://github.com/GemDems/AH
+ + c5f69bc...cbf9dc5 fresh-main -> main (forced update)
+~/workspace$ git checkout main
+Switched to branch 'main'
+Your branch and 'origin/main' have diverged,
+and have 98 and 1 different commits each, respectively.
+  (use "git pull" if you want to integrate the remote branch with yours)
+~/workspace$ git checkout main
+Already on 'main'
+Your branch and 'origin/main' have diverged,
+and have 98 and 1 different commits each, respectively.
+  (use "git pull" if you want to integrate the remote branch with yours)
+~/workspace$ git branch -D fresh-main
+Deleted branch fresh-main (was cbf9dc5).
+~/workspace$ 
