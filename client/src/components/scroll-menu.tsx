@@ -26,7 +26,7 @@ export default function ScrollMenu({ onCategorySelect, onExit }: ScrollMenuProps
       setIsVisible(shouldShow);
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 

@@ -51,7 +51,10 @@ export default function Home() {
   const [timerCount, setTimerCount] = useState(5);
   const [isTimerActive, setIsTimerActive] = useState(false);
   const [hasExpired, setHasExpired] = useState(false);
-
+  const showScrollButtonRef = useRef(false);
+  const hasExpiredRef = useRef(false);
+  const showReviewPopupRef = useRef(false);
+  const reviewDoneRef = useRef(false);
 
   // ─── Welcome-back returning visitor ───────────────────────────────────────
   const [showWelcomeBack, setShowWelcomeBack] = useState(false);
@@ -157,12 +160,15 @@ export default function Home() {
     const handleScroll = () => {
       const scrollY = window.scrollY;
       const shouldShow = scrollY > 2000;
-      if (shouldShow && !showScrollButton && !hasExpired) {
+      if (shouldShow && !showScrollButtonRef.current && !hasExpiredRef.current) {
+        showScrollButtonRef.current = true;
         setShowScrollButton(true);
         setIsTimerActive(true);
         setTimerCount(5);
       }
       if (scrollY < 100) {
+        showScrollButtonRef.current = false;
+        hasExpiredRef.current = false;
         setShowScrollButton(false);
         setIsTimerActive(false);
         setTimerCount(5);
@@ -171,7 +177,8 @@ export default function Home() {
       }
       // Show review popup when near bottom of page
       const nearBottom = scrollY + window.innerHeight >= document.documentElement.scrollHeight - 200;
-      if (nearBottom && !reviewDone && !showReviewPopup) {
+      if (nearBottom && !reviewDoneRef.current && !showReviewPopupRef.current) {
+        showReviewPopupRef.current = true;
         setShowReviewPopup(true);
       }
 
@@ -207,13 +214,15 @@ export default function Home() {
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [showScrollButton, hasExpired, reviewDone, showReviewPopup]);
+  }, []);
 
   useEffect(() => {
     if (isTimerActive && timerCount > 0) {
       const timer = setTimeout(() => setTimerCount(prev => prev - 1), 1000);
       return () => clearTimeout(timer);
     } else if (isTimerActive && timerCount === 0) {
+      showScrollButtonRef.current = false;
+      hasExpiredRef.current = true;
       setShowScrollButton(false);
       setIsTimerActive(false);
       setShowDropdown(false);

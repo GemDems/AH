@@ -85,7 +85,7 @@ export default function AIChatbot() {
   // Chat button visibility states
   const [showChatButton, setShowChatButton] = useState(true);
   const [isButtonFading, setIsButtonFading] = useState(false);
-  const [scrollTimeout, setScrollTimeout] = useState<NodeJS.Timeout | null>(null);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [isSlideUp, setIsSlideUp] = useState(false);
   const [isAnimationPaused, setIsAnimationPaused] = useState(false);
   const [showControlButton, setShowControlButton] = useState(false);
@@ -1608,8 +1608,9 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
       const scrollY = window.scrollY;
       
       // Clear any existing timeout
-      if (scrollTimeout) {
-        clearTimeout(scrollTimeout);
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+        scrollTimeoutRef.current = null;
       }
       
       // If scrolling down (moved down more than 50px), slide up and fade out completely
@@ -1626,7 +1627,7 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
         setIsSlideUp(false);
         
         if (!isAnimationPaused && !isHovering) {
-          const timeout = setTimeout(() => {
+          scrollTimeoutRef.current = setTimeout(() => {
             // Wait 2 seconds after user stops scrolling to show button
             setTimeout(() => {
               setIsButtonFading(true);
@@ -1641,8 +1642,6 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
               setFadeTimer(fadeOutTimer);
             }, 2000);
           }, 100);
-          
-          setScrollTimeout(timeout);
         }
       }
       
@@ -1652,9 +1651,9 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => {
       window.removeEventListener('scroll', handleScroll);
-      if (scrollTimeout) clearTimeout(scrollTimeout);
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
     };
-  }, [scrollTimeout]);
+  }, [isOpen, isAnimationPaused, isHovering, fadeTimer]);
 
   if (!isOpen) {
     return (
