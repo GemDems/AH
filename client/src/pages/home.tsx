@@ -504,8 +504,7 @@ export default function Home() {
               const rest  = filteredAndSortedLinks.slice(2);
               const restCols =
                 rest.length === 1 ? "grid-cols-1 max-w-sm mx-auto"
-                : rest.length === 2 ? "grid-cols-1 sm:grid-cols-2 max-w-2xl mx-auto"
-                : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3";
+                : "grid-cols-1 sm:grid-cols-2";
               const scrollTo = (selector: string) => {
                 document.querySelector(selector)?.scrollIntoView({ behavior: "smooth", block: "start" });
               };
