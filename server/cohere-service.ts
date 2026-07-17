@@ -39,33 +39,121 @@ function buildProductCatalog(products: AffiliateLink[]): string {
 }
 
 // ============================================================
+// TYPO TOLERANCE — simple Levenshtein for fuzzy matching
+// ============================================================
+function levenshtein(a: string, b: string): number {
+  const m = a.length, n = b.length;
+  const dp: number[][] = Array.from({ length: m + 1 }, (_, i) =>
+    Array.from({ length: n + 1 }, (_, j) => (i === 0 ? j : j === 0 ? i : 0))
+  );
+  for (let i = 1; i <= m; i++)
+    for (let j = 1; j <= n; j++)
+      dp[i][j] = a[i-1] === b[j-1] ? dp[i-1][j-1]
+        : 1 + Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]);
+  return dp[m][n];
+}
+
+function fuzzyIncludes(haystack: string, needle: string): boolean {
+  if (needle.length < 4) return haystack.includes(needle);
+  if (haystack.includes(needle)) return true;
+  // Check each word in haystack for close edit distance
+  const words = haystack.split(/\s+/);
+  const maxDist = needle.length <= 5 ? 1 : 2;
+  return words.some(w => Math.abs(w.length - needle.length) <= maxDist && levenshtein(w, needle) <= maxDist);
+}
+
+// ============================================================
+// CONCEPT EXPANSION — semantic synonyms for natural language
+// ============================================================
+const CONCEPT_MAP: Record<string, string[]> = {
+  kids: ["toy", "child", "children", "toddler", "baby", "play", "game", "fun", "junior"],
+  kid: ["toy", "child", "children", "toddler", "play", "game"],
+  children: ["toy", "kids", "child", "toddler", "baby", "play"],
+  child: ["toy", "kids", "children", "toddler", "play"],
+  baby: ["toy", "infant", "toddler", "kids", "child"],
+  boy: ["toy", "kids", "game", "play"],
+  girl: ["toy", "kids", "game", "play", "doll"],
+  enjoy: ["fun", "play", "love", "like", "entertainment"],
+  fun: ["toy", "game", "play", "entertainment", "kids"],
+  play: ["toy", "game", "kids", "fun"],
+  gift: ["toy", "present", "birthday", "surprise"],
+  present: ["gift", "toy", "birthday"],
+  birthday: ["gift", "toy", "present", "party"],
+  party: ["gift", "toy", "fun", "entertainment"],
+  home: ["furniture", "decor", "kitchen", "appliance", "cleaning"],
+  house: ["furniture", "decor", "kitchen", "home", "appliance"],
+  kitchen: ["food", "cooking", "appliance", "home"],
+  cook: ["kitchen", "food", "appliance", "cooking"],
+  fit: ["fitness", "workout", "exercise", "gym", "sport", "health"],
+  gym: ["fitness", "workout", "exercise", "sport", "health"],
+  workout: ["fitness", "gym", "exercise", "sport", "health"],
+  exercise: ["fitness", "gym", "workout", "sport", "health"],
+  sport: ["fitness", "workout", "exercise", "athletic"],
+  tech: ["electronic", "gadget", "device", "smart", "digital"],
+  gadget: ["tech", "electronic", "device", "smart"],
+  phone: ["mobile", "smartphone", "electronic", "device"],
+  cheap: ["deal", "affordable", "discount", "budget", "sale"],
+  affordable: ["cheap", "deal", "discount", "budget"],
+  deal: ["sale", "discount", "cheap", "affordable", "offer"],
+  good: ["best", "top", "quality", "popular", "recommended"],
+  best: ["top", "popular", "quality", "recommended", "elite"],
+  popular: ["best", "top", "trending", "hot"],
+  trending: ["popular", "hot", "best", "new"],
+  recommend: ["best", "top", "popular", "suggest"],
+  need: ["want", "looking", "find", "search"],
+  want: ["need", "looking", "find", "search"],
+  love: ["enjoy", "like", "favorite", "best"],
+  like: ["enjoy", "love", "similar", "want"],
+};
+
+function expandUserWords(words: string[]): string[] {
+  const expanded = new Set(words);
+  for (const word of words) {
+    const synonyms = CONCEPT_MAP[word] || [];
+    for (const syn of synonyms) expanded.add(syn);
+  }
+  return Array.from(expanded);
+}
+
+// ============================================================
 // BUILT-IN FALLBACK — runs when Cohere is unavailable/out of credits
 // ============================================================
 function scoreProduct(userMessage: string, product: AffiliateLink): number {
   const userLower = userMessage.toLowerCase();
-  const userWords = userLower.split(/\s+/).filter(w => w.length > 2);
+  const rawWords = userLower.split(/\s+/).filter(w => w.length > 2);
+  const userWords = expandUserWords(rawWords);
   let score = 0;
 
   const privateInfo = (product.aiPrivateInfo || "").toLowerCase();
-  for (const word of userWords) {
-    if (privateInfo.includes(word)) score += 10;
-  }
-  if (privateInfo && userWords.some(w => privateInfo.includes(w) && w.length > 3)) score += 15;
-  if (score > 0 && privateInfo.length > 0) {
-    const matching = userWords.filter(w => privateInfo.includes(w));
-    if (matching.length >= 2) score += 20;
-  }
-
   const title = product.title.toLowerCase();
   const desc = (product.description || "").toLowerCase();
   const cat = (product.category || "").toLowerCase();
-  for (const word of userWords) {
-    if (title.includes(word)) score += 6;
-    else if (desc.includes(word)) score += 3;
-    else if (cat.includes(word)) score += 2;
+  const productText = `${title} ${desc} ${cat} ${privateInfo}`;
+
+  for (const word of rawWords) {
+    // Private info (highest priority) with fuzzy match
+    if (privateInfo && fuzzyIncludes(privateInfo, word)) score += 10;
+    // Title with fuzzy match
+    if (fuzzyIncludes(title, word)) score += 7;
+    // Desc/category with fuzzy match
+    else if (fuzzyIncludes(desc, word)) score += 4;
+    else if (fuzzyIncludes(cat, word)) score += 3;
   }
 
-  if (score >= 5) {
+  // Bonus for multi-word private info match
+  if (privateInfo) {
+    const matching = rawWords.filter(w => fuzzyIncludes(privateInfo, w));
+    if (matching.length >= 2) score += 20;
+    else if (matching.length === 1 && matching[0].length > 3) score += 5;
+  }
+
+  // Concept expansion scoring (lower weight — semantic bonus)
+  const expandedOnly = expandUserWords(rawWords).filter(w => !rawWords.includes(w));
+  for (const expanded of expandedOnly) {
+    if (fuzzyIncludes(productText, expanded)) score += 3;
+  }
+
+  if (score >= 3) {
     if (product.isElitePick) score += 2;
     if (product.isVerified) score += 1;
   }
@@ -114,11 +202,13 @@ function generateBuiltInResponse(
       "recommend", "what do you have", "show me", "what's good", "whats good",
       "what's hot", "anything good", "best deal", "top deal", "popular", "most popular",
       "what should i", "surprise me", "what's new", "anything", "browse", "hot right now",
-      "what you got", "give me something", "help me find", "what's trending"
+      "what you got", "give me something", "help me find", "what's trending",
+      "what do", "what can", "looking for", "need something", "want something",
+      "got anything", "any good", "what would", "show me something"
     ];
     const isGeneralBrowse = browseIntent.some(phrase => lower.includes(phrase));
 
-    if (bestMatch && bestScore >= 5) {
+    if (bestMatch && bestScore >= 3) {
       const price = bestMatch.price ? `$${bestMatch.price}` : "great price";
       const verified = bestMatch.isVerified ? " ✔️ verified" : "";
       const elite = bestMatch.isElitePick ? " 🧠 Elite Pick" : "";
@@ -190,15 +280,20 @@ export async function generateAIChatResponse(
       const client = getCohere();
       const catalog = buildProductCatalog(availableProducts);
 
-      const systemPrompt = `You are Zero Doubt Zane — Elite Deals Hub's hype deal expert. Snappy, emoji-rich, fun. 2-3 sentences max unless asked for detail. Match user energy.${availableProducts.length === 0 ? ' NO products in catalog — never invent or link anything, just say deals are coming soon.' : ''}
+      const systemPrompt = `You are Zero Doubt Zane — Elite Deals Hub's hype deal expert. Snappy, emoji-rich, fun. 2-3 sentences max. Match user energy.${availableProducts.length === 0 ? ' NO products in catalog — never invent or link anything, just say deals are coming soon.' : ''}
 
 RULES:
-• Only recommend products from the CATALOG below. Never name external brands (Samsung, Apple, Nike, etc.).
-• Product match → reply: "oh we actually have that 👀 → [Name](URL)"
-• No match → "ngl not in stock rn 😅 check back soon!"
+• Only recommend products from the CATALOG below. Never name external brands.
+• ALWAYS try to connect the user's message to a catalog product — even indirect questions. Examples:
+  - "what do kids enjoy?" → look for toys/games in catalog → recommend it
+  - "im bored" → look for entertainment products
+  - "need a gift" → find anything gift-worthy in catalog
+  - "whats popular" → recommend highest-rated catalog item
 • Links MUST use exact catalog URLs. Format: [Name](URL). Never paste raw URLs.
-• For general chat/questions: answer naturally, then casually pivot back to deals.
-• PRIVATE INTEL field = top priority for matching — check it first.
+• PRIVATE INTEL field = top priority for matching — read it carefully.
+• Users OFTEN misspell — interpret charitably. "tyo" = toy, "chlid" = child, "expnsive" = expensive, etc.
+• Only say "not in stock" if NOTHING in the catalog is even loosely related.
+• For pure small talk (hi/thanks/bye): reply naturally, then pivot to deals.
 
 CATALOG:
 ${catalog}`;
