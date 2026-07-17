@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import type { AffiliateLink } from "@shared/schema";
 import AnimatedMessage from "./animated-message";
 import { ProductHighlightCard } from "./ui/product-highlight-card";
+import { LoadingBreadcrumb } from "./ui/loading-breadcrumb";
 
 interface Message {
   id: string;
@@ -2014,6 +2015,9 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
                 <div className="text-xs text-gray-400 mt-1">
                   You can still send messages while I'm crafting this pitch
                 </div>
+                <div className="mt-2">
+                  <LoadingBreadcrumb text="Locking in your perfect deal" />
+                </div>
               </div>
             </div>
           )}
@@ -2021,11 +2025,12 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
           {isTyping && !isSearching && countdown === 0 && (
             <div className="flex justify-start">
               <div className="bg-blue-600 bg-opacity-40 border border-blue-500 border-opacity-30 text-white px-4 py-2 rounded-lg">
-                <div className="flex space-x-1">
+                <div className="flex space-x-1 mb-2">
                   <div className="w-2 h-2 bg-white rounded-full animate-bounce"></div>
                   <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
                   <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                 </div>
+                <LoadingBreadcrumb text="Reading your mind" />
               </div>
             </div>
           )}
