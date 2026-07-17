@@ -5,6 +5,7 @@ import type { AffiliateLink } from "@shared/schema";
 import AnimatedMessage from "./animated-message";
 import { ProductHighlightCard } from "./ui/product-highlight-card";
 import { LoadingBreadcrumb } from "./ui/loading-breadcrumb";
+import { AgentThinkingBadge, PALETTES } from "./ui/grok-agent-thinking-indicator";
 
 interface Message {
   id: string;
@@ -112,6 +113,7 @@ export default function AIChatbot() {
   const [showNewMessagePopup, setShowNewMessagePopup] = useState(false);
   const [pitchClickCount, setPitchClickCount] = useState(0);
   const [showCancelButton, setShowCancelButton] = useState(false);
+  const [showAgentBadge, setShowAgentBadge] = useState(false);
   const [pitchTimeout, setPitchTimeout] = useState<NodeJS.Timeout | null>(null);
   const [countdownInterval, setCountdownInterval] = useState<NodeJS.Timeout | null>(null);
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -1992,46 +1994,72 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
           )}
 
           {isTyping && !isSearching && countdown > 0 && (
-            <div className="flex justify-start">
-              <div className="bg-blue-600 bg-opacity-40 border border-blue-500 border-opacity-30 text-white px-4 py-2 rounded-lg">
-                <div className="flex items-center space-x-3">
+            <div className="flex flex-col items-start gap-2">
+              {/* Original thinking bubble */}
+              <div className="flex justify-start">
+                <div className="bg-blue-600 bg-opacity-40 border border-blue-500 border-opacity-30 text-white px-4 py-2 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <div className="flex space-x-1">
+                      <div className="w-2 h-2 bg-white rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                      <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                    </div>
+                    <div className="text-sm text-gray-300">
+                      Crafting perfect pitch... ~{countdown}s
+                    </div>
+                    {showCancelButton && (
+                      <button
+                        onClick={handleCancelPitch}
+                        className="ml-2 bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-xs"
+                      >
+                        ✕ Cancel
+                      </button>
+                    )}
+                  </div>
+                  <div className="text-xs text-gray-400 mt-1">
+                    You can still send messages while I'm crafting this pitch
+                  </div>
+                </div>
+              </div>
+              {/* LoadingBreadcrumb — separate below the bubble */}
+              <LoadingBreadcrumb
+                text="Locking in your perfect deal"
+                onClick={() => setShowAgentBadge(v => !v)}
+                className="ml-1"
+              />
+              {showAgentBadge && (
+                <AgentThinkingBadge
+                  label="Zane is securing your deal"
+                  palette={PALETTES[3]}
+                />
+              )}
+            </div>
+          )}
+
+          {isTyping && !isSearching && countdown === 0 && (
+            <div className="flex flex-col items-start gap-2">
+              {/* Original thinking bubble */}
+              <div className="flex justify-start">
+                <div className="bg-blue-600 bg-opacity-40 border border-blue-500 border-opacity-30 text-white px-4 py-2 rounded-lg">
                   <div className="flex space-x-1">
                     <div className="w-2 h-2 bg-white rounded-full animate-bounce"></div>
                     <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
                     <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                   </div>
-                  <div className="text-sm text-gray-300">
-                    Crafting perfect pitch... ~{countdown}s
-                  </div>
-                  {showCancelButton && (
-                    <button
-                      onClick={handleCancelPitch}
-                      className="ml-2 bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-xs"
-                    >
-                      ✕ Cancel
-                    </button>
-                  )}
-                </div>
-                <div className="text-xs text-gray-400 mt-1">
-                  You can still send messages while I'm crafting this pitch
-                </div>
-                <div className="mt-2">
-                  <LoadingBreadcrumb text="Locking in your perfect deal" />
                 </div>
               </div>
-            </div>
-          )}
-
-          {isTyping && !isSearching && countdown === 0 && (
-            <div className="flex justify-start">
-              <div className="bg-blue-600 bg-opacity-40 border border-blue-500 border-opacity-30 text-white px-4 py-2 rounded-lg">
-                <div className="flex space-x-1 mb-2">
-                  <div className="w-2 h-2 bg-white rounded-full animate-bounce"></div>
-                  <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                  <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                </div>
-                <LoadingBreadcrumb text="Reading your mind" />
-              </div>
+              {/* LoadingBreadcrumb — separate below the bubble */}
+              <LoadingBreadcrumb
+                text="Reading your mind"
+                onClick={() => setShowAgentBadge(v => !v)}
+                className="ml-1"
+              />
+              {showAgentBadge && (
+                <AgentThinkingBadge
+                  label="Zane is reading your vibe"
+                  palette={PALETTES[0]}
+                />
+              )}
             </div>
           )}
           

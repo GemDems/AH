@@ -33,7 +33,7 @@ const LOADER_KEYFRAMES = `
       rgb(161 161 170) 100%
     );
     background-size: 200% auto;
-    animation: textShimmer 2s ease-in-out infinite;
+    animation: textShimmer 4s ease-in-out infinite;
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -90,7 +90,7 @@ const Loader = React.forwardRef<SVGSVGElement, LoaderProps>(
           } as React.CSSProperties : undefined}
           className={cn(
             "transition-opacity duration-300",
-            isReady ? "opacity-100 animate-[drawStroke_2.5s_infinite]" : "opacity-0"
+            isReady ? "opacity-100 animate-[drawStroke_5s_infinite]" : "opacity-0"
           )}
         />
       </svg>
@@ -103,14 +103,19 @@ Loader.displayName = "Loader";
 interface LoadingBreadcrumbProps {
   text?: string;
   className?: string;
+  onClick?: () => void;
 }
 
-export function LoadingBreadcrumb({ text = "Thinking", className }: LoadingBreadcrumbProps) {
+export function LoadingBreadcrumb({ text = "Thinking", className, onClick }: LoadingBreadcrumbProps) {
   return (
-    <div className={cn(
-      "flex items-center gap-2 text-[13px] font-medium tracking-wide",
-      className
-    )}>
+    <div
+      onClick={onClick}
+      className={cn(
+        "flex items-center gap-2 text-[13px] font-medium tracking-wide",
+        onClick && "cursor-pointer select-none",
+        className
+      )}
+    >
       <Loader size={16} strokeWidth={2.5} className="text-zinc-300" />
       <span className="lb-shimmer-text">{text}</span>
       <ChevronRight size={13} className="text-zinc-500" />
