@@ -1994,7 +1994,7 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
           )}
 
           {isTyping && !isSearching && countdown > 0 && (
-            <div className="flex flex-col items-start gap-2">
+            <div className="flex flex-col items-start gap-3">
               {/* Original thinking bubble */}
               <div className="flex justify-start">
                 <div className="bg-blue-600 bg-opacity-40 border border-blue-500 border-opacity-30 text-white px-4 py-2 rounded-lg">
@@ -2043,7 +2043,7 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
           )}
 
           {isTyping && !isSearching && countdown === 0 && (
-            <div className="flex flex-col items-start gap-2">
+            <div className="flex flex-col items-start gap-3">
               {/* Original thinking bubble */}
               <div className="flex justify-start">
                 <div className="bg-blue-600 bg-opacity-40 border border-blue-500 border-opacity-30 text-white px-4 py-2 rounded-lg">
