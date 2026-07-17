@@ -109,7 +109,7 @@ interface LoadingBreadcrumbProps {
 
 export function LoadingBreadcrumb({ text = "Thinking", texts, className, onClick }: LoadingBreadcrumbProps) {
   const list = texts && texts.length > 0 ? texts : [text];
-  const [index, setIndex] = useState(0);
+  const [index, setIndex] = useState(() => list.length > 1 ? Math.floor(Math.random() * list.length) : 0);
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
@@ -119,8 +119,8 @@ export function LoadingBreadcrumb({ text = "Thinking", texts, className, onClick
       setTimeout(() => {
         setIndex(i => (i + 1) % list.length);
         setVisible(true);
-      }, 600);
-    }, 3500);
+      }, 400);
+    }, 1800);
     return () => clearInterval(cycle);
   }, [list.length]);
 
