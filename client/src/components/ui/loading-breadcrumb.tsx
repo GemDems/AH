@@ -119,8 +119,8 @@ export function LoadingBreadcrumb({ text = "Thinking", texts, className, onClick
       setTimeout(() => {
         setIndex(i => (i + 1) % list.length);
         setVisible(true);
-      }, 400);
-    }, 1800);
+      }, 700);
+    }, 4000);
     return () => clearInterval(cycle);
   }, [list.length]);
 
