@@ -1601,6 +1601,22 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
     };
   }, []); // Only run once on mount
 
+  // Listen for search-bar queries sent from the header
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const query = (e as CustomEvent<{ text: string }>).detail?.text;
+      if (!query) return;
+      setIsOpen(true);
+      // Wait for the chat UI to mount, then fill + send
+      setTimeout(() => {
+        setInputValue(query);
+        setTimeout(() => handleSendMessage(query), 120);
+      }, 350);
+    };
+    window.addEventListener("zane:query", handler);
+    return () => window.removeEventListener("zane:query", handler);
+  }, []);
+
   // Scroll behavior - slide up animation when scrolling down
   useEffect(() => {
     if (isOpen) return; // Don't handle scroll when chat is open

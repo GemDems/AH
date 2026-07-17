@@ -202,14 +202,18 @@ export default function Header({ onSearch }: HeaderProps) {
             "Find your next favorite...",
           ]}
           onKeyDown={(e) => {
-            if (e.key === "Enter") {
+            if (e.key === "Enter" && headerSearch.trim()) {
               onSearch?.(headerSearch);
+              window.dispatchEvent(new CustomEvent("zane:query", { detail: { text: headerSearch.trim() } }));
               const el = document.querySelector('[data-section="products"]') as HTMLElement;
               el?.scrollIntoView({ behavior: "smooth" });
             }
           }}
           onFilterClick={() => {
-            onSearch?.(headerSearch);
+            if (headerSearch.trim()) {
+              onSearch?.(headerSearch);
+              window.dispatchEvent(new CustomEvent("zane:query", { detail: { text: headerSearch.trim() } }));
+            }
             const el = document.querySelector('[data-section="products"]') as HTMLElement;
             el?.scrollIntoView({ behavior: "smooth" });
           }}

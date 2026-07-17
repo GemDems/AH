@@ -86,15 +86,37 @@ export default function Home() {
     return x - Math.floor(x);
   }
 
+  // Fuzzy match helper — tolerates 1-2 character typos
+  function fuzzyMatch(haystack: string, needle: string): boolean {
+    if (!needle || needle.length < 2) return false;
+    if (haystack.includes(needle)) return true;
+    const words = haystack.split(/\s+/);
+    const maxDist = needle.length <= 4 ? 1 : 2;
+    return words.some(w => {
+      if (Math.abs(w.length - needle.length) > maxDist) return false;
+      let mismatches = 0;
+      for (let i = 0; i < Math.min(w.length, needle.length); i++) {
+        if (w[i] !== needle[i]) mismatches++;
+        if (mismatches > maxDist) return false;
+      }
+      return mismatches <= maxDist;
+    });
+  }
+
   const filteredAndSortedLinks = affiliateLinks
     .filter(link => {
       const matchesCategory = activeCategory === "all" || link.category.toLowerCase().includes(activeCategory.toLowerCase());
-      const q = searchQuery.toLowerCase();
-      const matchesSearch = !searchQuery ||
-        link.title.toLowerCase().includes(q) ||
-        link.description.toLowerCase().includes(q) ||
-        link.category.toLowerCase().includes(q) ||
-        (link.aiPrivateInfo && link.aiPrivateInfo.toLowerCase().includes(q));
+      const q = searchQuery.toLowerCase().trim();
+      if (!q) return matchesCategory;
+      const title = link.title.toLowerCase();
+      const desc = (link.description || "").toLowerCase();
+      const cat = (link.category || "").toLowerCase();
+      const priv = (link.aiPrivateInfo || "").toLowerCase();
+      const words = q.split(/\s+/).filter(w => w.length > 1);
+      const matchesSearch = words.some(word =>
+        title.includes(word) || desc.includes(word) || cat.includes(word) || priv.includes(word) ||
+        fuzzyMatch(title, word) || fuzzyMatch(desc, word) || fuzzyMatch(cat, word)
+      );
       return matchesCategory && matchesSearch;
     })
     .sort((a, b) => {
@@ -491,7 +513,7 @@ export default function Home() {
                 <>
                   <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
                     {first.map((link, i) => (
-                      <div key={link.id} data-product-card={i === 0 ? "first" : undefined}>
+                      <div key={link.id} data-product-card={i === 0 ? "first" : undefined} data-product-id={link.id}>
                         <AffiliateCard link={link} />
                       </div>
                     ))}
@@ -550,7 +572,7 @@ export default function Home() {
                   {rest.length > 0 && (
                     <div className={`grid gap-6 ${restCols}`}>
                       {rest.map((link) => (
-                        <div key={link.id}>
+                        <div key={link.id} data-product-id={link.id}>
                           <AffiliateCard link={link} />
                         </div>
                       ))}
