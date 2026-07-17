@@ -223,7 +223,7 @@ export default function Header({ onSearch }: HeaderProps) {
       <div className="relative text-center pt-10 pb-2 px-4">
         <div className="mb-3 flex justify-center">
           <LiquidBadge className="sm:w-44 w-40">
-            <span className="tracking-[0.06em] sm:tracking-[0.14em] whitespace-nowrap font-black border-t-[0px] border-r-[0px] border-b-[0px] border-l-[0px] text-[6px] sm:text-[8px]" style={{ WebkitTextStroke: "0.5px currentColor" }}>
+            <span className="tracking-[0.06em] sm:tracking-[0.14em] whitespace-nowrap font-black border-t-[0px] border-r-[0px] border-b-[0px] border-l-[0px] sm:text-[8px] text-[8px]" style={{ WebkitTextStroke: "0.5px currentColor" }}>
               #1 PREMIUM MARKETPLACE
             </span>
           </LiquidBadge>
