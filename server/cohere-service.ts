@@ -66,44 +66,40 @@ function fuzzyIncludes(haystack: string, needle: string): boolean {
 // CONCEPT EXPANSION — semantic synonyms for natural language
 // ============================================================
 const CONCEPT_MAP: Record<string, string[]> = {
-  kids: ["toy", "child", "children", "toddler", "baby", "play", "game", "fun", "junior"],
+  // Children / family
+  kids: ["toy", "child", "children", "toddler", "baby", "play", "game", "junior"],
   kid: ["toy", "child", "children", "toddler", "play", "game"],
   children: ["toy", "kids", "child", "toddler", "baby", "play"],
   child: ["toy", "kids", "children", "toddler", "play"],
   baby: ["toy", "infant", "toddler", "kids", "child"],
   boy: ["toy", "kids", "game", "play"],
   girl: ["toy", "kids", "game", "play", "doll"],
-  enjoy: ["fun", "play", "love", "like", "entertainment"],
-  fun: ["toy", "game", "play", "entertainment", "kids"],
-  play: ["toy", "game", "kids", "fun"],
-  gift: ["toy", "present", "birthday", "surprise"],
+  // Shopping intent (explicit)
+  gift: ["toy", "present", "birthday"],
   present: ["gift", "toy", "birthday"],
-  birthday: ["gift", "toy", "present", "party"],
-  party: ["gift", "toy", "fun", "entertainment"],
+  birthday: ["gift", "toy", "present"],
+  // Home
   home: ["furniture", "decor", "kitchen", "appliance", "cleaning"],
-  house: ["furniture", "decor", "kitchen", "home", "appliance"],
-  kitchen: ["food", "cooking", "appliance", "home"],
+  house: ["furniture", "decor", "kitchen", "appliance"],
+  kitchen: ["food", "cooking", "appliance"],
   cook: ["kitchen", "food", "appliance", "cooking"],
-  fit: ["fitness", "workout", "exercise", "gym", "sport", "health"],
+  // Fitness
   gym: ["fitness", "workout", "exercise", "sport", "health"],
   workout: ["fitness", "gym", "exercise", "sport", "health"],
   exercise: ["fitness", "gym", "workout", "sport", "health"],
   sport: ["fitness", "workout", "exercise", "athletic"],
+  // Tech
   tech: ["electronic", "gadget", "device", "smart", "digital"],
   gadget: ["tech", "electronic", "device", "smart"],
   phone: ["mobile", "smartphone", "electronic", "device"],
+  // Price / deals (explicit shopping signals)
   cheap: ["deal", "affordable", "discount", "budget", "sale"],
   affordable: ["cheap", "deal", "discount", "budget"],
-  deal: ["sale", "discount", "cheap", "affordable", "offer"],
-  good: ["best", "top", "quality", "popular", "recommended"],
-  best: ["top", "popular", "quality", "recommended", "elite"],
-  popular: ["best", "top", "trending", "hot"],
-  trending: ["popular", "hot", "best", "new"],
-  recommend: ["best", "top", "popular", "suggest"],
-  need: ["want", "looking", "find", "search"],
-  want: ["need", "looking", "find", "search"],
-  love: ["enjoy", "like", "favorite", "best"],
-  like: ["enjoy", "love", "similar", "want"],
+  deal: ["sale", "discount", "cheap", "affordable"],
+  // Explicit recommendation requests
+  popular: ["best", "top", "trending"],
+  trending: ["popular", "hot", "best"],
+  recommend: ["best", "top", "popular"],
 };
 
 function expandUserWords(words: string[]): string[] {
@@ -208,7 +204,7 @@ function generateBuiltInResponse(
     ];
     const isGeneralBrowse = browseIntent.some(phrase => lower.includes(phrase));
 
-    if (bestMatch && bestScore >= 3) {
+    if (bestMatch && bestScore >= 7) {
       const price = bestMatch.price ? `$${bestMatch.price}` : "great price";
       const verified = bestMatch.isVerified ? " ✔️ verified" : "";
       const elite = bestMatch.isElitePick ? " 🧠 Elite Pick" : "";
@@ -243,17 +239,15 @@ function generateBuiltInResponse(
       return { recommendedProduct: top, response, confidence: 0.75 };
     }
 
-    // Specific search but no match — nudge toward what we DO have
-    const top = products.find(p => p.isElitePick) || products[0];
-    const nudge = top ? ` while you're here — our hottest deal rn is [${top.title}](${top.url}) 🔥` : "";
+    // No shopping intent detected — just chat naturally
     const noMatchResponses = [
-      `hmm we don't have that one in stock rn 😅${nudge}`,
-      `ngl nothing in our current inventory matches that exactly 😅${nudge}`,
-      `can't find that specific item rn — new deals drop regularly!${nudge}`
+      "that's a good one! 🤔 let me know if you're looking for any deals and i'll hook you up 🔥",
+      "haha love the energy 😄 drop me what you're shopping for and i'll find you something 🔥",
+      "real talk i gotchu — what are you actually looking for today? 👀"
     ];
     return {
       response: noMatchResponses[Math.floor(Math.random() * noMatchResponses.length)],
-      confidence: 0.4
+      confidence: 0.3
     };
   }
 
@@ -284,16 +278,16 @@ export async function generateAIChatResponse(
 
 RULES:
 • Only recommend products from the CATALOG below. Never name external brands.
-• ALWAYS try to connect the user's message to a catalog product — even indirect questions. Examples:
-  - "what do kids enjoy?" → look for toys/games in catalog → recommend it
-  - "im bored" → look for entertainment products
-  - "need a gift" → find anything gift-worthy in catalog
-  - "whats popular" → recommend highest-rated catalog item
+• Only recommend a product if the user's message is GENUINELY related to it. Do NOT force-fit unrelated queries.
+  - "what do kids enjoy?" + catalog has a toy → recommend the toy ✅
+  - "what's the weather like?" → do NOT recommend anything, just chat naturally ✅
+  - "tell me a joke" → do NOT recommend anything, just reply naturally ✅
+  - "what's popular?" → recommend the best catalog item ✅
+• If the user's message is small talk, random chat, or clearly unrelated to shopping — reply naturally without pushing any product.
 • Links MUST use exact catalog URLs. Format: [Name](URL). Never paste raw URLs.
 • PRIVATE INTEL field = top priority for matching — read it carefully.
 • Users OFTEN misspell — interpret charitably. "tyo" = toy, "chlid" = child, "expnsive" = expensive, etc.
-• Only say "not in stock" if NOTHING in the catalog is even loosely related.
-• For pure small talk (hi/thanks/bye): reply naturally, then pivot to deals.
+• Only say "not in stock" if the user asked about something shopping-related and NOTHING in the catalog matches.
 
 CATALOG:
 ${catalog}`;
