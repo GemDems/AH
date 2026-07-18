@@ -263,16 +263,6 @@ export default function Home() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showDropdown]);
 
-  useEffect(() => {
-    if (!searchQuery) return;
-    const timeout = setTimeout(() => {
-      const firstCard = document.querySelector('[data-product-card]') as HTMLElement;
-      if (firstCard) {
-        firstCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }, 80);
-    return () => clearTimeout(timeout);
-  }, [searchQuery, filteredAndSortedLinks.length]);
 
   return (
     <div className="min-h-screen bg-gray-50">
