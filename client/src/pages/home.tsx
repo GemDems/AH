@@ -8,7 +8,7 @@ import CategoryFilter from "@/components/category-filter";
 import AffiliateCard from "@/components/affiliate-card";
 import AdminPanel from "@/components/admin-panel";
 import TrustIndicators from "@/components/trust-indicators";
-import { ChevronDown, Dice6, Gift } from "lucide-react";
+import { ChevronDown, Dice6, Gift, Search } from "lucide-react";
 
 import Leaderboard from "@/components/leaderboard";
 import ReferralSystem from "@/components/referral-system";
@@ -35,6 +35,7 @@ export default function Home() {
 
   const [discoverTab, setDiscoverTab] = useState<DiscoverTab>("popular");
   const [hasInteractedWithTabs, setHasInteractedWithTabs] = useState(false);
+  const [mobileTabsOpen, setMobileTabsOpen] = useState(false);
 
   // ── VRR gold progress bar ─────────────────────────────────────────────────
   const [vrFilled, setVrFilled] = useState(0);
@@ -396,23 +397,64 @@ export default function Home() {
           </p>
         </div>
         {/* ── Search bar + Discover tabs row ── */}
-        <div className="flex items-center gap-4 mb-12">
+        {/* DESKTOP — unchanged */}
+        <div className="hidden sm:flex items-center gap-4 mb-12">
           <div className="flex-1 min-w-0">
-            <SearchBar
-              onSearch={setSearchQuery}
-              links={affiliateLinks}
-              containerClass="relative"
-            />
+            <SearchBar onSearch={setSearchQuery} links={affiliateLinks} containerClass="relative" />
           </div>
           <div className="shrink-0 self-center">
             <DiscoverButton
               activeTab={discoverTab}
-              onTabChange={(tab) => {
-                setDiscoverTab(tab);
-                setHasInteractedWithTabs(true);
-              }}
+              onTabChange={(tab) => { setDiscoverTab(tab); setHasInteractedWithTabs(true); }}
             />
           </div>
+        </div>
+        {/* MOBILE — search icon toggles between SearchBar and tabs */}
+        <div className="sm:hidden mb-12">
+          <AnimatePresence mode="wait" initial={false}>
+            {!mobileTabsOpen ? (
+              <motion.div
+                key="mobile-search"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.18 }}
+                className="flex items-center gap-3"
+              >
+                <div className="flex-1 min-w-0">
+                  <SearchBar onSearch={setSearchQuery} links={affiliateLinks} containerClass="relative" />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setMobileTabsOpen(true)}
+                  className="shrink-0 w-11 h-11 bg-white rounded-full shadow-lg flex items-center justify-center"
+                >
+                  <Search className="w-5 h-5 text-gray-700" />
+                </button>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="mobile-tabs"
+                initial={{ opacity: 0, scale: 0.88 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.88 }}
+                transition={{ type: "spring", damping: 20, stiffness: 230, mass: 1.2 }}
+                className="flex items-center gap-3 justify-center"
+              >
+                <button
+                  type="button"
+                  onClick={() => setMobileTabsOpen(false)}
+                  className="shrink-0 w-11 h-11 bg-white rounded-full shadow-lg flex items-center justify-center"
+                >
+                  <Search className="w-5 h-5 text-gray-700" />
+                </button>
+                <DiscoverButton
+                  activeTab={discoverTab}
+                  onTabChange={(tab) => { setDiscoverTab(tab); setHasInteractedWithTabs(true); }}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* ── Instagram-style product stories ── */}

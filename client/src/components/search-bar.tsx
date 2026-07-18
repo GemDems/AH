@@ -65,7 +65,7 @@ export default function SearchBar({ onSearch, links, containerClass }: SearchBar
             
             <Button
               onClick={() => handleSearch(query)}
-              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-10 py-5 rounded-xl font-semibold text-xl shadow-lg transition-all duration-300"
+              className="hidden sm:flex bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-10 py-5 rounded-xl font-semibold text-xl shadow-lg transition-all duration-300"
             >
               Search
             </Button>
