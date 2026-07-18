@@ -92,6 +92,59 @@ function enforceDeviceDailyCap(req: Request, res: Response, next: NextFunction) 
   next();
 }
 
+// ── Burst detector: 5 messages in 60 s → 5-minute block ─────────────────────
+interface BurstRecord { timestamps: number[]; blockedUntil: number; }
+const deviceBurstMap = new Map<string, BurstRecord>();
+const BURST_WINDOW_MS  = 60_000;   // 60-second rolling window
+const BURST_LIMIT      = 5;        // max messages before block
+const BURST_BLOCK_MS   = 5 * 60_000; // 5-minute block
+
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, rec] of deviceBurstMap) {
+    if (rec.blockedUntil < now && rec.timestamps.every(t => now - t > BURST_WINDOW_MS)) {
+      deviceBurstMap.delete(key);
+    }
+  }
+}, 5 * 60_000);
+
+function enforceBurstLimit(req: Request, res: Response, next: NextFunction) {
+  const deviceId: string = (req.body?.deviceId as string) || "unknown";
+  const now = Date.now();
+
+  let rec = deviceBurstMap.get(deviceId);
+  if (!rec) {
+    rec = { timestamps: [], blockedUntil: 0 };
+    deviceBurstMap.set(deviceId, rec);
+  }
+
+  if (now < rec.blockedUntil) {
+    const minsLeft = Math.ceil((rec.blockedUntil - now) / 60_000);
+    return res.status(429).json({
+      rateLimited: true,
+      limitType: "burst_blocked",
+      message: `You've been sending messages too fast. You're temporarily blocked for ${minsLeft} more minute${minsLeft === 1 ? "" : "s"}. Take a breather and come back! ⏸️`
+    });
+  }
+
+  // Prune old timestamps outside the rolling window
+  rec.timestamps = rec.timestamps.filter(t => now - t < BURST_WINDOW_MS);
+
+  if (rec.timestamps.length >= BURST_LIMIT) {
+    rec.blockedUntil = now + BURST_BLOCK_MS;
+    deviceBurstMap.set(deviceId, rec);
+    return res.status(429).json({
+      rateLimited: true,
+      limitType: "burst_blocked",
+      message: "Whoa — that's 5 messages in under a minute! You've been blocked for 5 minutes. Slow down and I'll be ready when you are. ⏸️"
+    });
+  }
+
+  rec.timestamps.push(now);
+  deviceBurstMap.set(deviceId, rec);
+  next();
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 
 // Global live stats that persist across sessions
@@ -671,7 +724,7 @@ Transform now with maximum conversion power in minimal words:`;
   });
 
   // OpenAI Chat API endpoint (rate-limited)
-  app.post("/api/ai-chat", aiChatPerMinute, aiChatPerHour, enforceMinInterval, enforceDeviceDailyCap, async (req, res) => {
+  app.post("/api/ai-chat", aiChatPerMinute, aiChatPerHour, enforceMinInterval, enforceBurstLimit, enforceDeviceDailyCap, async (req, res) => {
     try {
       const { message, conversationHistory } = req.body;
       
@@ -685,6 +738,22 @@ Transform now with maximum conversion power in minimal words:`;
           rateLimited: false,
           limitType: "message_too_long",
           message: `Whoa, that's a lot of text! Please keep your message under 500 characters. You sent ${message.length} characters — try to shorten it a bit. ✂️`
+        });
+      }
+
+      // Gibberish filter — reject keyboard mash / all-random-character messages
+      const trimmed = message.trim();
+      const distinctChars = new Set(trimmed.toLowerCase().replace(/\s/g, "")).size;
+      const letterCount = (trimmed.match(/[a-zA-Z]/g) || []).length;
+      const isAllNonLetter = letterCount === 0 && trimmed.length > 0;
+      const isSingleRepeatedChar = distinctChars <= 1 && trimmed.length > 2;
+      const isFewDistinctChars = distinctChars < 2 && trimmed.length > 3;
+
+      if (isAllNonLetter || isSingleRepeatedChar || isFewDistinctChars) {
+        return res.status(400).json({
+          rateLimited: false,
+          limitType: "gibberish",
+          message: "That doesn't look like a real question! 🤔 Try typing something like \"what deals do you have?\" or \"recommend a good product\" and I'll help you out."
         });
       }
 

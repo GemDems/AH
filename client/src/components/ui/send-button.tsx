@@ -3,18 +3,19 @@ import styled from "styled-components";
 interface SendButtonProps {
   onClick?: (e: React.MouseEvent) => void;
   onMouseDown?: (e: React.MouseEvent) => void;
+  disabled?: boolean;
 }
 
 const StyledWrapper = styled.div`
-  button:hover .svg-wrapper {
+  button:not(:disabled):hover .svg-wrapper {
     animation: fly-1 0.6s ease-in-out infinite alternate;
   }
 
-  button:hover svg {
+  button:not(:disabled):hover svg {
     transform: translateX(1.2em) rotate(45deg) scale(1.1);
   }
 
-  button:hover span {
+  button:not(:disabled):hover span {
     transform: translateX(5em);
   }
 
@@ -28,13 +29,18 @@ const StyledWrapper = styled.div`
   }
 `;
 
-export default function SendButton({ onClick, onMouseDown }: SendButtonProps) {
+export default function SendButton({ onClick, onMouseDown, disabled }: SendButtonProps) {
   return (
     <StyledWrapper>
       <button
         onClick={onClick}
         onMouseDown={onMouseDown}
-        className="flex items-center rounded-2xl bg-blue-600 text-white text-lg font-medium px-5 py-2 pl-[0.9em] overflow-hidden transition-all duration-200 cursor-pointer active:scale-95"
+        disabled={disabled}
+        className={`flex items-center rounded-2xl text-white text-lg font-medium px-5 py-2 pl-[0.9em] overflow-hidden transition-all duration-200 ${
+          disabled
+            ? "bg-gray-600 opacity-50 cursor-not-allowed"
+            : "bg-blue-600 cursor-pointer active:scale-95"
+        }`}
       >
         <div className="svg-wrapper-1 flex items-center">
           <div className="svg-wrapper flex items-center">

@@ -138,6 +138,8 @@ export default function AIChatbot() {
   const spamStrikes         = useRef(0);            // escalation counter
   const lastMessageTime     = useRef(0);            // ms timestamp of last send
   const lastMessageContent  = useRef("");           // duplicate detection
+  const sendLockedUntil     = useRef(0);            // 3-second post-send lockout timestamp
+  const [sendLocked,        setSendLocked]        = useState(false);
   const [spamBlockedUntil, setSpamBlockedUntil] = useState<number | null>(null);
   const [cooldownSecsLeft,  setCooldownSecsLeft]  = useState(0);
   const [spamWarning,       setSpamWarning]       = useState<{ type: "warning" | "danger"; title: string; msg: string } | null>(null);
@@ -1056,6 +1058,7 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
     response: string;
     recommendedProduct?: any;
     confidence: number;
+    spamBlock?: { type: "warning" | "danger"; title: string; };
   }> => {
     try {
       // Try Cohere AI first — abort after 8 s so the chat never hangs
@@ -1090,15 +1093,31 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
       } else {
         const errorData = await response.json().catch(() => ({}));
 
-        // Rate-limit and validation errors — surface as Zane's chat bubble
-        if (response.status === 429 || errorData.limitType) {
+        if (errorData.limitType) {
+          // Burst block and gibberish → surface as spamWarning Admonition, not chat bubble
+          if (errorData.limitType === "burst_blocked") {
+            return {
+              response: "",
+              confidence: 0,
+              spamBlock: { type: "danger", title: "Slow Down — You've Been Temporarily Blocked" }
+            };
+          }
+          if (errorData.limitType === "gibberish") {
+            return {
+              response: "",
+              confidence: 0,
+              spamBlock: { type: "warning", title: "That Doesn't Look Like a Real Question" }
+            };
+          }
+
+          // Other rate-limit / validation errors — surface as Zane's chat bubble
           const zaneMessages: Record<string, string> = {
-            too_fast:       "Hey, slow down a little! ⚡ Give me a second between messages — I promise I'm not going anywhere.",
-            per_minute:     "Whoa, you're on fire! 🔥 I need a minute to catch my breath. Try again shortly.",
-            per_hour:       "You've been busy today! 🕐 You've hit your hourly message limit. Come back in a bit — I'll have deals waiting.",
-            daily_limit:    "You've maxed out your messages for today! 🌅 Come back tomorrow and I'll have even better deals lined up for you.",
+            too_fast:         "Hey, slow down a little! ⚡ Give me a second between messages — I promise I'm not going anywhere.",
+            per_minute:       "Whoa, you're on fire! 🔥 I need a minute to catch my breath. Try again shortly.",
+            per_hour:         "You've been busy today! 🕐 You've hit your hourly message limit. Come back in a bit — I'll have deals waiting.",
+            daily_limit:      "You've maxed out your messages for today! 🌅 Come back tomorrow and I'll have even better deals lined up for you.",
             message_too_long: "That message is too long for me to process! ✂️ Please keep it under 500 characters — try asking in a shorter way.",
-            session_full:   "This chat session is full (30 messages)! 🔄 Hit the reset button to start a fresh conversation — I'm ready when you are.",
+            session_full:     "This chat session is full (30 messages)! 🔄 Hit the reset button to start a fresh conversation — I'm ready when you are.",
           };
           const friendlyMsg = errorData.message || zaneMessages[errorData.limitType] || "Slow down a bit and try again in a moment! 😊";
           return { response: friendlyMsg, confidence: 0 };
@@ -1211,6 +1230,13 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
     lastMessageContent.current = textToSend.trim();
     activeGenerations.current += 1;
     incrementDailyMsg();
+
+    // 3-second send lockout — physically prevents burst sending
+    sendLockedUntil.current = now + 3000;
+    setSendLocked(true);
+    setTimeout(() => {
+      if (Date.now() >= sendLockedUntil.current) setSendLocked(false);
+    }, 3000);
     // ─────────────────────────────────────────────────────────────────────────
 
     let messageContent = textToSend;
@@ -1241,6 +1267,25 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
       // Use OpenAI-powered AI response generation
       const aiResult = await generateAIResponse(messageToProcess);
       
+      // Burst-block / gibberish rejection — show as spamWarning, skip bot bubble
+      if (aiResult.spamBlock) {
+        setSpamWarning({
+          type: aiResult.spamBlock.type,
+          title: aiResult.spamBlock.title,
+          msg: aiResult.response || (
+            aiResult.spamBlock.type === "danger"
+              ? "You've sent too many messages too quickly. Wait 5 minutes before trying again. ⏸️"
+              : "Please type a real question and I'll be happy to help you find the best deals! 😊"
+          ),
+        });
+        if (aiResult.spamBlock.type === "danger") {
+          setSpamBlockedUntil(Date.now() + 5 * 60_000);
+          setCooldownSecsLeft(300);
+        } else {
+          setTimeout(() => setSpamWarning(null), 5000);
+        }
+        return;
+      }
       // Create bot response message
       const botResponse: Message = {
         id: (Date.now() + 1).toString(),
@@ -2514,10 +2559,15 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
               type="text"
               data-chat-input
               value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && !spamBlockedUntil && handleSendMessage()}
-              placeholder={replyingTo ? `Reply to message...` : "Ask me anything about deals..."}
-              className="flex-1 bg-gray-800 text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none text-sm cursor-text"
+              onChange={(e) => !sendLocked && setInputValue(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && !spamBlockedUntil && !sendLocked && handleSendMessage()}
+              placeholder={sendLocked ? "⏳ Cooldown… (3s)" : replyingTo ? `Reply to message...` : "Ask me anything about deals..."}
+              disabled={sendLocked}
+              className={`flex-1 bg-gray-800 text-white px-3 py-2 rounded-lg border focus:outline-none text-sm transition-all duration-200 ${
+                sendLocked
+                  ? "border-gray-700 opacity-50 cursor-not-allowed pointer-events-none select-none"
+                  : "border-gray-600 focus:border-blue-500 cursor-text"
+              }`}
               style={{ fontFamily: 'Inter, sans-serif' }}
               onMouseDown={(e) => e.stopPropagation()}
               onFocus={(e) => e.stopPropagation()}
@@ -2526,9 +2576,10 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
             <SendButton
               onClick={(e) => {
                 e.stopPropagation();
-                handleSendMessage();
+                if (!sendLocked) handleSendMessage();
               }}
               onMouseDown={(e) => e.stopPropagation()}
+              disabled={sendLocked}
             />
           </div>
         </div>
