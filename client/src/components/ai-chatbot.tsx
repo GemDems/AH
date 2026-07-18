@@ -1143,6 +1143,7 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
   };
 
   const handleSendMessage = async (overrideMessage?: string) => {
+    if (hardBlockedUntil && Date.now() < hardBlockedUntil) return;
     const textToSend = overrideMessage ?? inputValue;
     if (!textToSend.trim()) return;
 
@@ -2484,7 +2485,7 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
               }
             })();
             
-            return (
+            return hardBlockedUntil ? null : (
               <div className="mb-2">
                 <button
                   onClick={() => {
