@@ -48,12 +48,9 @@ export default function Leaderboard() {
   useEffect(() => {
     if (realVipUsers?.topReferrers) {
       setTopReferrers(prev => {
-        // Get the minimum invite count from current leaderboard (17 is the lowest)
-        const minInvites = Math.min(...prev.map(r => r.referrals));
-        
-        // Filter real users who qualify (more than minimum invites)
+        // Filter real users who qualify: 3+ invites and a username set
         const qualifyingUsers = realVipUsers.topReferrers.filter(user => 
-          user.referralCount > minInvites && user.username
+          user.referralCount >= 3 && user.username
         );
 
         if (qualifyingUsers.length === 0) return prev;

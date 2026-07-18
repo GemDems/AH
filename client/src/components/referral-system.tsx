@@ -79,14 +79,12 @@ export default function ReferralSystem() {
     },
     onSuccess: (data) => {
       refetchStatus();
-      if (data.vipUnlocked) {
-        setShowUsernameModal(true);
-      } else {
-        toast({
-          title: "Code Applied!",
-          description: `Code used successfully. ${3 - data.usedCount} more uses needed for VIP.`,
-        });
-      }
+      toast({
+        title: "Code Applied!",
+        description: data.usedCount >= 3
+          ? "Code applied! Keep going."
+          : `Code applied! Keep going.`,
+      });
       setInputCode("");
     },
     onError: (error: any) => {
@@ -108,7 +106,7 @@ export default function ReferralSystem() {
         throw new Error("Please enter both first name and last initial");
       }
       const formattedUsername = formatUsername(username.trim(), lastName.trim());
-      const response = await apiRequest("POST", "/api/user/username", { 
+      const response = await apiRequest("POST", "/api/username/update", { 
         userId: deviceId, 
         username: formattedUsername 
       });
@@ -158,6 +156,13 @@ export default function ReferralSystem() {
   const handleSaveUsername = () => {
     saveUsernameMutation.mutate();
   };
+
+  // Show username prompt to the code OWNER when their code reaches 3 uses (isVip becomes true)
+  useEffect(() => {
+    if (referralStatus?.isVip && !referralStatus?.username) {
+      setShowUsernameForm(true);
+    }
+  }, [referralStatus?.isVip, referralStatus?.username]);
 
   // Calculate invite progress
   const inviteCount = referralStatus?.usedCount || 0;

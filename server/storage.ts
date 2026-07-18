@@ -238,9 +238,6 @@ export class DatabaseStorage implements IStorage {
     // This ensures that $1000 reward codes properly boost the owner's leaderboard ranking
     await this.incrementCodeOwnerLeaderboardInvites(referralCode.userId, pointsToAdd);
     
-    // Update the user's invite usage count (increment by 1 for each different code used)
-    await this.incrementUserInviteUsageCount(deviceId);
-    
     // Update VIP status if needed
     if (vipUnlocked) {
       await this.updateUserVipStatus(referralCode.userId, true);
