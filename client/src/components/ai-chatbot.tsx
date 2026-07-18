@@ -2329,22 +2329,26 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
                   </button>
                   
                   {/* Multi-colored "Why I Pitch This?" button - always visible on last bot msg with product */}
-                  {showPitchButton && isLastBotMsg && (
-                    <button
-                      onClick={handlePitchClick}
-                      className="text-xs transition-colors font-medium"
-                      style={{
-                        background: 'linear-gradient(45deg, #3b82f6, #eab308, #22c55e, #a855f7)',
-                        backgroundSize: '300% 300%',
-                        animation: 'gradient-fade 3s ease-in-out infinite',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                        backgroundClip: 'text'
-                      }}
-                    >
-                      Why I Pitch This?
-                    </button>
-                  )}
+                  {showPitchButton && isLastBotMsg && (() => {
+                    const pitchBlocked = !!(hardBlockedUntil || spamBlockedUntil);
+                    return (
+                      <button
+                        onClick={handlePitchClick}
+                        disabled={pitchBlocked}
+                        className={`text-xs transition-colors font-medium ${pitchBlocked ? 'opacity-40 cursor-not-allowed' : ''}`}
+                        style={pitchBlocked ? { color: '#6b7280' } : {
+                          background: 'linear-gradient(45deg, #3b82f6, #eab308, #22c55e, #a855f7)',
+                          backgroundSize: '300% 300%',
+                          animation: 'gradient-fade 3s ease-in-out infinite',
+                          WebkitBackgroundClip: 'text',
+                          WebkitTextFillColor: 'transparent',
+                          backgroundClip: 'text'
+                        }}
+                      >
+                        Why I Pitch This?
+                      </button>
+                    );
+                  })()}
                 </div>
               </div>
             </div>
