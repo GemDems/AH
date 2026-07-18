@@ -116,12 +116,15 @@ export default function AIChatbot() {
   const [pitchClickCount, setPitchClickCount] = useState(0);
   const [showCancelButton, setShowCancelButton] = useState(false);
   const [showAgentBadge, setShowAgentBadge] = useState(false);
+  const [isPitchPending, setIsPitchPending] = useState(false); // separate from isTyping
+  const pitchTimeoutRef = useRef<NodeJS.Timeout | null>(null); // ref = always current in closures
   const [pitchTimeout, setPitchTimeout] = useState<NodeJS.Timeout | null>(null);
   // Pitch rate-limit state (persisted in localStorage)
   const [pitchWindowCount, setPitchWindowCount] = useState(0);
   const [pitchWindowResetAt, setPitchWindowResetAt] = useState<number>(0);
   const [pitchDailyCount, setPitchDailyCount] = useState(0);
   const [pitchDayResetAt, setPitchDayResetAt] = useState<number>(0);
+  const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const [countdownInterval, setCountdownInterval] = useState<NodeJS.Timeout | null>(null);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -888,7 +891,11 @@ Can I help you find something excellent in one of these available categories?`
     localStorage.setItem('pitch_daily_count',     String(newDailyCount));
     localStorage.setItem('pitch_day_reset_at',    String(effectiveDayReset));
 
-    setIsTyping(true);
+    // Cancel any existing pitch before starting a new one
+    if (pitchTimeoutRef.current) clearTimeout(pitchTimeoutRef.current);
+    if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
+
+    setIsPitchPending(true); // ← own flag, never touches isTyping
     
     // Increment click count and show cancel button after second click
     const newClickCount = pitchClickCount + 1;
@@ -902,7 +909,7 @@ Can I help you find something excellent in one of these available categories?`
     const initialCountdown = Math.ceil(pitchDelay / 1000);
     setCountdown(initialCountdown);
     
-    // Countdown timer
+    // Countdown timer — stored in ref so the timeout callback always sees it
     const interval = setInterval(() => {
       setCountdown(prev => {
         if (prev <= 1) {
@@ -912,18 +919,24 @@ Can I help you find something excellent in one of these available categories?`
         return prev - 1;
       });
     }, 1000);
+    countdownIntervalRef.current = interval;
     setCountdownInterval(interval);
     
     // Collect all user messages for personalization
     const userMessages = messages.filter(m => !m.isBot).map(m => m.content);
+    const capturedProduct = foundProduct; // capture at click time — stays valid even if state changes
     
     const timeout = setTimeout(() => {
-      setIsTyping(false);
+      // Use ref to clear interval — always current, no stale closure
+      if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
+      countdownIntervalRef.current = null;
+      pitchTimeoutRef.current = null;
+
+      setIsPitchPending(false);
       setCountdown(0);
       setShowCancelButton(false);
-      if (countdownInterval) clearInterval(countdownInterval);
       
-      const pitchContent = generateAggressivePitch(foundProduct, userMessages);
+      const pitchContent = generateAggressivePitch(capturedProduct, userMessages);
       
       const pitchMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -944,19 +957,22 @@ Can I help you find something excellent in one of these available categories?`
       }, 5000);
     }, pitchDelay);
     
+    pitchTimeoutRef.current = timeout;
     setPitchTimeout(timeout);
   };
 
   const handleCancelPitch = () => {
-    if (pitchTimeout) {
-      clearTimeout(pitchTimeout);
-      setPitchTimeout(null);
+    if (pitchTimeoutRef.current) {
+      clearTimeout(pitchTimeoutRef.current);
+      pitchTimeoutRef.current = null;
     }
-    if (countdownInterval) {
-      clearInterval(countdownInterval);
-      setCountdownInterval(null);
+    if (countdownIntervalRef.current) {
+      clearInterval(countdownIntervalRef.current);
+      countdownIntervalRef.current = null;
     }
-    setIsTyping(false);
+    if (pitchTimeout) { clearTimeout(pitchTimeout); setPitchTimeout(null); }
+    if (countdownInterval) { clearInterval(countdownInterval); setCountdownInterval(null); }
+    setIsPitchPending(false);
     setCountdown(0);
     setShowCancelButton(false);
   };
@@ -2280,7 +2296,7 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
             </div>
           )}
 
-          {isTyping && !isSearching && countdown > 0 && (
+          {isPitchPending && countdown > 0 && (
             <div className="flex flex-col items-start gap-3">
               {/* Original thinking bubble */}
               <div className="flex justify-start">
@@ -2329,7 +2345,7 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
             </div>
           )}
 
-          {isTyping && !isSearching && countdown === 0 && (
+          {isTyping && !isSearching && !isPitchPending && (
             <div className="flex flex-col items-start gap-3">
               {/* Original thinking bubble */}
               <div className="flex justify-start">
