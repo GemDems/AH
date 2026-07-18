@@ -6,6 +6,7 @@ import AnimatedMessage from "./animated-message";
 import { ProductHighlightCard } from "./ui/product-highlight-card";
 import { LoadingBreadcrumb } from "./ui/loading-breadcrumb";
 import { AgentThinkingBadge, PALETTES } from "./ui/grok-agent-thinking-indicator";
+import SendButton from "./ui/send-button";
 
 interface Message {
   id: string;
@@ -2263,16 +2264,13 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
               onFocus={(e) => e.stopPropagation()}
               onClick={(e) => e.stopPropagation()}
             />
-            <button
+            <SendButton
               onClick={(e) => {
                 e.stopPropagation();
                 handleSendMessage();
               }}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors cursor-pointer"
               onMouseDown={(e) => e.stopPropagation()}
-            >
-              Send
-            </button>
+            />
           </div>
         </div>
       </div>
