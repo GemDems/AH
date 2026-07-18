@@ -2524,52 +2524,52 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
             </div>
           )}
           
-          {/* Hard block notification */}
-          {hardBlockedUntil && (
-            <div className="dark mb-2">
+          {hardBlockedUntil ? (
+            <div className="dark">
               <Admonition type="danger" title="You've Hit Your Limit">
                 Due to high traffic, messaging is temporarily paused. Try again in a couple minutes.
               </Admonition>
             </div>
-          )}
+          ) : (
+            <>
+              {spamWarning && (
+                <div className="dark mb-2">
+                  <Admonition type={spamWarning.type} title={spamWarning.title}>
+                    {spamWarning.msg}
+                  </Admonition>
+                </div>
+              )}
 
-          {/* Spam warning (gibberish only) */}
-          {spamWarning && !hardBlockedUntil && (
-            <div className="dark mb-2">
-              <Admonition type={spamWarning.type} title={spamWarning.title}>
-                {spamWarning.msg}
-              </Admonition>
-            </div>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  data-chat-input
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && !isTyping && handleSendMessage()}
+                  placeholder={replyingTo ? `Reply to message...` : "Ask me anything about deals..."}
+                  disabled={isTyping}
+                  className={`flex-1 bg-gray-800 text-white px-3 py-2 rounded-lg border focus:outline-none text-sm transition-all duration-200 ${
+                    isTyping
+                      ? "border-gray-700 opacity-50 cursor-not-allowed pointer-events-none select-none"
+                      : "border-gray-600 focus:border-blue-500 cursor-text"
+                  }`}
+                  style={{ fontFamily: 'Inter, sans-serif' }}
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onFocus={(e) => e.stopPropagation()}
+                  onClick={(e) => e.stopPropagation()}
+                />
+                <SendButton
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (!isTyping) handleSendMessage();
+                  }}
+                  onMouseDown={(e) => e.stopPropagation()}
+                  disabled={isTyping}
+                />
+              </div>
+            </>
           )}
-
-          <div className="flex gap-2">
-            <input
-              type="text"
-              data-chat-input
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && !hardBlockedUntil && !isTyping && handleSendMessage()}
-              placeholder={replyingTo ? `Reply to message...` : "Ask me anything about deals..."}
-              disabled={isTyping || !!hardBlockedUntil}
-              className={`flex-1 bg-gray-800 text-white px-3 py-2 rounded-lg border focus:outline-none text-sm transition-all duration-200 ${
-                isTyping || hardBlockedUntil
-                  ? "border-gray-700 opacity-50 cursor-not-allowed pointer-events-none select-none"
-                  : "border-gray-600 focus:border-blue-500 cursor-text"
-              }`}
-              style={{ fontFamily: 'Inter, sans-serif' }}
-              onMouseDown={(e) => e.stopPropagation()}
-              onFocus={(e) => e.stopPropagation()}
-              onClick={(e) => e.stopPropagation()}
-            />
-            <SendButton
-              onClick={(e) => {
-                e.stopPropagation();
-                if (!isTyping && !hardBlockedUntil) handleSendMessage();
-              }}
-              onMouseDown={(e) => e.stopPropagation()}
-              disabled={isTyping || !!hardBlockedUntil}
-            />
-          </div>
         </div>
       </div>
       
