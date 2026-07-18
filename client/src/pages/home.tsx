@@ -104,12 +104,69 @@ export default function Home() {
     });
   }
 
-  // Returns true if `text` contains `word`, its singular, or its plural
-  function wordMatches(text: string, word: string): boolean {
-    if (text.includes(word)) return true;
-    if (word.endsWith("s") && word.length > 2 && text.includes(word.slice(0, -1))) return true;
-    if (!word.endsWith("s") && text.includes(word + "s")) return true;
-    return false;
+  // Semantic synonym map — "cargo" can mean big/spacious, etc.
+  const semanticMap: Record<string, string[]> = {
+    cargo: ["large","big","spacious","storage","carry","capacity","heavy","load","outdoor","bag"],
+    big: ["large","xl","oversized","wide","cargo","huge","extra"],
+    large: ["big","xl","oversized","cargo","wide","huge","spacious"],
+    small: ["mini","compact","portable","tiny","micro","travel","light"],
+    mini: ["small","compact","portable","travel","tiny"],
+    pants: ["trousers","bottoms","jeans","leggings","shorts","clothing","apparel","fashion","wear","denim"],
+    jeans: ["denim","pants","trousers","bottoms","clothing","fashion"],
+    shoes: ["footwear","sneakers","boots","sandals","heels","kicks","slippers"],
+    shirt: ["top","tee","blouse","clothing","apparel","fashion","wear"],
+    jacket: ["coat","hoodie","outerwear","clothing","fashion","vest"],
+    dress: ["gown","skirt","clothing","fashion","apparel"],
+    phone: ["mobile","smartphone","device","android","iphone","cellular","cell"],
+    laptop: ["computer","pc","notebook","macbook","chromebook","device"],
+    headphones: ["earbuds","earphones","audio","sound","music","wireless","airpods"],
+    tv: ["television","screen","monitor","display","4k","smart"],
+    watch: ["smartwatch","wearable","timepiece","wristband","fitness"],
+    kitchen: ["cooking","chef","appliance","culinary","food","baking","utensil"],
+    furniture: ["chair","table","desk","sofa","couch","bed","shelf","storage"],
+    decor: ["decoration","ornament","aesthetic","design","interior","home"],
+    gym: ["fitness","workout","exercise","training","sport","health"],
+    outdoor: ["camping","hiking","adventure","nature","garden","trek"],
+    yoga: ["fitness","wellness","meditation","stretch","exercise","mat"],
+    skincare: ["moisturizer","serum","cream","lotion","beauty","face","glow"],
+    makeup: ["cosmetics","beauty","lipstick","foundation","eyeshadow","blush"],
+    toy: ["play","game","kids","children","fun","educational","toddler"],
+    toys: ["play","game","kids","children","fun","educational","toddler"],
+    game: ["toy","play","puzzle","board","entertainment","fun","gaming"],
+    beauty: ["skincare","makeup","cosmetics","care","glow","cream","lotion"],
+    bag: ["backpack","purse","tote","handbag","pouch","sack","cargo","carry"],
+    book: ["reading","novel","guide","education","learn","literature"],
+    food: ["snack","nutrition","meal","diet","cooking","eat","drink"],
+  };
+
+  // Score how well a single query word matches a text field
+  function fieldScore(text: string, word: string): number {
+    if (!text) return 0;
+    let s = 0;
+    // Exact substring
+    if (text.includes(word)) s += 40;
+    // Singular/plural (only add if no exact match already)
+    else if (word.endsWith("s") && word.length > 2 && text.includes(word.slice(0, -1))) s += 35;
+    else if (!word.endsWith("s") && text.includes(word + "s")) s += 35;
+    // Fuzzy: allow 1 typo for words ≥ 4 chars
+    else if (word.length >= 4) {
+      const wordArr = text.split(/\s+/);
+      const maxDist = 1;
+      const fuzzy = wordArr.some(w => {
+        if (Math.abs(w.length - word.length) > maxDist) return false;
+        let mismatches = 0;
+        for (let i = 0; i < Math.min(w.length, word.length); i++) {
+          if (w[i] !== word[i]) mismatches++;
+          if (mismatches > maxDist) return false;
+        }
+        return mismatches <= maxDist;
+      });
+      if (fuzzy) s += 22;
+    }
+    // Semantic synonyms
+    const synonyms = semanticMap[word] || [];
+    synonyms.forEach(syn => { if (text.includes(syn)) s += 10; });
+    return s;
   }
 
   const filteredAndSortedLinks = (() => {
@@ -123,27 +180,26 @@ export default function Home() {
         if (words.length === 0) return { link, score: 0 };
 
         const title = link.title.toLowerCase();
-        const desc = (link.description || "").toLowerCase();
-        const cat = (link.category || "").toLowerCase();
-        const priv = (link.aiPrivateInfo || "").toLowerCase();
+        const desc  = (link.description || "").toLowerCase();
+        const cat   = (link.category || "").toLowerCase();
+        const priv  = (link.aiPrivateInfo || "").toLowerCase();
 
-        // All words must match somewhere (handles singular/plural)
-        const allMatch = words.every(word =>
-          wordMatches(title, word) || wordMatches(desc, word) ||
-          wordMatches(cat, word) || wordMatches(priv, word)
-        );
-        if (!allMatch) return null;
-
-        // Score by match location: title > description/category > private info
-        let score = 0;
+        // Score each word across all fields
+        let totalScore = 0;
         words.forEach(word => {
-          if (wordMatches(title, word)) score += 30;
-          if (wordMatches(desc, word)) score += 20;
-          if (wordMatches(cat, word)) score += 20;
-          if (wordMatches(priv, word)) score += 10;
+          const wordBest = Math.max(
+            fieldScore(title, word) * 1.5,   // title matches worth more
+            fieldScore(desc,  word),
+            fieldScore(cat,   word),
+            fieldScore(priv,  word)
+          );
+          totalScore += wordBest;
         });
 
-        return { link, score };
+        // Minimum threshold: at least 20 points total to show the product
+        if (totalScore < 20) return null;
+
+        return { link, score: totalScore };
       })
       .filter(Boolean) as { link: AffiliateLink; score: number }[];
 
