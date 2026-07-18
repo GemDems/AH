@@ -114,7 +114,7 @@ export default function Home() {
       const cat = (link.category || "").toLowerCase();
       const priv = (link.aiPrivateInfo || "").toLowerCase();
       const words = q.split(/\s+/).filter(w => w.length > 1);
-      const matchesSearch = words.some(word =>
+      const matchesSearch = words.every(word =>
         title.includes(word) || desc.includes(word) || cat.includes(word) || priv.includes(word) ||
         fuzzyMatch(title, word) || fuzzyMatch(desc, word) || fuzzyMatch(cat, word)
       );

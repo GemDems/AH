@@ -329,38 +329,44 @@ What specific type of product are you looking for? I can show you the newest opt
         // Create comprehensive searchable text including ALL available data
         const allProductData = `${title} ${description} ${category} ${aiPrivateInfo}`.toLowerCase();
         
-        // ENHANCED keyword matching with COMPLETE product knowledge
+        // ENHANCED keyword matching — ALL words must contribute a score
+        let unmatchedWords = 0;
         userWords.forEach(word => {
+          let wordScore = 0;
           // Check title matches (high priority)
           if (title.includes(word)) {
-            score += 50;
+            wordScore += 50;
             reasons.push(`exact title match "${word}"`);
           }
           
           // Check description matches (highest priority)
           if (description.includes(word)) {
-            score += 60;
+            wordScore += 60;
             reasons.push(`description contains "${word}"`);
           }
           
           // Check category matches
           if (category.includes(word)) {
-            score += 40;
+            wordScore += 40;
             reasons.push(`category matches "${word}"`);
           }
           
           // Check AI private info (secret detailed analysis) - ENHANCED
           if (aiPrivateInfo.includes(word)) {
-            score += 80; // Higher score for AI private info matches
+            wordScore += 80;
             reasons.push(`detailed match for "${word}"`);
           }
-          
-          // Check comprehensive data for broader matches
-          if (allProductData.includes(word) && word.length > 3) {
-            score += 30;
-            reasons.push(`comprehensive match for "${word}"`);
+
+          if (wordScore === 0) {
+            unmatchedWords++;
           }
+          score += wordScore;
         });
+
+        // Disqualify product if ANY query word had zero matches
+        if (unmatchedWords > 0) {
+          score = 0;
+        }
         
         // Semantic analysis for better understanding
         if (lowerQuery.includes('cheap') || lowerQuery.includes('affordable') || lowerQuery.includes('budget')) {
