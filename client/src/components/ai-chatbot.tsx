@@ -190,6 +190,15 @@ export default function AIChatbot() {
     queryKey: ["/api/affiliate-links"],
   });
 
+  // Re-attach recommendedProduct objects after restore (we only persist the ID)
+  const messagesWithProducts = messages.map(msg => {
+    if (msg.recommendedProduct) return msg; // already attached (current session)
+    const pid = (msg as any)._productId;
+    if (!pid) return msg;
+    const found = (affiliateLinks as AffiliateLink[]).find(l => l.id === pid);
+    return found ? { ...msg, recommendedProduct: found } : msg;
+  });
+
   // Dynamic response generator based on user query
   const generateDynamicResponse = (userMessage: string, context: any) => {
     const lowerMessage = userMessage.toLowerCase();
@@ -1686,13 +1695,15 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
     }
   }, [messages]);
 
-  // Save messages to localStorage — strip recommendedProduct (large objects) to avoid quota errors
+  // Save messages to localStorage — strip full recommendedProduct object but save ID for re-attach
   useEffect(() => {
     try {
-      const slim = messages.map(({ recommendedProduct: _, ...msg }) => msg);
+      const slim = messages.map(({ recommendedProduct, ...msg }) => ({
+        ...msg,
+        ...(recommendedProduct ? { _productId: recommendedProduct.id } : {})
+      }));
       localStorage.setItem(`chatMessages-${sessionId}`, JSON.stringify(slim));
     } catch {
-      // If storage is still full, clear old chat history and try again
       localStorage.removeItem(`chatMessages-${sessionId}`);
     }
   }, [messages, sessionId]);
@@ -2255,7 +2266,9 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
           onTouchStart={(e) => e.stopPropagation()}
           onTouchMove={(e) => e.stopPropagation()}
         >
-          {messages.map((message) => (
+          {messagesWithProducts.map((message, msgIndex) => {
+            const isLastBotMsg = message.isBot && msgIndex === messagesWithProducts.map((m, i) => m.isBot ? i : -1).filter(i => i >= 0).at(-1);
+            return (
             <div
               key={message.id}
               className={`flex ${message.isBot ? 'justify-start' : 'justify-end'} group`}
@@ -2280,9 +2293,9 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
                   </div>
                 )}
                 {/* Reply button and Pitch button */}
-                <div className={`mt-1 flex gap-3 opacity-0 group-hover:opacity-100 ${
-                  message.isBot ? 'justify-start' : 'justify-end'
-                }`}>
+                <div className={`mt-1 flex gap-3 ${
+                  isLastBotMsg ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                } ${message.isBot ? 'justify-start' : 'justify-end'}`}>
                   <button
                     onClick={() => setReplyingTo(message)}
                     className="text-xs text-gray-400 hover:text-blue-400 transition-colors"
@@ -2290,11 +2303,11 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
                     Reply to this
                   </button>
                   
-                  {/* Multi-colored "Why I Pitch This?" button - only show when product is found */}
-                  {showPitchButton && message.isBot && (
+                  {/* Multi-colored "Why I Pitch This?" button - always visible on last bot msg with product */}
+                  {showPitchButton && isLastBotMsg && (
                     <button
                       onClick={handlePitchClick}
-                      className="text-xs transition-colors"
+                      className="text-xs transition-colors font-medium"
                       style={{
                         background: 'linear-gradient(45deg, #3b82f6, #eab308, #22c55e, #a855f7)',
                         backgroundSize: '300% 300%',
@@ -2310,7 +2323,8 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
                 </div>
               </div>
             </div>
-          ))}
+            );
+          })}
           
           {isSearching && (
             <div className="flex justify-start">
