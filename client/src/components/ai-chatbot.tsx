@@ -1094,14 +1094,7 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
         const errorData = await response.json().catch(() => ({}));
 
         if (errorData.limitType) {
-          // Burst block and gibberish → surface as spamWarning Admonition, not chat bubble
-          if (errorData.limitType === "burst_blocked") {
-            return {
-              response: "",
-              confidence: 0,
-              spamBlock: { type: "danger", title: "Slow Down — You've Been Temporarily Blocked" }
-            };
-          }
+          // Gibberish → flash warning briefly, no hard block
           if (errorData.limitType === "gibberish") {
             return {
               response: "",
@@ -1109,25 +1102,21 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
               spamBlock: { type: "warning", title: "That Doesn't Look Like a Real Question" }
             };
           }
-          if (errorData.limitType === "window_limit") {
-            return {
-              response: "",
-              confidence: 0,
-              spamBlock: { type: "danger", title: "High Traffic — Slow Down" }
-            };
+
+          // Non-rate-limit errors that Zane should explain inline
+          if (errorData.limitType === "message_too_long") {
+            return { response: "That message is too long! ✂️ Please keep it under 500 characters.", confidence: 0 };
+          }
+          if (errorData.limitType === "session_full") {
+            return { response: "This chat session is full (30 messages)! 🔄 Hit the reset button to start fresh.", confidence: 0 };
           }
 
-          // Other rate-limit / validation errors — surface as Zane's chat bubble
-          const zaneMessages: Record<string, string> = {
-            too_fast:         "Hey, slow down a little! ⚡ Give me a second between messages — I promise I'm not going anywhere.",
-            per_minute:       "Whoa, you're on fire! 🔥 I need a minute to catch my breath. Try again shortly.",
-            per_hour:         "You've been busy today! 🕐 You've hit your hourly message limit. Come back in a bit — I'll have deals waiting.",
-            daily_limit:      "You've maxed out your messages for today! 🌅 Come back tomorrow and I'll have even better deals lined up for you.",
-            message_too_long: "That message is too long for me to process! ✂️ Please keep it under 500 characters — try asking in a shorter way.",
-            session_full:     "This chat session is full (30 messages)! 🔄 Hit the reset button to start a fresh conversation — I'm ready when you are.",
+          // ALL rate-limit errors → hard block, no Zane bubble
+          return {
+            response: "",
+            confidence: 0,
+            spamBlock: { type: "danger", title: "Hard Block" }
           };
-          const friendlyMsg = errorData.message || zaneMessages[errorData.limitType] || "Slow down a bit and try again in a moment! 😊";
-          return { response: friendlyMsg, confidence: 0 };
         }
 
         throw new Error(`API error: ${response.status}`);
