@@ -186,9 +186,25 @@ export default function AffiliateCard({ link }: AffiliateCardProps) {
     window.open(link.url, '_blank');
   };
 
-  const allImages = link.imageUrls && link.imageUrls.length > 0
-    ? link.imageUrls.filter(u => u && u.trim())
-    : (link.imageUrl && link.imageUrl.trim() ? [link.imageUrl] : []);
+  // imageUrls are stripped from the main API response for performance.
+  // Fetch them lazily from the dedicated endpoint.
+  const [allImages, setAllImages] = useState<string[]>(() => {
+    const base = link.imageUrl && link.imageUrl.trim() ? [link.imageUrl] : [];
+    return base;
+  });
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`/api/affiliate-links/${link.id}/images`)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (cancelled) return;
+        const imgs: string[] = data?.imageUrls?.filter((u: string) => u && u.trim()) ?? [];
+        if (imgs.length > 0) setAllImages(imgs);
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [link.id]);
 
   return (
     <>
