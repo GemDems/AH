@@ -115,8 +115,7 @@ export default function Home() {
       const priv = (link.aiPrivateInfo || "").toLowerCase();
       const words = q.split(/\s+/).filter(w => w.length > 1);
       const matchesSearch = words.every(word =>
-        title.includes(word) || desc.includes(word) || cat.includes(word) || priv.includes(word) ||
-        fuzzyMatch(title, word) || fuzzyMatch(desc, word) || fuzzyMatch(cat, word)
+        title.includes(word) || desc.includes(word) || cat.includes(word) || priv.includes(word)
       );
       return matchesCategory && matchesSearch;
     })
