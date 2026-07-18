@@ -7,6 +7,18 @@ import { generateAIChatResponse } from "./cohere-service";
 import { smsService } from "./sms-service";
 import rateLimit, { ipKeyGenerator } from "express-rate-limit";
 
+// ── Map size cap helper (prevents unbounded growth under high traffic) ────────
+const MAX_MAP_SIZE = 10_000;
+
+function cappedSet<K, V>(map: Map<K, V>, key: K, value: V): void {
+  if (!map.has(key) && map.size >= MAX_MAP_SIZE) {
+    // Evict the oldest entry (Maps preserve insertion order)
+    const firstKey = map.keys().next().value as K;
+    map.delete(firstKey);
+  }
+  map.set(key, value);
+}
+
 // ── AI Chat Rate Limiters ─────────────────────────────────────────────────────
 
 const aiChatPerMinute = rateLimit({
@@ -59,7 +71,7 @@ function enforceMinInterval(req: Request, res: Response, next: NextFunction) {
       message: "You're typing faster than I can think! Give me 1-2 seconds between messages. ⚡"
     });
   }
-  lastIpRequestTime.set(ip, now);
+  cappedSet(lastIpRequestTime, ip, now);
   next();
 }
 
@@ -88,7 +100,7 @@ function enforceDeviceDailyCap(req: Request, res: Response, next: NextFunction) 
   }
 
   record.count += 1;
-  deviceDailyCount.set(deviceId, record);
+  cappedSet(deviceDailyCount, deviceId, record);
   next();
 }
 
@@ -115,7 +127,7 @@ function enforceBurstLimit(req: Request, res: Response, next: NextFunction) {
   let rec = deviceBurstMap.get(deviceId);
   if (!rec) {
     rec = { timestamps: [], blockedUntil: 0 };
-    deviceBurstMap.set(deviceId, rec);
+    cappedSet(deviceBurstMap, deviceId, rec);
   }
 
   if (now < rec.blockedUntil) {
@@ -132,7 +144,6 @@ function enforceBurstLimit(req: Request, res: Response, next: NextFunction) {
 
   if (rec.timestamps.length >= BURST_LIMIT) {
     rec.blockedUntil = now + BURST_BLOCK_MS;
-    deviceBurstMap.set(deviceId, rec);
     return res.status(429).json({
       rateLimited: true,
       limitType: "burst_blocked",
@@ -141,7 +152,6 @@ function enforceBurstLimit(req: Request, res: Response, next: NextFunction) {
   }
 
   rec.timestamps.push(now);
-  deviceBurstMap.set(deviceId, rec);
   next();
 }
 
@@ -163,7 +173,7 @@ function enforceWindowLimit(req: Request, res: Response, next: NextFunction) {
   const now = Date.now();
 
   let rec = deviceWindowMap.get(deviceId);
-  if (!rec) { rec = { timestamps: [] }; deviceWindowMap.set(deviceId, rec); }
+  if (!rec) { rec = { timestamps: [] }; cappedSet(deviceWindowMap, deviceId, rec); }
 
   rec.timestamps = rec.timestamps.filter(t => now - t < WINDOW_MS);
 
@@ -179,7 +189,6 @@ function enforceWindowLimit(req: Request, res: Response, next: NextFunction) {
   }
 
   rec.timestamps.push(now);
-  deviceWindowMap.set(deviceId, rec);
   next();
 }
 // ─────────────────────────────────────────────────────────────────────────────
