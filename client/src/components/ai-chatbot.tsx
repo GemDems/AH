@@ -872,10 +872,9 @@ Can I help you find something excellent in one of these available categories?`
 
     // ── Hard block check: chat window limit active ──
     if (hardBlockedUntil && Date.now() < hardBlockedUntil) {
-      const minsLeft = Math.ceil((hardBlockedUntil - Date.now()) / 60_000);
       if (!pitchLimitNotif) {
         if (pitchLimitTimerRef.current) clearTimeout(pitchLimitTimerRef.current);
-        setPitchLimitNotif(`Why I Pitch This? isn't available right now — you've hit your chat limit. It resets in ${minsLeft} minute${minsLeft === 1 ? "" : "s"}. 🚦`);
+        setPitchLimitNotif("Why I Pitch This? isn't available right now — you've hit your chat limit. Come back soon! 🚦");
         pitchLimitTimerRef.current = setTimeout(() => setPitchLimitNotif(null), 6000);
       }
       return;
