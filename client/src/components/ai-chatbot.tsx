@@ -138,8 +138,7 @@ export default function AIChatbot() {
   const spamStrikes         = useRef(0);            // escalation counter
   const lastMessageTime     = useRef(0);            // ms timestamp of last send
   const lastMessageContent  = useRef("");           // duplicate detection
-  const sendLockedUntil     = useRef(0);            // 3-second post-send lockout timestamp
-  const [sendLocked,        setSendLocked]        = useState(false);
+  const sendLockedUntil     = useRef(0);            // kept for compat, unused
   const [spamBlockedUntil, setSpamBlockedUntil] = useState<number | null>(null);
   const [cooldownSecsLeft,  setCooldownSecsLeft]  = useState(0);
   const [spamWarning,       setSpamWarning]       = useState<{ type: "warning" | "danger"; title: string; msg: string } | null>(null);
@@ -1238,12 +1237,6 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
     activeGenerations.current += 1;
     incrementDailyMsg();
 
-    // 3-second send lockout — physically prevents burst sending
-    sendLockedUntil.current = now + 3000;
-    setSendLocked(true);
-    setTimeout(() => {
-      if (Date.now() >= sendLockedUntil.current) setSendLocked(false);
-    }, 3000);
     // ─────────────────────────────────────────────────────────────────────────
 
     let messageContent = textToSend;
@@ -2566,12 +2559,12 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
               type="text"
               data-chat-input
               value={inputValue}
-              onChange={(e) => !sendLocked && setInputValue(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && !spamBlockedUntil && !sendLocked && handleSendMessage()}
-              placeholder={sendLocked ? "⏳ Cooldown… (3s)" : replyingTo ? `Reply to message...` : "Ask me anything about deals..."}
-              disabled={sendLocked}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && !spamBlockedUntil && !isTyping && handleSendMessage()}
+              placeholder={replyingTo ? `Reply to message...` : "Ask me anything about deals..."}
+              disabled={isTyping}
               className={`flex-1 bg-gray-800 text-white px-3 py-2 rounded-lg border focus:outline-none text-sm transition-all duration-200 ${
-                sendLocked
+                isTyping
                   ? "border-gray-700 opacity-50 cursor-not-allowed pointer-events-none select-none"
                   : "border-gray-600 focus:border-blue-500 cursor-text"
               }`}
@@ -2583,10 +2576,10 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
             <SendButton
               onClick={(e) => {
                 e.stopPropagation();
-                if (!sendLocked) handleSendMessage();
+                if (!isTyping) handleSendMessage();
               }}
               onMouseDown={(e) => e.stopPropagation()}
-              disabled={sendLocked}
+              disabled={isTyping}
             />
           </div>
         </div>
