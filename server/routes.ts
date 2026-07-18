@@ -378,13 +378,28 @@ Transform now with maximum conversion power in minimal words:`;
     }
   });
 
-  // Get published affiliate links (public) — served from 30 s in-memory cache
+  // Get published affiliate links (public) — served from 30 s in-memory cache.
+  // imageUrls (base64 blobs) are stripped here; fetch them on demand via /:id/images.
   app.get("/api/affiliate-links", async (req, res) => {
     try {
       const links = await getCachedPublishedLinks();
-      res.json(links);
+      const stripped = links.map(({ imageUrls: _dropped, ...rest }) => rest);
+      res.json(stripped);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch affiliate links" });
+    }
+  });
+
+  // Lazy images endpoint — returns full imageUrls (base64 ok) for one product
+  app.get("/api/affiliate-links/:id/images", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const links = await getCachedPublishedLinks();
+      const link = links.find((l) => l.id === id);
+      if (!link) return res.status(404).json({ message: "Not found" });
+      res.json({ imageUrls: link.imageUrls ?? [] });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch images" });
     }
   });
 

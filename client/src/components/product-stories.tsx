@@ -12,14 +12,12 @@ function getFallbackImage(link: AffiliateLink): string {
   )}`;
 }
 
-function getProductImages(link: AffiliateLink): string[] {
-  if (link.imageUrls && link.imageUrls.length > 0) return link.imageUrls;
-  if (link.imageUrl) return [link.imageUrl];
-  return [getFallbackImage(link)];
+function getThumbnailImage(link: AffiliateLink): string {
+  if (link.imageUrl) return link.imageUrl;
+  return getFallbackImage(link);
 }
 
-function getProductStories(link: AffiliateLink): Story[] {
-  const imgs = getProductImages(link);
+function buildStories(imgs: string[], link: AffiliateLink): Story[] {
   const ring = imgs.length > 1 ? imgs : [imgs[0], imgs[0]];
   return ring.map((src, i) => ({ id: `${link.id}-${i}`, type: "image" as const, src }));
 }
@@ -104,6 +102,8 @@ export default function ProductStories({ products }: ProductStoriesProps) {
 
   const [activeIdx, setActiveIdx] = useState<number | null>(null);
   const [viewedSets, setViewedSets] = useState<Map<number, Set<number>>>(new Map());
+  // Cache of fully-loaded imageUrls per product id (fetched lazily on first tap)
+  const [loadedImages, setLoadedImages] = useState<Map<number, string[]>>(new Map());
 
   // Stable ref so callbacks don't change reference when activeIdx changes
   const activeIdxRef = useRef(activeIdx);
@@ -112,9 +112,27 @@ export default function ProductStories({ products }: ProductStoriesProps) {
   const publishedRef = useRef(published);
   useEffect(() => { publishedRef.current = published; }, [published]);
 
-  const handleThumbnailClick = useCallback((idx: number) => {
+  const handleThumbnailClick = useCallback(async (idx: number) => {
+    const product = publishedRef.current[idx];
+    if (!product) return;
+    // Fetch full imageUrls if not already loaded
+    if (!loadedImages.has(product.id)) {
+      try {
+        const res = await fetch(`/api/affiliate-links/${product.id}/images`);
+        if (res.ok) {
+          const data = await res.json();
+          setLoadedImages((prev) => {
+            const next = new Map(prev);
+            next.set(product.id, data.imageUrls ?? []);
+            return next;
+          });
+        }
+      } catch {
+        // Non-fatal — will fall back to single imageUrl
+      }
+    }
     setActiveIdx(idx);
-  }, []);
+  }, [loadedImages]);
 
   // onClose: advance to next product, or truly close at the end
   const handleClose = useCallback(() => {
@@ -145,9 +163,11 @@ export default function ProductStories({ products }: ProductStoriesProps) {
   if (published.length === 0) return null;
 
   const activeProduct = activeIdx !== null ? published[activeIdx] : null;
-  const activeStories: Story[] = activeProduct ? getProductStories(activeProduct) : [];
-  const activeImages = activeProduct ? getProductImages(activeProduct) : [];
-  const activeAvatar = activeImages[0] ?? "";
+  const activeFullImages = activeProduct
+    ? (loadedImages.get(activeProduct.id)?.length ? loadedImages.get(activeProduct.id)! : (activeProduct.imageUrl ? [activeProduct.imageUrl] : [getFallbackImage(activeProduct)]))
+    : [];
+  const activeStories: Story[] = activeProduct ? buildStories(activeFullImages, activeProduct) : [];
+  const activeAvatar = activeFullImages[0] ?? "";
   const activeUsername = activeProduct?.title.split(" ").slice(0, 3).join(" ") ?? "";
   const activeViewed = activeProduct
     ? (viewedSets.get(activeProduct.id) ?? new Set<number>())
