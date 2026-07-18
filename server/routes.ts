@@ -770,7 +770,7 @@ Transform now with maximum conversion power in minimal words:`;
   });
 
   // OpenAI Chat API endpoint (rate-limited)
-  app.post("/api/ai-chat", aiChatPerMinute, aiChatPerHour, enforceMinInterval, enforceWindowLimit, enforceBurstLimit, enforceDeviceDailyCap, async (req, res) => {
+  app.post("/api/ai-chat", enforceMinInterval, enforceWindowLimit, enforceBurstLimit, enforceDeviceDailyCap, async (req, res) => {
     try {
       const { message, conversationHistory } = req.body;
       

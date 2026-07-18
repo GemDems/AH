@@ -143,7 +143,7 @@ export default function AIChatbot() {
   const [cooldownSecsLeft,  setCooldownSecsLeft]  = useState(0);
   const [spamWarning,       setSpamWarning]       = useState<{ type: "warning" | "danger"; title: string; msg: string } | null>(null);
   const [hardBlockedUntil,  setHardBlockedUntil]  = useState<number | null>(() => {
-    const stored = parseInt(localStorage.getItem("chat_hard_block_until") || "0", 10);
+    const stored = parseInt(localStorage.getItem("chat_hard_block_v2") || "0", 10);
     return stored > Date.now() ? stored : null;
   });
 
@@ -1623,17 +1623,17 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
 
   useEffect(() => {
     if (hardBlockedUntil) {
-      localStorage.setItem("chat_hard_block_until", String(hardBlockedUntil));
+      localStorage.setItem("chat_hard_block_v2", String(hardBlockedUntil));
       const tick = setInterval(() => {
         if (Date.now() >= hardBlockedUntil) {
           setHardBlockedUntil(null);
-          localStorage.removeItem("chat_hard_block_until");
+          localStorage.removeItem("chat_hard_block_v2");
           clearInterval(tick);
         }
       }, 1000);
       return () => clearInterval(tick);
     } else {
-      localStorage.removeItem("chat_hard_block_until");
+      localStorage.removeItem("chat_hard_block_v2");
     }
   }, [hardBlockedUntil]);
 
