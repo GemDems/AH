@@ -2347,7 +2347,7 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
                   
                   {/* Multi-colored "Why I Pitch This?" button - always visible on last bot msg with product */}
                   {showPitchButton && isLastBotMsg && (() => {
-                    const pitchBlocked = !!(hardBlockedUntil || spamBlockedUntil);
+                    const pitchBlocked = !!hardBlockedUntil;
                     return (
                       <button
                         onClick={handlePitchClick}
@@ -2568,7 +2568,7 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
               }
             })();
             
-            const suggBlocked = !!(hardBlockedUntil || spamBlockedUntil || isTyping);
+            const suggBlocked = !!(hardBlockedUntil || isTyping);
             return (
               <div className="mb-2">
                 <button
