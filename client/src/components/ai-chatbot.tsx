@@ -117,6 +117,11 @@ export default function AIChatbot() {
   const [showCancelButton, setShowCancelButton] = useState(false);
   const [showAgentBadge, setShowAgentBadge] = useState(false);
   const [pitchTimeout, setPitchTimeout] = useState<NodeJS.Timeout | null>(null);
+  // Pitch rate-limit state (persisted in localStorage)
+  const [pitchWindowCount, setPitchWindowCount] = useState(0);
+  const [pitchWindowResetAt, setPitchWindowResetAt] = useState<number>(0);
+  const [pitchDailyCount, setPitchDailyCount] = useState(0);
+  const [pitchDayResetAt, setPitchDayResetAt] = useState<number>(0);
   const [countdownInterval, setCountdownInterval] = useState<NodeJS.Timeout | null>(null);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -814,7 +819,56 @@ Can I help you find something excellent in one of these available categories?`
 
   const handlePitchClick = () => {
     if (!foundProduct) return;
-    
+
+    const now = Date.now();
+
+    // ── Daily cap: 15 total per day ──
+    const midnight = (() => {
+      const d = new Date(); d.setHours(24, 0, 0, 0); return d.getTime();
+    })();
+    const effectiveDailyCount = now < pitchDayResetAt ? pitchDailyCount : 0;
+    const effectiveDayReset   = now < pitchDayResetAt ? pitchDayResetAt : midnight;
+
+    if (effectiveDailyCount >= 15) {
+      const blockedMsg: Message = {
+        id: Date.now().toString(),
+        content: "🚫 You've used all 15 **Why I Pitch This?** requests for today. Come back tomorrow — I'll have even sharper reasons waiting for you. 🔥",
+        isBot: true,
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, blockedMsg]);
+      return;
+    }
+
+    // ── 5-minute window cap: 3 per 5 min ──
+    const effectiveWindowCount = now < pitchWindowResetAt ? pitchWindowCount : 0;
+    const effectiveWindowReset = now < pitchWindowResetAt ? pitchWindowResetAt : now + 5 * 60 * 1000;
+
+    if (effectiveWindowCount >= 3) {
+      const secsLeft = Math.ceil((pitchWindowResetAt - now) / 1000);
+      const minsLeft = Math.ceil(secsLeft / 60);
+      const blockedMsg: Message = {
+        id: Date.now().toString(),
+        content: `⏳ Easy there — you've hit 3 **Why I Pitch This?** in 5 minutes. Give me ${minsLeft > 1 ? `${minsLeft} more minutes` : 'a moment'} and I'll be ready to sell you again. 😏`,
+        isBot: true,
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, blockedMsg]);
+      return;
+    }
+
+    // ── All clear — update counters ──
+    const newWindowCount = effectiveWindowCount + 1;
+    const newDailyCount  = effectiveDailyCount  + 1;
+    setPitchWindowCount(newWindowCount);
+    setPitchWindowResetAt(effectiveWindowReset);
+    setPitchDailyCount(newDailyCount);
+    setPitchDayResetAt(effectiveDayReset);
+    localStorage.setItem('pitch_window_count',    String(newWindowCount));
+    localStorage.setItem('pitch_window_reset_at', String(effectiveWindowReset));
+    localStorage.setItem('pitch_daily_count',     String(newDailyCount));
+    localStorage.setItem('pitch_day_reset_at',    String(effectiveDayReset));
+
     setIsTyping(true);
     
     // Increment click count and show cancel button after second click
@@ -1458,6 +1512,32 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
   };
 
   // Countdown timer for spam cooldown
+  // Load pitch rate-limit counters from localStorage on mount
+  useEffect(() => {
+    const now = Date.now();
+    const wc = parseInt(localStorage.getItem('pitch_window_count') || '0', 10);
+    const wr = parseInt(localStorage.getItem('pitch_window_reset_at') || '0', 10);
+    const dc = parseInt(localStorage.getItem('pitch_daily_count') || '0', 10);
+    const dr = parseInt(localStorage.getItem('pitch_day_reset_at') || '0', 10);
+    // Reset window if expired
+    if (now >= wr) {
+      setPitchWindowCount(0);
+      setPitchWindowResetAt(0);
+    } else {
+      setPitchWindowCount(wc);
+      setPitchWindowResetAt(wr);
+    }
+    // Reset daily if past midnight
+    if (now >= dr) {
+      setPitchDailyCount(0);
+      setPitchDayResetAt(0);
+      localStorage.setItem('pitch_daily_count', '0');
+    } else {
+      setPitchDailyCount(dc);
+      setPitchDayResetAt(dr);
+    }
+  }, []);
+
   useEffect(() => {
     if (!spamBlockedUntil) return;
     const tick = setInterval(() => {
