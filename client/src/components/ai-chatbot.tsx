@@ -138,6 +138,25 @@ export default function AIChatbot() {
   const [spamBlockedUntil, setSpamBlockedUntil] = useState<number | null>(null);
   const [cooldownSecsLeft,  setCooldownSecsLeft]  = useState(0);
   const [spamWarning,       setSpamWarning]       = useState<{ type: "warning" | "danger"; title: string; msg: string } | null>(null);
+
+  // ── Daily message cap (50/day) ───────────────────────────────────────────────
+  const DAILY_MSG_LIMIT = 50;
+  const getDailyMsgState = () => {
+    const count = parseInt(localStorage.getItem("chat_daily_msg_count") || "0", 10);
+    const resetAt = parseInt(localStorage.getItem("chat_daily_msg_reset_at") || "0", 10);
+    const now = Date.now();
+    if (now >= resetAt) {
+      // New day — reset
+      localStorage.setItem("chat_daily_msg_count", "0");
+      localStorage.setItem("chat_daily_msg_reset_at", String(now + 24 * 60 * 60 * 1000));
+      return { count: 0 };
+    }
+    return { count, resetAt };
+  };
+  const incrementDailyMsg = () => {
+    const { count } = getDailyMsgState();
+    localStorage.setItem("chat_daily_msg_count", String(count + 1));
+  };
   // ────────────────────────────────────────────────────────────────────────────
 
   const chatRef = useRef<HTMLDivElement>(null);
@@ -1096,17 +1115,40 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
     const now = Date.now();
 
     // ── Spam guard ────────────────────────────────────────────────────────────
+    // 0. Daily message cap (50/day)
+    const dailyState = getDailyMsgState();
+    if (dailyState.count >= DAILY_MSG_LIMIT) {
+      const resetIn = dailyState.resetAt ? Math.ceil((dailyState.resetAt - now) / 3_600_000) : 24;
+      setSpamWarning({
+        type: "danger",
+        title: "Daily Limit Reached",
+        msg: `You've sent ${DAILY_MSG_LIMIT} messages today. Access resets in ~${resetIn}h. Come back tomorrow! 🔄`,
+      });
+      return;
+    }
+
     // 1. Still in cooldown?
     if (spamBlockedUntil && now < spamBlockedUntil) {
       spamStrikes.current += 1;
-      const extra = spamStrikes.current * 15_000;
-      const newUntil = spamBlockedUntil + extra;
+      let newUntil: number;
+      if (spamStrikes.current === 1) {
+        // First spam after warning → jump straight to 2 minutes from now
+        newUntil = now + 120_000;
+      } else {
+        // Each subsequent spam → double the remaining time
+        const remaining = spamBlockedUntil - now;
+        newUntil = now + remaining * 2;
+      }
       setSpamBlockedUntil(newUntil);
-      setCooldownSecsLeft(Math.ceil((newUntil - now) / 1000));
+      const secsLeft = Math.ceil((newUntil - now) / 1000);
+      setCooldownSecsLeft(secsLeft);
+      const minLeft = Math.floor(secsLeft / 60);
+      const secPart = secsLeft % 60;
+      const timeStr = minLeft > 0 ? `${minLeft}m ${secPart}s` : `${secsLeft}s`;
       setSpamWarning({
         type: "danger",
-        title: "Cooldown Extended",
-        msg: `Keep trying and the wait gets longer. Please wait ${Math.ceil((newUntil - now) / 1000)}s.`,
+        title: spamStrikes.current === 1 ? "Cooldown Extended to 2 Minutes" : "Cooldown Doubled",
+        msg: `Keep trying and it doubles every time. Wait ${timeStr}.`,
       });
       return;
     }
@@ -1147,11 +1189,12 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
       return;
     }
 
-    // All checks passed — clear warning and record
+    // All checks passed — clear warning, record, increment daily count
     setSpamWarning(null);
     lastMessageTime.current = now;
     lastMessageContent.current = textToSend.trim();
     activeGenerations.current += 1;
+    incrementDailyMsg();
     // ─────────────────────────────────────────────────────────────────────────
 
     let messageContent = textToSend;
