@@ -281,6 +281,7 @@ interface StoryViewerModalProps {
   initialIndex: number;
   viewedIndices: Set<number>;
   onClose: () => void;
+  onDismiss?: () => void;
   onStoryChange: (index: number) => void;
   productKey?: string | number;
 }
@@ -293,6 +294,7 @@ function StoryViewerModal({
   initialIndex,
   viewedIndices,
   onClose,
+  onDismiss,
   onStoryChange,
   productKey,
 }: StoryViewerModalProps) {
@@ -480,10 +482,10 @@ function StoryViewerModal({
       }
 
       if (offset.y > 100 || velocity.y > 500) {
-        onClose();
+        (onDismiss ?? onClose)();
       }
     },
-    [goToNext, goToPrevious, onClose]
+    [goToNext, goToPrevious, onClose, onDismiss]
   );
 
   React.useEffect(() => {
@@ -496,7 +498,7 @@ function StoryViewerModal({
           goToNext();
           break;
         case "Escape":
-          onClose();
+          (onDismiss ?? onClose)();
           break;
         case " ":
           e.preventDefault();
@@ -603,7 +605,7 @@ function StoryViewerModal({
                 onPointerDown={(e) => e.stopPropagation()}
                 onClick={(e) => {
                   e.stopPropagation();
-                  onClose();
+                  (onDismiss ?? onClose)();
                 }}
                 aria-label="Close"
               >

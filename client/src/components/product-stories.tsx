@@ -232,6 +232,7 @@ export default function ProductStories({ products }: ProductStoriesProps) {
             initialIndex={0}
             viewedIndices={activeViewed}
             onClose={handleClose}
+            onDismiss={() => setActiveIdx(null)}
             onStoryChange={handleStoryChange}
           />
         )}
