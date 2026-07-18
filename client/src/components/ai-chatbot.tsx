@@ -142,6 +142,8 @@ export default function AIChatbot() {
   const [spamBlockedUntil, setSpamBlockedUntil] = useState<number | null>(null);
   const [cooldownSecsLeft,  setCooldownSecsLeft]  = useState(0);
   const [spamWarning,       setSpamWarning]       = useState<{ type: "warning" | "danger"; title: string; msg: string } | null>(null);
+  const [hardBlockedUntil,  setHardBlockedUntil]  = useState<number | null>(null);
+  const [hardBlockSecsLeft, setHardBlockSecsLeft] = useState(0);
 
   // ── Daily message cap (50/day) ───────────────────────────────────────────────
   const DAILY_MSG_LIMIT = 50;
@@ -1159,38 +1161,13 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
     // 0. Daily message cap (50/day)
     const dailyState = getDailyMsgState();
     if (dailyState.count >= DAILY_MSG_LIMIT) {
-      const resetIn = dailyState.resetAt ? Math.ceil((dailyState.resetAt - now) / 3_600_000) : 24;
-      setSpamWarning({
-        type: "danger",
-        title: "Daily Limit Reached",
-        msg: `You've sent ${DAILY_MSG_LIMIT} messages today. Access resets in ~${resetIn}h. Come back tomorrow! 🔄`,
-      });
+      setHardBlockedUntil(now + 2 * 60_000);
+      setHardBlockSecsLeft(120);
       return;
     }
 
-    // 1. Still in cooldown?
-    if (spamBlockedUntil && now < spamBlockedUntil) {
-      spamStrikes.current += 1;
-      let newUntil: number;
-      if (spamStrikes.current === 1) {
-        // First spam after warning → jump straight to 2 minutes from now
-        newUntil = now + 120_000;
-      } else {
-        // Each subsequent spam → double the remaining time
-        const remaining = spamBlockedUntil - now;
-        newUntil = now + remaining * 2;
-      }
-      setSpamBlockedUntil(newUntil);
-      const secsLeft = Math.ceil((newUntil - now) / 1000);
-      setCooldownSecsLeft(secsLeft);
-      const minLeft = Math.floor(secsLeft / 60);
-      const secPart = secsLeft % 60;
-      const timeStr = minLeft > 0 ? `${minLeft}m ${secPart}s` : `${secsLeft}s`;
-      setSpamWarning({
-        type: "danger",
-        title: spamStrikes.current === 1 ? "Cooldown Extended to 2 Minutes" : "Cooldown Doubled",
-        msg: `Keep trying and it doubles every time. Wait ${timeStr}.`,
-      });
+    // 1. Still in hard block?
+    if (hardBlockedUntil && now < hardBlockedUntil) {
       return;
     }
 
@@ -1267,21 +1244,18 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
       // Use OpenAI-powered AI response generation
       const aiResult = await generateAIResponse(messageToProcess);
       
-      // Burst-block / gibberish rejection — show as spamWarning, skip bot bubble
+      // Burst-block / window-limit rejection — hard block for 2 minutes
       if (aiResult.spamBlock) {
-        setSpamWarning({
-          type: aiResult.spamBlock.type,
-          title: aiResult.spamBlock.title,
-          msg: aiResult.response || (
-            aiResult.spamBlock.type === "danger"
-              ? "You've sent too many messages too quickly. Wait 5 minutes before trying again. ⏸️"
-              : "Please type a real question and I'll be happy to help you find the best deals! 😊"
-          ),
-        });
         if (aiResult.spamBlock.type === "danger") {
-          setSpamBlockedUntil(Date.now() + 5 * 60_000);
-          setCooldownSecsLeft(300);
+          setHardBlockedUntil(Date.now() + 2 * 60_000);
+          setHardBlockSecsLeft(120);
         } else {
+          // Gibberish warning — just flash the admonition briefly, no hard block
+          setSpamWarning({
+            type: aiResult.spamBlock.type,
+            title: aiResult.spamBlock.title,
+            msg: "Please type a real question and I'll be happy to help you find the best deals! 😊",
+          });
           setTimeout(() => setSpamWarning(null), 5000);
         }
         return;
@@ -1656,6 +1630,21 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
     }, 500);
     return () => clearInterval(tick);
   }, [spamBlockedUntil]);
+
+  useEffect(() => {
+    if (!hardBlockedUntil) return;
+    const tick = setInterval(() => {
+      const secsLeft = Math.ceil((hardBlockedUntil - Date.now()) / 1000);
+      if (secsLeft <= 0) {
+        setHardBlockSecsLeft(0);
+        setHardBlockedUntil(null);
+        clearInterval(tick);
+      } else {
+        setHardBlockSecsLeft(secsLeft);
+      }
+    }, 500);
+    return () => clearInterval(tick);
+  }, [hardBlockedUntil]);
 
   useEffect(() => {
     const cleanup = () => {
