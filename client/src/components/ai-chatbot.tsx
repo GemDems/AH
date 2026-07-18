@@ -1241,8 +1241,6 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
       // Use OpenAI-powered AI response generation
       const aiResult = await generateAIResponse(messageToProcess);
       
-      setIsTyping(false);
-      
       // Create bot response message
       const botResponse: Message = {
         id: (Date.now() + 1).toString(),
@@ -1265,8 +1263,6 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
 
     } catch (error) {
       console.log('🔄 Cohere unavailable, using local AI system');
-      // Since Cohere failed, directly use the local advanced AI system
-      setIsTyping(false);
       
       const localResponse = generateContextualResponse(messageToProcess, conversationHistory);
 
@@ -1297,6 +1293,8 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
       }
     } finally {
       activeGenerations.current = Math.max(0, activeGenerations.current - 1);
+      // Only hide the thinking indicator when the LAST in-flight generation completes
+      if (activeGenerations.current === 0) setIsTyping(false);
     }
   };
 
