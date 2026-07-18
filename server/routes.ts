@@ -20,6 +20,22 @@ function cappedSet<K, V>(map: Map<K, V>, key: K, value: V): void {
   map.set(key, value);
 }
 
+// ── Affiliate-links cache (30 s TTL) ─────────────────────────────────────────
+let _linksCache: { data: any[]; ts: number } | null = null;
+const LINKS_CACHE_TTL = 30_000;
+
+async function getCachedPublishedLinks() {
+  const now = Date.now();
+  if (_linksCache && now - _linksCache.ts < LINKS_CACHE_TTL) return _linksCache.data;
+  const data = await storage.getPublishedAffiliateLinks();
+  _linksCache = { data, ts: now };
+  return data;
+}
+
+function invalidateLinksCache() {
+  _linksCache = null;
+}
+
 // Per-IP minimum interval store (1.5 s between requests)
 const lastIpRequestTime = new Map<string, number>();
 
@@ -215,12 +231,14 @@ async function processScheduledOperations() {
       // Auto-publish drafts that are scheduled for now
       if (link.isDraft && link.scheduledPublishAt && now >= link.scheduledPublishAt) {
         await storage.publishDraft(link.id);
+        invalidateLinksCache();
         console.log(`Auto-published draft: ${link.title}`);
       }
       
       // Auto-delete products scheduled for deletion
       if (link.scheduledDeleteAt && now >= link.scheduledDeleteAt) {
         await storage.deleteAffiliateLink(link.id);
+        invalidateLinksCache();
         console.log(`Auto-deleted product: ${link.title}`);
       }
     }
@@ -360,10 +378,10 @@ Transform now with maximum conversion power in minimal words:`;
     }
   });
 
-  // Get published affiliate links (public)
+  // Get published affiliate links (public) — served from 30 s in-memory cache
   app.get("/api/affiliate-links", async (req, res) => {
     try {
-      const links = await storage.getPublishedAffiliateLinks();
+      const links = await getCachedPublishedLinks();
       res.json(links);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch affiliate links" });
@@ -394,6 +412,7 @@ Transform now with maximum conversion power in minimal words:`;
       const id = parseInt(req.params.id);
       const published = await storage.publishDraft(id);
       if (published) {
+        invalidateLinksCache();
         res.json(published);
       } else {
         res.status(404).json({ message: "Draft not found" });
@@ -406,6 +425,7 @@ Transform now with maximum conversion power in minimal words:`;
   app.post("/api/admin/publish-all", async (req, res) => {
     try {
       const published = await storage.publishAllDrafts();
+      invalidateLinksCache();
       res.json({ published: published.length, products: published });
     } catch (error) {
       res.status(500).json({ message: "Failed to publish all drafts" });
@@ -457,6 +477,7 @@ Transform now with maximum conversion power in minimal words:`;
       const id = parseInt(req.params.id);
       const deleted = await storage.deleteAffiliateLink(id);
       if (deleted) {
+        invalidateLinksCache();
         res.json({ message: "Product deleted successfully" });
       } else {
         res.status(404).json({ message: "Product not found" });
@@ -475,6 +496,7 @@ Transform now with maximum conversion power in minimal words:`;
       if (!link) return res.status(404).json({ message: "Product not found" });
       const newVerified = link.isVerified ? 0 : 1;
       const updated = await storage.updateAffiliateLink(id, { isVerified: newVerified } as any);
+      invalidateLinksCache();
       res.json(updated);
     } catch (error) {
       console.error("Error toggling verified status:", error);
@@ -512,6 +534,7 @@ Transform now with maximum conversion power in minimal words:`;
       };
       
       const newLink = await storage.createAffiliateLink(linkData);
+      invalidateLinksCache();
       res.status(201).json(newLink);
     } catch (error) {
       console.error("Error creating affiliate link:", error);
@@ -552,6 +575,7 @@ Transform now with maximum conversion power in minimal words:`;
         return res.status(404).json({ message: "Link not found" });
       }
 
+      invalidateLinksCache();
       res.json({ message: "Link deleted successfully" });
     } catch (error) {
       res.status(500).json({ message: "Failed to delete affiliate link" });
@@ -806,8 +830,8 @@ Transform now with maximum conversion power in minimal words:`;
         });
       }
 
-      // Get available products for AI context
-      const availableProducts = await storage.getPublishedAffiliateLinks();
+      // Get available products for AI context (served from cache)
+      const availableProducts = await getCachedPublishedLinks();
       
       // Generate AI response using Cohere
       const aiResult = await generateAIChatResponse(
