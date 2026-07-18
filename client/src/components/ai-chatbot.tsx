@@ -142,7 +142,10 @@ export default function AIChatbot() {
   const [spamBlockedUntil, setSpamBlockedUntil] = useState<number | null>(null);
   const [cooldownSecsLeft,  setCooldownSecsLeft]  = useState(0);
   const [spamWarning,       setSpamWarning]       = useState<{ type: "warning" | "danger"; title: string; msg: string } | null>(null);
-  const [hardBlockedUntil,  setHardBlockedUntil]  = useState<number | null>(null);
+  const [hardBlockedUntil,  setHardBlockedUntil]  = useState<number | null>(() => {
+    const stored = parseInt(localStorage.getItem("chat_hard_block_until") || "0", 10);
+    return stored > Date.now() ? stored : null;
+  });
 
   // ── Daily message cap (50/day) ───────────────────────────────────────────────
   const DAILY_MSG_LIMIT = 50;
@@ -1618,14 +1621,19 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
   }, [spamBlockedUntil]);
 
   useEffect(() => {
-    if (!hardBlockedUntil) return;
-    const tick = setInterval(() => {
-      if (Date.now() >= hardBlockedUntil) {
-        setHardBlockedUntil(null);
-        clearInterval(tick);
-      }
-    }, 1000);
-    return () => clearInterval(tick);
+    if (hardBlockedUntil) {
+      localStorage.setItem("chat_hard_block_until", String(hardBlockedUntil));
+      const tick = setInterval(() => {
+        if (Date.now() >= hardBlockedUntil) {
+          setHardBlockedUntil(null);
+          localStorage.removeItem("chat_hard_block_until");
+          clearInterval(tick);
+        }
+      }, 1000);
+      return () => clearInterval(tick);
+    } else {
+      localStorage.removeItem("chat_hard_block_until");
+    }
   }, [hardBlockedUntil]);
 
   useEffect(() => {
