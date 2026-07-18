@@ -5,7 +5,7 @@ import { insertAffiliateLinkSchema, insertAiConversationSchema, insertSmsMessage
 import { z } from "zod";
 import { generateAIChatResponse } from "./cohere-service";
 import { smsService } from "./sms-service";
-import rateLimit, { ipKeyGenerator } from "express-rate-limit";
+import { ipKeyGenerator } from "express-rate-limit";
 
 // ── Map size cap helper (prevents unbounded growth under high traffic) ────────
 const MAX_MAP_SIZE = 10_000;
@@ -18,36 +18,6 @@ function cappedSet<K, V>(map: Map<K, V>, key: K, value: V): void {
   }
   map.set(key, value);
 }
-
-// ── AI Chat Rate Limiters ─────────────────────────────────────────────────────
-
-const aiChatPerMinute = rateLimit({
-  windowMs: 60 * 1000,
-  max: 8,
-  handler: (_req, res) => {
-    res.status(429).json({
-      rateLimited: true,
-      limitType: "per_minute",
-      message: "Whoa, slow down! Even I need a breath. Try again in a minute. 😅"
-    });
-  },
-  standardHeaders: false,
-  legacyHeaders: false,
-});
-
-const aiChatPerHour = rateLimit({
-  windowMs: 60 * 60 * 1000,
-  max: 40,
-  handler: (_req, res) => {
-    res.status(429).json({
-      rateLimited: true,
-      limitType: "per_hour",
-      message: "You've hit your hourly limit — come back in a bit! I'll be here when you return. 🕐"
-    });
-  },
-  standardHeaders: false,
-  legacyHeaders: false,
-});
 
 // Per-IP minimum interval store (1.5 s between requests)
 const lastIpRequestTime = new Map<string, number>();
@@ -184,7 +154,7 @@ function enforceWindowLimit(req: Request, res: Response, next: NextFunction) {
     return res.status(429).json({
       rateLimited: true,
       limitType: "window_limit",
-      message: `Due to high traffic we're limiting requests right now — you've hit ${WINDOW_LIMIT} messages in 2 minutes. Please wait ${minsLeft > 1 ? `${minsLeft} minutes` : `${secsLeft} seconds`} and try again. 🚦`
+      message: `Due to high traffic we're limiting requests right now — you've hit ${WINDOW_LIMIT} messages in 30 minutes. Please wait ${minsLeft > 1 ? `${minsLeft} minutes` : `${secsLeft} seconds`} and try again. 🚦`
     });
   }
 

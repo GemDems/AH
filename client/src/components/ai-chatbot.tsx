@@ -38,9 +38,18 @@ export default function AIChatbot() {
     return result;
   };
 
+  // Get or create a stable per-device ID (shared with referral system key)
+  const getOrCreateDeviceId = (): string => {
+    const existing = localStorage.getItem('elite_device_id') || localStorage.getItem('deviceId');
+    if (existing) return existing;
+    const newId = `device_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    localStorage.setItem('elite_device_id', newId);
+    return newId;
+  };
+
   // Generate unique session ID for this tab
   const [sessionId] = useState(() => {
-    const deviceId = localStorage.getItem('deviceId') || 'unknown';
+    const deviceId = getOrCreateDeviceId();
     const tabId = Math.random().toString(36).substr(2, 9);
     return `${deviceId}-${tabId}`;
   });
@@ -1069,7 +1078,7 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
       // Try Cohere AI first — abort after 8 s so the chat never hangs
       const controller = new AbortController();
       const abortTimer = setTimeout(() => controller.abort(), 8000);
-      const deviceId = localStorage.getItem('deviceId') || 'unknown';
+      const deviceId = getOrCreateDeviceId();
 
       const response = await fetch('/api/ai-chat', {
         method: 'POST',
