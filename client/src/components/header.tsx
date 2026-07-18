@@ -235,7 +235,7 @@ export default function Header({ onSearch }: HeaderProps) {
             </span>
           </LiquidBadge>
         </div>
-        <h1 className="font-extrabold leading-none tracking-tight text-white" style={{ fontSize: "clamp(52px,9vw,88px)", letterSpacing: "-0.02em" }}>
+        <h1 className="font-extrabold leading-none tracking-tight text-white" style={{ fontSize: "clamp(78px,9vw,88px)", letterSpacing: "-0.02em" }}>
           ELITE<br />
           <span style={{ color: "#2563eb" }}>DEALS</span>
         </h1>
