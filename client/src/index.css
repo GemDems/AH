@@ -19,8 +19,6 @@ html {
   min-height: 100%;
   background-color: #111827 !important;
   overscroll-behavior-y: none;
-  scroll-snap-type: y proximity;
-  scroll-behavior: smooth;
 }
 
 body, html {

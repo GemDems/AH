@@ -615,7 +615,7 @@ export default function Home() {
                 <>
                   <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
                     {first.map((link, i) => (
-                      <div key={link.id} data-product-card={i === 0 ? "first" : undefined} data-product-id={link.id} style={{ scrollSnapAlign: 'start', scrollMarginTop: '72px' }}>
+                      <div key={link.id} data-product-card={i === 0 ? "first" : undefined} data-product-id={link.id}>
                         <AffiliateCard link={link} />
                       </div>
                     ))}
@@ -674,7 +674,7 @@ export default function Home() {
                   {rest.length > 0 && (
                     <div className={`grid gap-6 ${restCols}`}>
                       {rest.map((link) => (
-                        <div key={link.id} data-product-id={link.id} style={{ scrollSnapAlign: 'start', scrollMarginTop: '72px' }}>
+                        <div key={link.id} data-product-id={link.id}>
                           <AffiliateCard link={link} />
                         </div>
                       ))}
