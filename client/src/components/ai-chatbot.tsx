@@ -870,6 +870,17 @@ Can I help you find something excellent in one of these available categories?`
   const handlePitchClick = () => {
     if (!foundProduct) return;
 
+    // ── Hard block check: chat window limit active ──
+    if (hardBlockedUntil && Date.now() < hardBlockedUntil) {
+      const minsLeft = Math.ceil((hardBlockedUntil - Date.now()) / 60_000);
+      if (!pitchLimitNotif) {
+        if (pitchLimitTimerRef.current) clearTimeout(pitchLimitTimerRef.current);
+        setPitchLimitNotif(`Why I Pitch This? isn't available right now — you've hit your chat limit. It resets in ${minsLeft} minute${minsLeft === 1 ? "" : "s"}. 🚦`);
+        pitchLimitTimerRef.current = setTimeout(() => setPitchLimitNotif(null), 6000);
+      }
+      return;
+    }
+
     const now = Date.now();
 
     // ── Daily cap: 15 total per day ──
