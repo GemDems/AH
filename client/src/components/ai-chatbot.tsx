@@ -2353,10 +2353,15 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
               <LoadingBreadcrumb
                 texts={[
                   "Locking in your perfect deal",
+                  "Verified by thousands of buyers",
+                  "Reading your mind",
                   "Scanning exclusive offers",
+                  "Checking real customer reviews",
                   "Hunting the best price for you",
-                  "Securing your offer now",
                   "This one was made for you",
+                  "Confirming it's still in stock",
+                  "Securing your offer now",
+                  "Rated top pick this week",
                 ]}
                 onClick={() => setShowAgentBadge(v => !v)}
                 className="ml-1"
@@ -2385,11 +2390,18 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
               {/* LoadingBreadcrumb — separate below the bubble */}
               <LoadingBreadcrumb
                 texts={[
+                  "Scanning top-rated options",
                   "Reading your mind",
+                  "Verified by real buyers",
                   "Finding your perfect match",
+                  "Checking stock right now",
                   "Your deal is almost here",
+                  "Trusted by thousands",
                   "Almost ready for you",
+                  "Cross-checking the best price",
                   "Worth the wait — promise",
+                  "Top pick incoming",
+                  "Rated #1 this week",
                 ]}
                 onClick={() => setShowAgentBadge(v => !v)}
                 className="ml-1"
