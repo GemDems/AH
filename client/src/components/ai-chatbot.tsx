@@ -7,6 +7,7 @@ import { ProductHighlightCard } from "./ui/product-highlight-card";
 import { LoadingBreadcrumb } from "./ui/loading-breadcrumb";
 import { AgentThinkingBadge, PALETTES } from "./ui/grok-agent-thinking-indicator";
 import SendButton from "./ui/send-button";
+import { Admonition } from "./ui/admonition";
 
 interface Message {
   id: string;
@@ -123,7 +124,17 @@ export default function AIChatbot() {
   const [shouldGlowRestoreButton, setShouldGlowRestoreButton] = useState(false);
   const [isHoveringRestoreButton, setIsHoveringRestoreButton] = useState(false);
   const [hoverTimer, setHoverTimer] = useState<NodeJS.Timeout | null>(null);
-  
+
+  // ── Spam protection ─────────────────────────────────────────────────────────
+  const activeGenerations   = useRef(0);            // in-flight AI calls (max 2)
+  const spamStrikes         = useRef(0);            // escalation counter
+  const lastMessageTime     = useRef(0);            // ms timestamp of last send
+  const lastMessageContent  = useRef("");           // duplicate detection
+  const [spamBlockedUntil, setSpamBlockedUntil] = useState<number | null>(null);
+  const [cooldownSecsLeft,  setCooldownSecsLeft]  = useState(0);
+  const [spamWarning,       setSpamWarning]       = useState<{ type: "warning" | "danger"; title: string; msg: string } | null>(null);
+  // ────────────────────────────────────────────────────────────────────────────
+
   const chatRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -1010,6 +1021,67 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
     const textToSend = overrideMessage ?? inputValue;
     if (!textToSend.trim()) return;
 
+    const now = Date.now();
+
+    // ── Spam guard ────────────────────────────────────────────────────────────
+    // 1. Still in cooldown?
+    if (spamBlockedUntil && now < spamBlockedUntil) {
+      spamStrikes.current += 1;
+      const extra = spamStrikes.current * 15_000;
+      const newUntil = spamBlockedUntil + extra;
+      setSpamBlockedUntil(newUntil);
+      setCooldownSecsLeft(Math.ceil((newUntil - now) / 1000));
+      setSpamWarning({
+        type: "danger",
+        title: "Cooldown Extended",
+        msg: `Keep trying and the wait gets longer. Please wait ${Math.ceil((newUntil - now) / 1000)}s.`,
+      });
+      return;
+    }
+
+    // 2. Too many concurrent generations (max 2)
+    if (activeGenerations.current >= 2) {
+      const cooldownMs = 12_000;
+      const until = now + cooldownMs;
+      setSpamBlockedUntil(until);
+      setCooldownSecsLeft(12);
+      setSpamWarning({
+        type: "warning",
+        title: "Slow Down",
+        msg: "I'm already thinking about 2 messages. Give me a moment to finish — you're blocked for 12s.",
+      });
+      return;
+    }
+
+    // 3. Minimum gap between sends (1.5s)
+    if (now - lastMessageTime.current < 1500) {
+      setSpamWarning({
+        type: "warning",
+        title: "Too Fast",
+        msg: "You're sending messages too quickly. Wait a moment before sending again.",
+      });
+      setTimeout(() => setSpamWarning(null), 3000);
+      return;
+    }
+
+    // 4. Duplicate message detection
+    if (textToSend.trim() === lastMessageContent.current) {
+      setSpamWarning({
+        type: "warning",
+        title: "Duplicate Message",
+        msg: "You already sent that exact message. Try rephrasing or ask something different.",
+      });
+      setTimeout(() => setSpamWarning(null), 3000);
+      return;
+    }
+
+    // All checks passed — clear warning and record
+    setSpamWarning(null);
+    lastMessageTime.current = now;
+    lastMessageContent.current = textToSend.trim();
+    activeGenerations.current += 1;
+    // ─────────────────────────────────────────────────────────────────────────
+
     let messageContent = textToSend;
     
     // If replying to a message, include context
@@ -1092,6 +1164,8 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
         setShowPitchButton(true);
         console.log('🎯 Product found by local system:', localFoundProduct.title);
       }
+    } finally {
+      activeGenerations.current = Math.max(0, activeGenerations.current - 1);
     }
   };
 
@@ -1364,6 +1438,24 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
       setPosition({ x: newX, y: newY });
     }
   };
+
+  // Countdown timer for spam cooldown
+  useEffect(() => {
+    if (!spamBlockedUntil) return;
+    const tick = setInterval(() => {
+      const secsLeft = Math.ceil((spamBlockedUntil - Date.now()) / 1000);
+      if (secsLeft <= 0) {
+        setCooldownSecsLeft(0);
+        setSpamBlockedUntil(null);
+        setSpamWarning(null);
+        spamStrikes.current = 0;
+        clearInterval(tick);
+      } else {
+        setCooldownSecsLeft(secsLeft);
+      }
+    }, 500);
+    return () => clearInterval(tick);
+  }, [spamBlockedUntil]);
 
   useEffect(() => {
     const cleanup = () => {
@@ -2250,13 +2342,25 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
             </div>
           )}
           
+          {/* Spam warning */}
+          {spamWarning && (
+            <div className="mb-2">
+              <Admonition type={spamWarning.type} title={spamWarning.title}>
+                {spamWarning.msg}
+                {spamBlockedUntil && cooldownSecsLeft > 0 && (
+                  <span className="ml-1 font-bold">({cooldownSecsLeft}s)</span>
+                )}
+              </Admonition>
+            </div>
+          )}
+
           <div className="flex gap-2">
             <input
               type="text"
               data-chat-input
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+              onKeyPress={(e) => e.key === 'Enter' && !spamBlockedUntil && handleSendMessage()}
               placeholder={replyingTo ? `Reply to message...` : "Ask me anything about deals..."}
               className="flex-1 bg-gray-800 text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none text-sm cursor-text"
               style={{ fontFamily: 'Inter, sans-serif' }}
