@@ -143,7 +143,6 @@ export default function AIChatbot() {
   const [cooldownSecsLeft,  setCooldownSecsLeft]  = useState(0);
   const [spamWarning,       setSpamWarning]       = useState<{ type: "warning" | "danger"; title: string; msg: string } | null>(null);
   const [hardBlockedUntil,  setHardBlockedUntil]  = useState<number | null>(null);
-  const [hardBlockSecsLeft, setHardBlockSecsLeft] = useState(0);
 
   // ── Daily message cap (50/day) ───────────────────────────────────────────────
   const DAILY_MSG_LIMIT = 50;
@@ -1162,7 +1161,6 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
     const dailyState = getDailyMsgState();
     if (dailyState.count >= DAILY_MSG_LIMIT) {
       setHardBlockedUntil(now + 2 * 60_000);
-      setHardBlockSecsLeft(120);
       return;
     }
 
@@ -1248,7 +1246,6 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
       if (aiResult.spamBlock) {
         if (aiResult.spamBlock.type === "danger") {
           setHardBlockedUntil(Date.now() + 2 * 60_000);
-          setHardBlockSecsLeft(120);
         } else {
           // Gibberish warning — just flash the admonition briefly, no hard block
           setSpamWarning({
@@ -1634,15 +1631,11 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
   useEffect(() => {
     if (!hardBlockedUntil) return;
     const tick = setInterval(() => {
-      const secsLeft = Math.ceil((hardBlockedUntil - Date.now()) / 1000);
-      if (secsLeft <= 0) {
-        setHardBlockSecsLeft(0);
+      if (Date.now() >= hardBlockedUntil) {
         setHardBlockedUntil(null);
         clearInterval(tick);
-      } else {
-        setHardBlockSecsLeft(secsLeft);
       }
-    }, 500);
+    }, 1000);
     return () => clearInterval(tick);
   }, [hardBlockedUntil]);
 
@@ -2531,14 +2524,20 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
             </div>
           )}
           
-          {/* Spam warning */}
-          {spamWarning && (
+          {/* Hard block notification */}
+          {hardBlockedUntil && (
+            <div className="dark mb-2">
+              <Admonition type="danger" title="You've Hit Your Limit">
+                Due to high traffic, messaging is temporarily paused. Try again in a couple minutes.
+              </Admonition>
+            </div>
+          )}
+
+          {/* Spam warning (gibberish only) */}
+          {spamWarning && !hardBlockedUntil && (
             <div className="dark mb-2">
               <Admonition type={spamWarning.type} title={spamWarning.title}>
                 {spamWarning.msg}
-                {spamBlockedUntil && cooldownSecsLeft > 0 && (
-                  <span className="ml-1 font-bold">({cooldownSecsLeft}s)</span>
-                )}
               </Admonition>
             </div>
           )}
@@ -2549,11 +2548,11 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
               data-chat-input
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && !spamBlockedUntil && !isTyping && handleSendMessage()}
+              onKeyPress={(e) => e.key === 'Enter' && !hardBlockedUntil && !isTyping && handleSendMessage()}
               placeholder={replyingTo ? `Reply to message...` : "Ask me anything about deals..."}
-              disabled={isTyping}
+              disabled={isTyping || !!hardBlockedUntil}
               className={`flex-1 bg-gray-800 text-white px-3 py-2 rounded-lg border focus:outline-none text-sm transition-all duration-200 ${
-                isTyping
+                isTyping || hardBlockedUntil
                   ? "border-gray-700 opacity-50 cursor-not-allowed pointer-events-none select-none"
                   : "border-gray-600 focus:border-blue-500 cursor-text"
               }`}
@@ -2565,10 +2564,10 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
             <SendButton
               onClick={(e) => {
                 e.stopPropagation();
-                if (!isTyping) handleSendMessage();
+                if (!isTyping && !hardBlockedUntil) handleSendMessage();
               }}
               onMouseDown={(e) => e.stopPropagation()}
-              disabled={isTyping}
+              disabled={isTyping || !!hardBlockedUntil}
             />
           </div>
         </div>
