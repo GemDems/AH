@@ -145,6 +145,43 @@ function enforceBurstLimit(req: Request, res: Response, next: NextFunction) {
   next();
 }
 
+// ── Window limit: 10 messages per 2 minutes ─────────────────────────────────
+interface WindowRecord { timestamps: number[]; }
+const deviceWindowMap = new Map<string, WindowRecord>();
+const WINDOW_MS    = 2 * 60_000;  // 2-minute rolling window
+const WINDOW_LIMIT = 10;          // max messages in that window
+
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, rec] of deviceWindowMap) {
+    if (rec.timestamps.every(t => now - t > WINDOW_MS)) deviceWindowMap.delete(key);
+  }
+}, 5 * 60_000);
+
+function enforceWindowLimit(req: Request, res: Response, next: NextFunction) {
+  const deviceId: string = (req.body?.deviceId as string) || "unknown";
+  const now = Date.now();
+
+  let rec = deviceWindowMap.get(deviceId);
+  if (!rec) { rec = { timestamps: [] }; deviceWindowMap.set(deviceId, rec); }
+
+  rec.timestamps = rec.timestamps.filter(t => now - t < WINDOW_MS);
+
+  if (rec.timestamps.length >= WINDOW_LIMIT) {
+    const oldestInWindow = rec.timestamps[0];
+    const secsLeft = Math.ceil((oldestInWindow + WINDOW_MS - now) / 1000);
+    const minsLeft = Math.ceil(secsLeft / 60);
+    return res.status(429).json({
+      rateLimited: true,
+      limitType: "window_limit",
+      message: `Due to high traffic we're limiting requests right now — you've hit ${WINDOW_LIMIT} messages in 2 minutes. Please wait ${minsLeft > 1 ? `${minsLeft} minutes` : `${secsLeft} seconds`} and try again. 🚦`
+    });
+  }
+
+  rec.timestamps.push(now);
+  deviceWindowMap.set(deviceId, rec);
+  next();
+}
 // ─────────────────────────────────────────────────────────────────────────────
 
 // Global live stats that persist across sessions
@@ -724,7 +761,7 @@ Transform now with maximum conversion power in minimal words:`;
   });
 
   // OpenAI Chat API endpoint (rate-limited)
-  app.post("/api/ai-chat", aiChatPerMinute, aiChatPerHour, enforceMinInterval, enforceBurstLimit, enforceDeviceDailyCap, async (req, res) => {
+  app.post("/api/ai-chat", aiChatPerMinute, aiChatPerHour, enforceMinInterval, enforceWindowLimit, enforceBurstLimit, enforceDeviceDailyCap, async (req, res) => {
     try {
       const { message, conversationHistory } = req.body;
       

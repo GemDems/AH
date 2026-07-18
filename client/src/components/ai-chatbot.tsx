@@ -1109,6 +1109,13 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
               spamBlock: { type: "warning", title: "That Doesn't Look Like a Real Question" }
             };
           }
+          if (errorData.limitType === "window_limit") {
+            return {
+              response: "",
+              confidence: 0,
+              spamBlock: { type: "danger", title: "High Traffic — Slow Down" }
+            };
+          }
 
           // Other rate-limit / validation errors — surface as Zane's chat bubble
           const zaneMessages: Record<string, string> = {
