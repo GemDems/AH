@@ -162,6 +162,23 @@ function generateBuiltInResponse(
 ): ProductAnalysisResult {
   const lower = userMessage.toLowerCase().trim();
 
+  // Non-shopping topics — site features the AI should NEVER turn into product pitches
+  const siteTopics = [
+    "leaderboard", "vip", "referral", "invite", "invites", "code", "bonus code",
+    "rank", "ranking", "points", "progress", "savings", "how do i get vip",
+    "how do i qualify", "username", "profile", "my account", "my code",
+    "used count", "score", "status", "tier", "earn", "reward"
+  ];
+  const isSiteTopic = siteTopics.some(t => lower.includes(t));
+  if (isSiteTopic) {
+    const siteResponses = [
+      "that's a site feature question — i'm the deal-finder here 😄 for VIP/leaderboard stuff, check the section at the bottom of the page!",
+      "i'm mostly the shopping expert here 🛍️ for leaderboard or VIP questions, scroll down to the VIP section on the page!",
+      "great question but that's above my pay grade 😂 i handle deals — for referrals/VIP, check the bottom of the page!"
+    ];
+    return { response: siteResponses[Math.floor(Math.random() * siteResponses.length)], confidence: 0.4 };
+  }
+
   // Greetings
   const greetings = ["hey", "hi", "hello", "sup", "yo", "hiya", "what's up", "whats up", "howdy", "helo", "heya"];
   if (greetings.some(g => lower === g || lower.startsWith(g + " ") || lower.startsWith(g + "!"))) {
@@ -193,18 +210,18 @@ function generateBuiltInResponse(
       if (s > bestScore) { bestMatch = product; bestScore = s; }
     }
 
-    // Detect general browsing / recommendation intent
+    // Detect general browsing / recommendation intent — ONLY clear shopping phrases
     const browseIntent = [
-      "recommend", "what do you have", "show me", "what's good", "whats good",
-      "what's hot", "anything good", "best deal", "top deal", "popular", "most popular",
-      "what should i", "surprise me", "what's new", "anything", "browse", "hot right now",
-      "what you got", "give me something", "help me find", "what's trending",
-      "what do", "what can", "looking for", "need something", "want something",
-      "got anything", "any good", "what would", "show me something"
+      "recommend", "what do you have", "show me deals", "what's good to buy",
+      "what's hot right now", "best deal", "top deal", "most popular deal",
+      "surprise me", "what's new in stock", "hot right now",
+      "what you got for sale", "give me a deal", "what's trending to buy",
+      "got any deals", "show me something to buy", "what should i buy",
+      "what's your best product", "what's popular right now"
     ];
     const isGeneralBrowse = browseIntent.some(phrase => lower.includes(phrase));
 
-    if (bestMatch && bestScore >= 7) {
+    if (bestMatch && bestScore >= 15) {
       const price = bestMatch.price ? `$${bestMatch.price}` : "great price";
       const verified = bestMatch.isVerified ? " ✔️ verified" : "";
       const elite = bestMatch.isElitePick ? " 🧠 Elite Pick" : "";
@@ -283,6 +300,10 @@ RULES:
   - "what's the weather like?" → do NOT recommend anything, just chat naturally ✅
   - "tell me a joke" → do NOT recommend anything, just reply naturally ✅
   - "what's popular?" → recommend the best catalog item ✅
+• SITE FEATURE QUESTIONS — if the user asks about VIP status, leaderboard, referral codes, invite codes, rankings, points, savings tracker, or any other site feature: reply naturally explaining you're the deal-finder and direct them to the relevant section on the page. NEVER push a product in response to these.
+  - "how do I get VIP?" → explain you handle deals, point them to the VIP section ✅
+  - "what's my leaderboard rank?" → explain you handle deals, point them to the leaderboard ✅
+  - "how do referral codes work?" → explain you handle deals, refer them to the VIP section ✅
 • If the user's message is small talk, random chat, or clearly unrelated to shopping — reply naturally without pushing any product.
 • Links MUST use exact catalog URLs. Format: [Name](URL). Never paste raw URLs.
 • PRIVATE INTEL field = top priority for matching — read it carefully.
