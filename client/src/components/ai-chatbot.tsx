@@ -972,6 +972,8 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
       // Try Cohere AI first — abort after 8 s so the chat never hangs
       const controller = new AbortController();
       const abortTimer = setTimeout(() => controller.abort(), 8000);
+      const deviceId = localStorage.getItem('deviceId') || 'unknown';
+
       const response = await fetch('/api/ai-chat', {
         method: 'POST',
         headers: {
@@ -980,6 +982,7 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
         signal: controller.signal,
         body: JSON.stringify({
           message: userMessage,
+          deviceId,
           conversationHistory: conversationHistory.map(msg => ({
             role: msg.role,
             content: msg.content
@@ -990,10 +993,6 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
 
       if (response.ok) {
         const aiResult = await response.json();
-        console.log('🤖 Cohere Response:', aiResult.response);
-        console.log('🎯 Recommended Product:', aiResult.recommendedProduct?.title);
-        console.log('📊 Confidence:', aiResult.confidence);
-        
         return {
           response: aiResult.response,
           recommendedProduct: aiResult.recommendedProduct,
@@ -1001,10 +1000,29 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
         };
       } else {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(`Cohere API failed: ${response.status} ${errorData.error || 'Unknown error'}`);
+
+        // Rate-limit and validation errors — surface as Zane's chat bubble
+        if (response.status === 429 || errorData.limitType) {
+          const zaneMessages: Record<string, string> = {
+            too_fast:       "Hey, slow down a little! ⚡ Give me a second between messages — I promise I'm not going anywhere.",
+            per_minute:     "Whoa, you're on fire! 🔥 I need a minute to catch my breath. Try again shortly.",
+            per_hour:       "You've been busy today! 🕐 You've hit your hourly message limit. Come back in a bit — I'll have deals waiting.",
+            daily_limit:    "You've maxed out your messages for today! 🌅 Come back tomorrow and I'll have even better deals lined up for you.",
+            message_too_long: "That message is too long for me to process! ✂️ Please keep it under 500 characters — try asking in a shorter way.",
+            session_full:   "This chat session is full (30 messages)! 🔄 Hit the reset button to start a fresh conversation — I'm ready when you are.",
+          };
+          const friendlyMsg = errorData.message || zaneMessages[errorData.limitType] || "Slow down a bit and try again in a moment! 😊";
+          return { response: friendlyMsg, confidence: 0 };
+        }
+
+        throw new Error(`API error: ${response.status}`);
       }
     } catch (error) {
-      console.log('⚠️ Cohere unavailable, using local AI system:', error.message);
+      // If the error already has a friendly response baked in, propagate it
+      if (error instanceof Error && error.message.startsWith("ZANE:")) {
+        return { response: error.message.slice(5), confidence: 0 };
+      }
+      console.log('⚠️ Cohere unavailable, using local AI system:', (error as Error).message);
       const fallbackResponse = generateContextualResponse(userMessage, conversationHistory);
       return {
         response: fallbackResponse,

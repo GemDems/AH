@@ -1,10 +1,98 @@
-import type { Express } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertAffiliateLinkSchema, insertAiConversationSchema, insertSmsMessageSchema, insertUserSmsPreferencesSchema } from "@shared/schema";
 import { z } from "zod";
 import { generateAIChatResponse } from "./cohere-service";
 import { smsService } from "./sms-service";
+import rateLimit, { ipKeyGenerator } from "express-rate-limit";
+
+// ── AI Chat Rate Limiters ─────────────────────────────────────────────────────
+
+const aiChatPerMinute = rateLimit({
+  windowMs: 60 * 1000,
+  max: 8,
+  handler: (_req, res) => {
+    res.status(429).json({
+      rateLimited: true,
+      limitType: "per_minute",
+      message: "Whoa, slow down! Even I need a breath. Try again in a minute. 😅"
+    });
+  },
+  standardHeaders: false,
+  legacyHeaders: false,
+});
+
+const aiChatPerHour = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 40,
+  handler: (_req, res) => {
+    res.status(429).json({
+      rateLimited: true,
+      limitType: "per_hour",
+      message: "You've hit your hourly limit — come back in a bit! I'll be here when you return. 🕐"
+    });
+  },
+  standardHeaders: false,
+  legacyHeaders: false,
+});
+
+// Per-IP minimum interval store (1.5 s between requests)
+const lastIpRequestTime = new Map<string, number>();
+
+// Prune stale interval entries every 5 minutes to prevent unbounded growth
+setInterval(() => {
+  const cutoff = Date.now() - 60_000;
+  for (const [key, ts] of lastIpRequestTime) {
+    if (ts < cutoff) lastIpRequestTime.delete(key);
+  }
+}, 5 * 60_000);
+
+function enforceMinInterval(req: Request, res: Response, next: NextFunction) {
+  const ip = ipKeyGenerator(req.ip || "");
+  const now = Date.now();
+  const last = lastIpRequestTime.get(ip) || 0;
+  if (now - last < 1500) {
+    return res.status(429).json({
+      rateLimited: true,
+      limitType: "too_fast",
+      message: "You're typing faster than I can think! Give me 1-2 seconds between messages. ⚡"
+    });
+  }
+  lastIpRequestTime.set(ip, now);
+  next();
+}
+
+// Per-device daily cap (60 messages/day)
+interface DailyRecord { count: number; resetAt: number; }
+const deviceDailyCount = new Map<string, DailyRecord>();
+const DAILY_CAP = 60;
+
+function enforceDeviceDailyCap(req: Request, res: Response, next: NextFunction) {
+  const deviceId: string = (req.body?.deviceId as string) || "unknown";
+  const now = Date.now();
+  const midnight = new Date(); midnight.setHours(24, 0, 0, 0);
+  const resetAt = midnight.getTime();
+
+  let record = deviceDailyCount.get(deviceId);
+  if (!record || now >= record.resetAt) {
+    record = { count: 0, resetAt };
+  }
+
+  if (record.count >= DAILY_CAP) {
+    return res.status(429).json({
+      rateLimited: true,
+      limitType: "daily_limit",
+      message: `You've used all ${DAILY_CAP} messages for today — come back tomorrow! I'll have plenty more deals waiting for you. 🌅`
+    });
+  }
+
+  record.count += 1;
+  deviceDailyCount.set(deviceId, record);
+  next();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 // Global live stats that persist across sessions
 let liveStats = {
@@ -582,13 +670,32 @@ Transform now with maximum conversion power in minimal words:`;
     }
   });
 
-  // OpenAI Chat API endpoint
-  app.post("/api/ai-chat", async (req, res) => {
+  // OpenAI Chat API endpoint (rate-limited)
+  app.post("/api/ai-chat", aiChatPerMinute, aiChatPerHour, enforceMinInterval, enforceDeviceDailyCap, async (req, res) => {
     try {
       const { message, conversationHistory } = req.body;
       
       if (!message || typeof message !== 'string') {
         return res.status(400).json({ message: "Message is required" });
+      }
+
+      // Message length validation (500 char max)
+      if (message.length > 500) {
+        return res.status(400).json({
+          rateLimited: false,
+          limitType: "message_too_long",
+          message: `Whoa, that's a lot of text! Please keep your message under 500 characters. You sent ${message.length} characters — try to shorten it a bit. ✂️`
+        });
+      }
+
+      // Conversation turns cap (max 30 turns = 15 back-and-forth)
+      const history = Array.isArray(conversationHistory) ? conversationHistory : [];
+      if (history.length > 30) {
+        return res.status(400).json({
+          rateLimited: false,
+          limitType: "session_full",
+          message: "We've had a great conversation, but this chat session is full (30 messages)! Start a fresh chat to keep exploring deals — I'll be ready with new recommendations. 🔄"
+        });
       }
 
       // Get available products for AI context
