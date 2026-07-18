@@ -104,6 +104,14 @@ export default function Home() {
     });
   }
 
+  // Returns true if `text` contains `word`, its singular, or its plural
+  function wordMatches(text: string, word: string): boolean {
+    if (text.includes(word)) return true;
+    if (word.endsWith("s") && word.length > 2 && text.includes(word.slice(0, -1))) return true;
+    if (!word.endsWith("s") && text.includes(word + "s")) return true;
+    return false;
+  }
+
   const filteredAndSortedLinks = (() => {
     const q = searchQuery.toLowerCase().trim();
     const words = q ? q.split(/\s+/).filter(w => w.length > 1) : [];
@@ -119,19 +127,20 @@ export default function Home() {
         const cat = (link.category || "").toLowerCase();
         const priv = (link.aiPrivateInfo || "").toLowerCase();
 
-        // Require ALL words to match somewhere (strict accuracy)
+        // All words must match somewhere (handles singular/plural)
         const allMatch = words.every(word =>
-          title.includes(word) || desc.includes(word) || cat.includes(word) || priv.includes(word)
+          wordMatches(title, word) || wordMatches(desc, word) ||
+          wordMatches(cat, word) || wordMatches(priv, word)
         );
         if (!allMatch) return null;
 
-        // Score by match quality: title > description/category > private info
+        // Score by match location: title > description/category > private info
         let score = 0;
         words.forEach(word => {
-          if (title.includes(word)) score += 30;
-          if (desc.includes(word)) score += 20;
-          if (cat.includes(word)) score += 20;
-          if (priv.includes(word)) score += 10;
+          if (wordMatches(title, word)) score += 30;
+          if (wordMatches(desc, word)) score += 20;
+          if (wordMatches(cat, word)) score += 20;
+          if (wordMatches(priv, word)) score += 10;
         });
 
         return { link, score };
@@ -140,9 +149,7 @@ export default function Home() {
 
     return scored
       .sort((a, b) => {
-        // If searching, sort by relevance score first
         if (q) return b.score - a.score;
-
         if (discoverTab === "favorites") {
           const wA = 40 + Math.floor(seededRand(a.link.id, 6) * 180);
           const wB = 40 + Math.floor(seededRand(b.link.id, 6) * 180);
