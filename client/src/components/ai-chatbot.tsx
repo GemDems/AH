@@ -142,6 +142,8 @@ export default function AIChatbot() {
   const [spamBlockedUntil, setSpamBlockedUntil] = useState<number | null>(null);
   const [cooldownSecsLeft,  setCooldownSecsLeft]  = useState(0);
   const [spamWarning,       setSpamWarning]       = useState<{ type: "warning" | "danger"; title: string; msg: string } | null>(null);
+  const [pitchLimitNotif,   setPitchLimitNotif]   = useState<string | null>(null);
+  const pitchLimitTimerRef  = useRef<NodeJS.Timeout | null>(null);
   const [hardBlockedUntil,  setHardBlockedUntil]  = useState<number | null>(() => {
     // Clear any old keys from previous versions
     localStorage.removeItem("chat_hard_block_until");
@@ -860,13 +862,11 @@ Can I help you find something excellent in one of these available categories?`
     const effectiveDayReset   = now < pitchDayResetAt ? pitchDayResetAt : midnight;
 
     if (effectiveDailyCount >= 15) {
-      const blockedMsg: Message = {
-        id: Date.now().toString(),
-        content: "🚫 You've used all 15 **Why I Pitch This?** requests for today. Come back tomorrow — I'll have even sharper reasons waiting for you. 🔥",
-        isBot: true,
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, blockedMsg]);
+      if (!pitchLimitNotif) {
+        if (pitchLimitTimerRef.current) clearTimeout(pitchLimitTimerRef.current);
+        setPitchLimitNotif("You've used all 15 Why I Pitch This? requests for today. Come back tomorrow!");
+        pitchLimitTimerRef.current = setTimeout(() => setPitchLimitNotif(null), 5000);
+      }
       return;
     }
 
@@ -877,13 +877,12 @@ Can I help you find something excellent in one of these available categories?`
     if (effectiveWindowCount >= 3) {
       const secsLeft = Math.ceil((pitchWindowResetAt - now) / 1000);
       const minsLeft = Math.ceil(secsLeft / 60);
-      const blockedMsg: Message = {
-        id: Date.now().toString(),
-        content: `⏳ Easy there — you've hit 3 **Why I Pitch This?** in 5 minutes. Give me ${minsLeft > 1 ? `${minsLeft} more minutes` : 'a moment'} and I'll be ready to sell you again. 😏`,
-        isBot: true,
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, blockedMsg]);
+      const timeStr = minsLeft > 1 ? `${minsLeft} more minutes` : 'a moment';
+      if (!pitchLimitNotif) {
+        if (pitchLimitTimerRef.current) clearTimeout(pitchLimitTimerRef.current);
+        setPitchLimitNotif(`You've hit 3 Why I Pitch This? in 5 minutes. Wait ${timeStr} and try again.`);
+        pitchLimitTimerRef.current = setTimeout(() => setPitchLimitNotif(null), 5000);
+      }
       return;
     }
 
@@ -2537,6 +2536,14 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
                 <div className="dark mb-2">
                   <Admonition type={spamWarning.type} title={spamWarning.title}>
                     {spamWarning.msg}
+                  </Admonition>
+                </div>
+              )}
+
+              {pitchLimitNotif && (
+                <div className="dark mb-2">
+                  <Admonition type="warning" title="Pitch Limit Reached">
+                    {pitchLimitNotif}
                   </Admonition>
                 </div>
               )}
