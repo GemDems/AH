@@ -192,7 +192,14 @@ export default function Header({ onSearch }: HeaderProps) {
       <div className="relative z-20 px-4" style={{ marginTop: "14px" }}>
         <AnimatedGlowingSearchBar
           value={headerSearch}
-          onChange={setHeaderSearch}
+          onChange={(val) => {
+            setHeaderSearch(val);
+            onSearch?.(val);
+            if (val.trim()) {
+              const el = document.querySelector('[data-section="products"]') as HTMLElement;
+              el?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+          }}
           placeholder="Search for deals..."
           animatedPhrases={[
             "Search for deals...",

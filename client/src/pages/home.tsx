@@ -387,7 +387,7 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main data-section="products" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="text-center mb-6">
           <h2 className="font-extrabold text-4xl sm:text-5xl mb-2" style={{ color: "#00008B" }}>
             Elite Deals Hub
