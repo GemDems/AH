@@ -155,10 +155,10 @@ function enforceBurstLimit(req: Request, res: Response, next: NextFunction) {
   next();
 }
 
-// ── Window limit: 10 messages per 2 minutes ─────────────────────────────────
+// ── Window limit: 10 messages per 30 minutes ────────────────────────────────
 interface WindowRecord { timestamps: number[]; }
 const deviceWindowMap = new Map<string, WindowRecord>();
-const WINDOW_MS    = 2 * 60_000;  // 2-minute rolling window
+const WINDOW_MS    = 30 * 60_000; // 30-minute rolling window
 const WINDOW_LIMIT = 10;          // max messages in that window
 
 setInterval(() => {

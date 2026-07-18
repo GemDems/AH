@@ -1153,7 +1153,7 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
     // 0. Daily message cap (50/day)
     const dailyState = getDailyMsgState();
     if (dailyState.count >= DAILY_MSG_LIMIT) {
-      setHardBlockedUntil(now + 2 * 60_000);
+      setHardBlockedUntil(now + 10 * 60_000);
       return;
     }
 
@@ -1235,10 +1235,10 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
       // Use OpenAI-powered AI response generation
       const aiResult = await generateAIResponse(messageToProcess);
       
-      // Burst-block / window-limit rejection — hard block for 2 minutes
+      // Burst-block / window-limit rejection — hard block for 10 minutes
       if (aiResult.spamBlock) {
         if (aiResult.spamBlock.type === "danger") {
-          setHardBlockedUntil(Date.now() + 2 * 60_000);
+          setHardBlockedUntil(Date.now() + 10 * 60_000);
         } else {
           // Gibberish warning — just flash the admonition briefly, no hard block
           setSpamWarning({
