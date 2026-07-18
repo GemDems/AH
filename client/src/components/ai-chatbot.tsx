@@ -161,6 +161,22 @@ export default function AIChatbot() {
     return stored > Date.now() ? stored : null;
   });
 
+  // Synchronous helper — writes localStorage immediately (no async React state lag)
+  const setHardBlock = (until: number | null) => {
+    if (until && until > Date.now()) {
+      localStorage.setItem("chat_hard_block_v3", String(until));
+    } else {
+      localStorage.removeItem("chat_hard_block_v3");
+    }
+    setHardBlockedUntil(until);
+  };
+
+  // Helper to check block status directly from localStorage (avoids stale closure issues)
+  const isChatHardBlocked = (): boolean => {
+    const stored = parseInt(localStorage.getItem("chat_hard_block_v3") || "0", 10);
+    return stored > Date.now();
+  };
+
   // ── Daily message cap (50/day) ───────────────────────────────────────────────
   const DAILY_MSG_LIMIT = 50;
   const getDailyMsgState = () => {
@@ -870,8 +886,8 @@ Can I help you find something excellent in one of these available categories?`
   const handlePitchClick = () => {
     if (!foundProduct) return;
 
-    // ── Hard block check: chat window limit active ──
-    if (hardBlockedUntil && Date.now() < hardBlockedUntil) {
+    // ── Hard block check: read localStorage directly to avoid stale React state ──
+    if (isChatHardBlocked()) {
       if (!pitchLimitNotif) {
         if (pitchLimitTimerRef.current) clearTimeout(pitchLimitTimerRef.current);
         setPitchLimitNotif("Why I Pitch This? isn't available right now — you've hit your chat limit. Come back soon! 🚦");
@@ -1183,7 +1199,7 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
     // 0. Daily message cap (50/day)
     const dailyState = getDailyMsgState();
     if (dailyState.count >= DAILY_MSG_LIMIT) {
-      setHardBlockedUntil(now + 30 * 60_000);
+      setHardBlock(now + 30 * 60_000);
       return;
     }
 
@@ -1268,7 +1284,7 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
       // Burst-block / window-limit rejection — hard block for 30 minutes
       if (aiResult.spamBlock) {
         if (aiResult.spamBlock.type === "danger") {
-          setHardBlockedUntil(Date.now() + 30 * 60_000);
+          setHardBlock(Date.now() + 30 * 60_000);
         } else {
           // Gibberish warning — just flash the admonition briefly, no hard block
           setSpamWarning({
@@ -1656,8 +1672,7 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
       localStorage.setItem("chat_hard_block_v3", String(hardBlockedUntil));
       const tick = setInterval(() => {
         if (Date.now() >= hardBlockedUntil) {
-          setHardBlockedUntil(null);
-          localStorage.removeItem("chat_hard_block_v3");
+          setHardBlock(null);
           clearInterval(tick);
         }
       }, 1000);
