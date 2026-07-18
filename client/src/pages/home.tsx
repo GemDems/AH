@@ -411,7 +411,7 @@ export default function Home() {
         </div>
         {/* MOBILE — search icon toggles between SearchBar and tabs */}
         <div className="sm:hidden mb-12">
-          <AnimatePresence mode="wait" initial={false}>
+          <AnimatePresence mode="sync" initial={false}>
             {!mobileTabsOpen ? (
               <motion.div
                 key="mobile-search"
