@@ -464,7 +464,7 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <main data-section="products" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main data-section="products" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ scrollSnapAlign: 'start', scrollMarginTop: '0px' }}>
         <div className="text-center mb-6">
           <h2 className="font-extrabold text-4xl sm:text-5xl mb-2" style={{ color: "#00008B" }}>
             Elite Deals Hub
@@ -686,11 +686,11 @@ export default function Home() {
           </div>
         )}
       </main>
-      <div data-section="trust"><TrustIndicators /></div>
-      <div className="bg-white pt-0 pb-10" data-section="leaderboard">
+      <div data-section="trust" style={{ scrollSnapAlign: 'start' }}><TrustIndicators /></div>
+      <div className="bg-white pt-0 pb-10" data-section="leaderboard" style={{ scrollSnapAlign: 'start' }}>
         <Leaderboard />
       </div>
-      <div className="bg-gray-100 py-8 border-t" data-section="savings-progress">
+      <div className="bg-gray-100 py-8 border-t" data-section="savings-progress" style={{ scrollSnapAlign: 'start' }}>
         <div className="max-w-md mx-auto">
           <h2 className="text-center text-gray-500 text-xs mb-4 uppercase tracking-wider">Elite Access</h2>
           <ReferralSystem />
