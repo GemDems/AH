@@ -2568,7 +2568,7 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
               }
             })();
             
-            const suggBlocked = !!(hardBlockedUntil || spamBlockedUntil);
+            const suggBlocked = !!(hardBlockedUntil || spamBlockedUntil || isTyping);
             return (
               <div className="mb-2">
                 <button

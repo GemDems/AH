@@ -143,7 +143,7 @@ function enforceBurstLimit(req: Request, res: Response, next: NextFunction) {
 }
 
 // ── Window limit: 10 messages per 30 minutes (persisted to disk) ─────────────
-interface WindowRecord { timestamps: number[]; }
+interface WindowRecord { timestamps: number[]; blockedUntil?: number; }
 const deviceWindowMap = new Map<string, WindowRecord>();
 const WINDOW_MS    = 30 * 60_000; // 30-minute rolling window
 const WINDOW_LIMIT = 10;          // max messages in that window
@@ -152,11 +152,12 @@ const RATE_LIMIT_FILE = "/tmp/elite-rate-limits.json";
 // Load persisted window data on startup so server restarts don't reset counters
 try {
   const raw = fs.readFileSync(RATE_LIMIT_FILE, "utf8");
-  const parsed = JSON.parse(raw) as { windowMap: Record<string, { timestamps: number[] }> };
+  const parsed = JSON.parse(raw) as { windowMap: Record<string, { timestamps: number[]; blockedUntil?: number }> };
   const now = Date.now();
   for (const [key, rec] of Object.entries(parsed.windowMap || {})) {
     const fresh = rec.timestamps.filter((t: number) => now - t < WINDOW_MS);
-    if (fresh.length > 0) deviceWindowMap.set(key, { timestamps: fresh });
+    const blockedUntil = rec.blockedUntil && rec.blockedUntil > now ? rec.blockedUntil : undefined;
+    if (fresh.length > 0 || blockedUntil) deviceWindowMap.set(key, { timestamps: fresh, blockedUntil });
   }
 } catch { /* first run — file doesn't exist yet */ }
 
@@ -172,7 +173,9 @@ setInterval(saveWindowMap, 15_000);
 setInterval(() => {
   const now = Date.now();
   for (const [key, rec] of deviceWindowMap) {
-    if (rec.timestamps.every(t => now - t > WINDOW_MS)) deviceWindowMap.delete(key);
+    const blockExpired = !rec.blockedUntil || now >= rec.blockedUntil;
+    const tsStale = rec.timestamps.every(t => now - t > WINDOW_MS);
+    if (blockExpired && tsStale) deviceWindowMap.delete(key);
   }
 }, 5 * 60_000);
 
@@ -183,21 +186,37 @@ function enforceWindowLimit(req: Request, res: Response, next: NextFunction) {
   let rec = deviceWindowMap.get(deviceId);
   if (!rec) { rec = { timestamps: [] }; cappedSet(deviceWindowMap, deviceId, rec); }
 
-  rec.timestamps = rec.timestamps.filter(t => now - t < WINDOW_MS);
-
-  if (rec.timestamps.length >= WINDOW_LIMIT) {
-    const oldestInWindow = rec.timestamps[0];
-    const secsLeft = Math.ceil((oldestInWindow + WINDOW_MS - now) / 1000);
-    const minsLeft = Math.ceil(secsLeft / 60);
+  // Still within a guaranteed hard block? Reject immediately.
+  if (rec.blockedUntil && now < rec.blockedUntil) {
     return res.status(429).json({
       rateLimited: true,
       limitType: "window_limit",
-      message: `Due to high traffic we're limiting requests right now — you've hit ${WINDOW_LIMIT} messages in 30 minutes. Please wait ${minsLeft > 1 ? `${minsLeft} minutes` : `${secsLeft} seconds`} and try again. 🚦`
+      message: `Due to high traffic, messaging is paused. Try again soon. 🚦`
+    });
+  }
+
+  // Hard block expired — clear it and let timestamps decide
+  if (rec.blockedUntil && now >= rec.blockedUntil) {
+    rec.blockedUntil = undefined;
+    rec.timestamps = [];
+  }
+
+  rec.timestamps = rec.timestamps.filter(t => now - t < WINDOW_MS);
+
+  if (rec.timestamps.length >= WINDOW_LIMIT) {
+    // Set a guaranteed full 30-minute block from RIGHT NOW
+    rec.blockedUntil = now + WINDOW_MS;
+    rec.timestamps = [];
+    saveWindowMap();
+    return res.status(429).json({
+      rateLimited: true,
+      limitType: "window_limit",
+      message: `Due to high traffic we're limiting requests right now — you've hit ${WINDOW_LIMIT} messages. Please wait 30 minutes and try again. 🚦`
     });
   }
 
   rec.timestamps.push(now);
-  saveWindowMap(); // persist immediately on every new message
+  saveWindowMap();
   next();
 }
 // ─────────────────────────────────────────────────────────────────────────────
