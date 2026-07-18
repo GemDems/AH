@@ -411,50 +411,34 @@ export default function Home() {
         </div>
         {/* MOBILE — search icon toggles between SearchBar and tabs */}
         <div className="sm:hidden mb-12">
-          <AnimatePresence mode="sync" initial={false}>
-            {!mobileTabsOpen ? (
-              <motion.div
-                key="mobile-search"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.18 }}
-                className="flex items-center gap-3"
+          {!mobileTabsOpen ? (
+            <div className="flex items-center gap-3">
+              <div className="flex-1 min-w-0">
+                <SearchBar onSearch={setSearchQuery} links={affiliateLinks} containerClass="relative" />
+              </div>
+              <button
+                type="button"
+                onClick={() => setMobileTabsOpen(true)}
+                className="shrink-0 w-11 h-11 bg-white rounded-full shadow-lg flex items-center justify-center"
               >
-                <div className="flex-1 min-w-0">
-                  <SearchBar onSearch={setSearchQuery} links={affiliateLinks} containerClass="relative" />
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setMobileTabsOpen(true)}
-                  className="shrink-0 w-11 h-11 bg-white rounded-full shadow-lg flex items-center justify-center"
-                >
-                  <Search className="w-5 h-5 text-gray-700" />
-                </button>
-              </motion.div>
-            ) : (
-              <motion.div
-                key="mobile-tabs"
-                initial={{ opacity: 0, scale: 0.88 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.88 }}
-                transition={{ type: "spring", damping: 20, stiffness: 230, mass: 1.2 }}
-                className="flex items-center gap-3 justify-center"
+                <Search className="w-5 h-5 text-gray-700" />
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-3 justify-center">
+              <button
+                type="button"
+                onClick={() => setMobileTabsOpen(false)}
+                className="shrink-0 w-11 h-11 bg-white rounded-full shadow-lg flex items-center justify-center"
               >
-                <button
-                  type="button"
-                  onClick={() => setMobileTabsOpen(false)}
-                  className="shrink-0 w-11 h-11 bg-white rounded-full shadow-lg flex items-center justify-center"
-                >
-                  <Search className="w-5 h-5 text-gray-700" />
-                </button>
-                <DiscoverButton
-                  activeTab={discoverTab}
-                  onTabChange={(tab) => { setDiscoverTab(tab); setHasInteractedWithTabs(true); }}
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
+                <Search className="w-5 h-5 text-gray-700" />
+              </button>
+              <DiscoverButton
+                activeTab={discoverTab}
+                onTabChange={(tab) => { setDiscoverTab(tab); setHasInteractedWithTabs(true); }}
+              />
+            </div>
+          )}
         </div>
 
         {/* ── Instagram-style product stories ── */}
