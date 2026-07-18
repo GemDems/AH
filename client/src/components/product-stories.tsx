@@ -196,15 +196,16 @@ export default function ProductStories({ products }: ProductStoriesProps) {
         <style>{`.ps-row::-webkit-scrollbar{display:none}`}</style>
         <div className="ps-row flex gap-4 px-2 py-2 w-max">
           {published.map((product, pi) => {
-            const imgs = getProductImages(product);
-            const ring = imgs.length > 1 ? imgs : [imgs[0], imgs[0]];
+            const thumb = getThumbnailImage(product);
+            const fullImgs = loadedImages.get(product.id);
+            const segCount = fullImgs && fullImgs.length > 1 ? fullImgs.length : 2;
             return (
               <RingThumbnail
                 key={product.id}
                 title={product.title}
-                avatar={imgs[0]}
+                avatar={thumb}
                 viewedIndices={viewedSets.get(product.id) ?? new Set()}
-                segmentCount={ring.length}
+                segmentCount={segCount}
                 isActive={activeIdx === pi}
                 onClick={() => handleThumbnailClick(pi)}
               />
