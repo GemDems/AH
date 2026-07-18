@@ -1160,7 +1160,16 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
             return { response: "This chat session is full (30 messages)! 🔄 Hit the reset button to start fresh.", confidence: 0 };
           }
 
-          // ALL rate-limit errors → hard block, no Zane bubble
+          // Burst block (sent too fast) → temporary warning only, NOT a 30-min hard block
+          if (errorData.limitType === "burst_blocked") {
+            return {
+              response: "",
+              confidence: 0,
+              spamBlock: { type: "warning", title: "Slow Down" }
+            };
+          }
+
+          // Window limit (10 msgs / 30 min) → full 30-min hard block
           return {
             response: "",
             confidence: 0,
@@ -1285,8 +1294,16 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
       if (aiResult.spamBlock) {
         if (aiResult.spamBlock.type === "danger") {
           setHardBlock(Date.now() + 30 * 60_000);
+        } else if (aiResult.spamBlock.title === "Slow Down") {
+          // Burst block — disable input for 5 min matching server, show warning
+          setSpamBlockedUntil(Date.now() + 5 * 60_000);
+          setSpamWarning({
+            type: "warning",
+            title: "Slow Down",
+            msg: "You've been sending messages too fast. Wait a few minutes and try again. ⏸️",
+          });
         } else {
-          // Gibberish warning — just flash the admonition briefly, no hard block
+          // Gibberish warning — just flash the admonition briefly, no block
           setSpamWarning({
             type: aiResult.spamBlock.type,
             title: aiResult.spamBlock.title,
