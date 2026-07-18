@@ -104,33 +104,58 @@ export default function Home() {
     });
   }
 
-  const filteredAndSortedLinks = affiliateLinks
-    .filter(link => {
-      const matchesCategory = activeCategory === "all" || link.category.toLowerCase().includes(activeCategory.toLowerCase());
-      const q = searchQuery.toLowerCase().trim();
-      if (!q) return matchesCategory;
-      const title = link.title.toLowerCase();
-      const desc = (link.description || "").toLowerCase();
-      const cat = (link.category || "").toLowerCase();
-      const priv = (link.aiPrivateInfo || "").toLowerCase();
-      const words = q.split(/\s+/).filter(w => w.length > 1);
-      const matchesSearch = words.every(word =>
-        title.includes(word) || desc.includes(word) || cat.includes(word) || priv.includes(word)
-      );
-      return matchesCategory && matchesSearch;
-    })
-    .sort((a, b) => {
-      if (discoverTab === "favorites") {
-        const wA = 40 + Math.floor(seededRand(a.id, 6) * 180);
-        const wB = 40 + Math.floor(seededRand(b.id, 6) * 180);
-        return wB - wA;
-      }
-      if (hasInteractedWithTabs && discoverTab === "popular") {
-        return (b.clicks || 0) - (a.clicks || 0);
-      }
-      if (sortByClicks) return (b.clicks || 0) - (a.clicks || 0);
-      return 0;
-    });
+  const filteredAndSortedLinks = (() => {
+    const q = searchQuery.toLowerCase().trim();
+    const words = q ? q.split(/\s+/).filter(w => w.length > 1) : [];
+
+    const scored = affiliateLinks
+      .map(link => {
+        const matchesCategory = activeCategory === "all" || link.category.toLowerCase().includes(activeCategory.toLowerCase());
+        if (!matchesCategory) return null;
+        if (words.length === 0) return { link, score: 0 };
+
+        const title = link.title.toLowerCase();
+        const desc = (link.description || "").toLowerCase();
+        const cat = (link.category || "").toLowerCase();
+        const priv = (link.aiPrivateInfo || "").toLowerCase();
+
+        // Require ALL words to match somewhere (strict accuracy)
+        const allMatch = words.every(word =>
+          title.includes(word) || desc.includes(word) || cat.includes(word) || priv.includes(word)
+        );
+        if (!allMatch) return null;
+
+        // Score by match quality: title > description/category > private info
+        let score = 0;
+        words.forEach(word => {
+          if (title.includes(word)) score += 30;
+          if (desc.includes(word)) score += 20;
+          if (cat.includes(word)) score += 20;
+          if (priv.includes(word)) score += 10;
+        });
+
+        return { link, score };
+      })
+      .filter(Boolean) as { link: AffiliateLink; score: number }[];
+
+    return scored
+      .sort((a, b) => {
+        // If searching, sort by relevance score first
+        if (q) return b.score - a.score;
+
+        if (discoverTab === "favorites") {
+          const wA = 40 + Math.floor(seededRand(a.link.id, 6) * 180);
+          const wB = 40 + Math.floor(seededRand(b.link.id, 6) * 180);
+          return wB - wA;
+        }
+        if (hasInteractedWithTabs && discoverTab === "popular") {
+          return (b.link.clicks || 0) - (a.link.clicks || 0);
+        }
+        if (sortByClicks) return (b.link.clicks || 0) - (a.link.clicks || 0);
+        return 0;
+      })
+      .map(s => s.link);
+  })();
 
   const categories = [
     { id: "all",     label: "All Deals",        emoji: "" },
