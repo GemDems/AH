@@ -115,7 +115,9 @@ export default function ProductStories({ products }: ProductStoriesProps) {
   const handleThumbnailClick = useCallback(async (idx: number) => {
     const product = publishedRef.current[idx];
     if (!product) return;
-    // Fetch full imageUrls if not already loaded
+    // Open immediately — don't wait for images
+    setActiveIdx(idx);
+    // Fetch full imageUrls in the background if not already loaded
     if (!loadedImages.has(product.id)) {
       try {
         const res = await fetch(`/api/affiliate-links/${product.id}/images`);
@@ -131,7 +133,6 @@ export default function ProductStories({ products }: ProductStoriesProps) {
         // Non-fatal — will fall back to single imageUrl
       }
     }
-    setActiveIdx(idx);
   }, [loadedImages]);
 
   // onClose: advance to next product, or truly close at the end
