@@ -2344,7 +2344,7 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
           
           {/* Spam warning */}
           {spamWarning && (
-            <div className="mb-2">
+            <div className="dark mb-2">
               <Admonition type={spamWarning.type} title={spamWarning.title}>
                 {spamWarning.msg}
                 {spamBlockedUntil && cooldownSecsLeft > 0 && (
