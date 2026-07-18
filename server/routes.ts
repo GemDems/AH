@@ -6,6 +6,7 @@ import { z } from "zod";
 import { generateAIChatResponse } from "./cohere-service";
 import { smsService } from "./sms-service";
 import { ipKeyGenerator } from "express-rate-limit";
+import fs from "fs";
 
 // ── Map size cap helper (prevents unbounded growth under high traffic) ────────
 const MAX_MAP_SIZE = 10_000;
@@ -125,12 +126,33 @@ function enforceBurstLimit(req: Request, res: Response, next: NextFunction) {
   next();
 }
 
-// ── Window limit: 10 messages per 30 minutes ────────────────────────────────
+// ── Window limit: 10 messages per 30 minutes (persisted to disk) ─────────────
 interface WindowRecord { timestamps: number[]; }
 const deviceWindowMap = new Map<string, WindowRecord>();
 const WINDOW_MS    = 30 * 60_000; // 30-minute rolling window
 const WINDOW_LIMIT = 10;          // max messages in that window
+const RATE_LIMIT_FILE = "/tmp/elite-rate-limits.json";
 
+// Load persisted window data on startup so server restarts don't reset counters
+try {
+  const raw = fs.readFileSync(RATE_LIMIT_FILE, "utf8");
+  const parsed = JSON.parse(raw) as { windowMap: Record<string, { timestamps: number[] }> };
+  const now = Date.now();
+  for (const [key, rec] of Object.entries(parsed.windowMap || {})) {
+    const fresh = rec.timestamps.filter((t: number) => now - t < WINDOW_MS);
+    if (fresh.length > 0) deviceWindowMap.set(key, { timestamps: fresh });
+  }
+} catch { /* first run — file doesn't exist yet */ }
+
+// Save to disk every 15 seconds so data survives restarts
+function saveWindowMap() {
+  try {
+    fs.writeFileSync(RATE_LIMIT_FILE, JSON.stringify({ windowMap: Object.fromEntries(deviceWindowMap) }));
+  } catch { /* non-fatal */ }
+}
+setInterval(saveWindowMap, 15_000);
+
+// Prune stale entries every 5 minutes
 setInterval(() => {
   const now = Date.now();
   for (const [key, rec] of deviceWindowMap) {
@@ -159,6 +181,7 @@ function enforceWindowLimit(req: Request, res: Response, next: NextFunction) {
   }
 
   rec.timestamps.push(now);
+  saveWindowMap(); // persist immediately on every new message
   next();
 }
 // ─────────────────────────────────────────────────────────────────────────────

@@ -38,7 +38,7 @@ export default function Leaderboard() {
   // Fetch real VIP users with 3+ invites and usernames
   const { data: realVipUsers } = useQuery({
     queryKey: ["/api/leaderboard"],
-    refetchInterval: 10000, // Check every 10 seconds for new VIP members
+    refetchInterval: 30000, // Check every 30 seconds for new VIP members
   });
 
   // Random states for VIP users

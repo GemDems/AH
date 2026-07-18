@@ -35,8 +35,8 @@ export default function ReferralSystem() {
       const response = await fetch(`/api/referral/status?userId=${deviceId}&t=${Date.now()}`);
       return response.json();
     },
-    refetchInterval: 5000, // Auto-refresh every 5 seconds for live updates
-    staleTime: 0 // Always consider data stale to force fresh fetches
+    refetchInterval: 20000, // Refresh every 20 seconds
+    staleTime: 10000
   });
 
   // Format username properly: "John W" format - only first letters capitalized

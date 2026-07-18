@@ -321,7 +321,10 @@ function StoryViewerModal({
   const startTimeRef = React.useRef<number>(0);
   const elapsedRef = React.useRef<number>(0);
 
-  const currentStory = stories[currentIndex];
+  const currentStory = stories[Math.min(currentIndex, stories.length - 1)] ?? stories[0];
+
+  // Safety: if stories is empty, render nothing
+  if (!currentStory) return null;
 
   const goToNext = React.useCallback(() => {
     if (currentIndex < stories.length - 1) {
