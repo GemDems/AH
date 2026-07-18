@@ -2551,14 +2551,17 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
               }
             })();
             
-            return hardBlockedUntil ? null : (
+            const suggBlocked = !!(hardBlockedUntil || spamBlockedUntil);
+            return (
               <div className="mb-2">
                 <button
                   onClick={() => {
+                    if (suggBlocked) return;
                     setInputValue(singleQuestion);
                     setTimeout(handleSendMessage, 100);
                   }}
-                  className="px-2 py-1 text-xs text-blue-400 hover:text-blue-300 transition-colors"
+                  disabled={suggBlocked}
+                  className={`px-2 py-1 text-xs transition-colors ${suggBlocked ? 'text-gray-600 opacity-40 cursor-not-allowed' : 'text-blue-400 hover:text-blue-300'}`}
                 >
                   {singleQuestion}
                 </button>
