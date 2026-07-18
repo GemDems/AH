@@ -195,10 +195,6 @@ export default function Header({ onSearch }: HeaderProps) {
           onChange={(val) => {
             setHeaderSearch(val);
             onSearch?.(val);
-            if (val.trim()) {
-              const el = document.querySelector('[data-section="products"]') as HTMLElement;
-              el?.scrollIntoView({ behavior: "smooth", block: "start" });
-            }
           }}
           placeholder="Search for deals..."
           animatedPhrases={[
