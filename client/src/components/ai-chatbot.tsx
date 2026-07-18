@@ -326,47 +326,78 @@ What specific type of product are you looking for? I can show you the newest opt
         const isVerified = product.isVerified === 1;
         const aiPrivateInfo = product.aiPrivateInfo?.toLowerCase() || '';
         
-        // Create comprehensive searchable text including ALL available data
-        const allProductData = `${title} ${description} ${category} ${aiPrivateInfo}`.toLowerCase();
-        
-        // ENHANCED keyword matching — ALL words must contribute a score
-        let unmatchedWords = 0;
+        // Semantic synonym map (same as search bar)
+        const chatSemanticMap: Record<string, string[]> = {
+          cargo: ["large","big","spacious","storage","carry","capacity","heavy","load","outdoor","bag"],
+          big: ["large","xl","oversized","wide","cargo","huge","extra"],
+          large: ["big","xl","oversized","cargo","wide","huge","spacious"],
+          small: ["mini","compact","portable","tiny","micro","travel","light"],
+          mini: ["small","compact","portable","travel","tiny"],
+          pants: ["trousers","bottoms","jeans","leggings","shorts","clothing","apparel","fashion","wear","denim"],
+          jeans: ["denim","pants","trousers","bottoms","clothing","fashion"],
+          shoes: ["footwear","sneakers","boots","sandals","heels","kicks","slippers"],
+          shirt: ["top","tee","blouse","clothing","apparel","fashion","wear"],
+          jacket: ["coat","hoodie","outerwear","clothing","fashion","vest"],
+          dress: ["gown","skirt","clothing","fashion","apparel"],
+          phone: ["mobile","smartphone","device","android","iphone","cellular","cell"],
+          laptop: ["computer","pc","notebook","macbook","chromebook","device"],
+          headphones: ["earbuds","earphones","audio","sound","music","wireless","airpods"],
+          tv: ["television","screen","monitor","display","4k","smart"],
+          watch: ["smartwatch","wearable","timepiece","wristband","fitness"],
+          kitchen: ["cooking","chef","appliance","culinary","food","baking","utensil"],
+          furniture: ["chair","table","desk","sofa","couch","bed","shelf","storage"],
+          decor: ["decoration","ornament","aesthetic","design","interior","home"],
+          gym: ["fitness","workout","exercise","training","sport","health"],
+          outdoor: ["camping","hiking","adventure","nature","garden","trek"],
+          yoga: ["fitness","wellness","meditation","stretch","exercise","mat"],
+          skincare: ["moisturizer","serum","cream","lotion","beauty","face","glow"],
+          makeup: ["cosmetics","beauty","lipstick","foundation","eyeshadow","blush"],
+          toy: ["play","game","kids","children","fun","educational","toddler"],
+          toys: ["play","game","kids","children","fun","educational","toddler"],
+          game: ["toy","play","puzzle","board","entertainment","fun","gaming"],
+          beauty: ["skincare","makeup","cosmetics","care","glow","cream","lotion"],
+          bag: ["backpack","purse","tote","handbag","pouch","sack","cargo","carry"],
+          book: ["reading","novel","guide","education","learn","literature"],
+          food: ["snack","nutrition","meal","diet","cooking","eat","drink"],
+        };
+
+        // Score a single word against a text field (exact, plural/singular, fuzzy, semantic)
+        const chatFieldScore = (text: string, word: string, baseWeight: number): number => {
+          if (!text) return 0;
+          let s = 0;
+          if (text.includes(word)) { s += baseWeight; }
+          else if (word.endsWith("s") && word.length > 2 && text.includes(word.slice(0, -1))) { s += baseWeight * 0.9; }
+          else if (!word.endsWith("s") && text.includes(word + "s")) { s += baseWeight * 0.9; }
+          else if (word.length >= 4) {
+            const textWords = text.split(/\s+/);
+            const fuzzy = textWords.some(w => {
+              if (Math.abs(w.length - word.length) > 1) return false;
+              let mismatches = 0;
+              for (let i = 0; i < Math.min(w.length, word.length); i++) {
+                if (w[i] !== word[i]) mismatches++;
+                if (mismatches > 1) return false;
+              }
+              return mismatches <= 1;
+            });
+            if (fuzzy) s += baseWeight * 0.55;
+          }
+          // Semantic synonyms (additive bonus)
+          const synonyms = chatSemanticMap[word] || [];
+          synonyms.forEach(syn => { if (text.includes(syn)) s += 12; });
+          return s;
+        };
+
+        // Score every word across all fields; use score threshold instead of strict all-must-match
         userWords.forEach(word => {
-          let wordScore = 0;
-          // Check title matches (high priority)
-          if (title.includes(word)) {
-            wordScore += 50;
-            reasons.push(`exact title match "${word}"`);
-          }
-          
-          // Check description matches (highest priority)
-          if (description.includes(word)) {
-            wordScore += 60;
-            reasons.push(`description contains "${word}"`);
-          }
-          
-          // Check category matches
-          if (category.includes(word)) {
-            wordScore += 40;
-            reasons.push(`category matches "${word}"`);
-          }
-          
-          // Check AI private info (secret detailed analysis) - ENHANCED
-          if (aiPrivateInfo.includes(word)) {
-            wordScore += 80;
-            reasons.push(`detailed match for "${word}"`);
-          }
-
-          if (wordScore === 0) {
-            unmatchedWords++;
-          }
-          score += wordScore;
+          const wordBest = Math.max(
+            chatFieldScore(title,       word, 70),
+            chatFieldScore(description, word, 60),
+            chatFieldScore(category,    word, 45),
+            chatFieldScore(aiPrivateInfo, word, 80)
+          );
+          score += wordBest;
+          if (wordBest > 0) reasons.push(`matched "${word}"`);
         });
-
-        // Disqualify product if ANY query word had zero matches
-        if (unmatchedWords > 0) {
-          score = 0;
-        }
         
         // Semantic analysis for better understanding
         if (lowerQuery.includes('cheap') || lowerQuery.includes('affordable') || lowerQuery.includes('budget')) {
@@ -390,8 +421,8 @@ What specific type of product are you looking for? I can show you the newest opt
           }
         }
         
-        // Add to matches if it has any relevance
-        if (score > 0) {
+        // Add to matches if score is meaningful (filters out very weak semantic-only hits)
+        if (score >= 20) {
           productMatches.push({
             product,
             score,
@@ -523,8 +554,8 @@ Can I help you find something excellent in one of these available categories?`
         return gracefulResponses[Math.floor(Math.random() * gracefulResponses.length)];
       }
 
-      // If we found matches with HIGH scores (meaning REAL matches), show them
-      if (topMatches.length > 0 && topMatches[0].score >= 50) { // Only show if score is REALLY high
+      // If we found matches, show them (threshold tuned to new scoring scale)
+      if (topMatches.length > 0 && topMatches[0].score >= 35) {
         const bestMatch = topMatches[0];
         
         // Set found product for pitch button
