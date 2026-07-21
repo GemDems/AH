@@ -29,7 +29,26 @@ import { Settings } from "lucide-react";
 
 export default function Home() {
   const [showAdmin, setShowAdmin] = useState(false);
-  const [activeCategory, setActiveCategory] = useState("all");
+  const [activeCategories, setActiveCategories] = useState<Set<string>>(new Set(["all"]));
+
+  const toggleCategory = (id: string) => {
+    setActiveCategories(prev => {
+      const next = new Set(prev);
+      if (id === "all") {
+        return new Set(["all"]);
+      }
+      // Remove "all" when picking a specific genre
+      next.delete("all");
+      if (next.has(id)) {
+        next.delete(id);
+        // Nothing left → fall back to All
+        if (next.size === 0) return new Set(["all"]);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
   const [searchQuery, setSearchQuery] = useState("");
   const [sortByClicks, setSortByClicks] = useState(false);
 
@@ -175,7 +194,9 @@ export default function Home() {
 
     const scored = affiliateLinks
       .map(link => {
-        const matchesCategory = activeCategory === "all" || link.category.toLowerCase().includes(activeCategory.toLowerCase());
+        const matchesCategory =
+          activeCategories.has("all") ||
+          [...activeCategories].some(cat => link.category.toLowerCase().includes(cat.toLowerCase()));
         if (!matchesCategory) return null;
         if (words.length === 0) return { link, score: 0 };
 
@@ -232,7 +253,7 @@ export default function Home() {
 
   const handleNewDropsClick = () => {
     setSortByClicks(true);
-    setActiveCategory("all");
+    setActiveCategories(new Set(["all"]));
     setSearchQuery("");
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -263,8 +284,8 @@ export default function Home() {
   };
 
   const handleDropdownCategorySelect = (category: string) => {
-    setActiveCategory(category);
-    setShowDropdown(false);
+    toggleCategory(category);
+    if (category === "all") setShowDropdown(false);
   };
 
   useEffect(() => {
@@ -408,10 +429,13 @@ export default function Home() {
                 <button
                   key={category.id}
                   onClick={() => handleDropdownCategorySelect(category.id)}
-                  className="w-full px-4 py-2 text-left hover:bg-white/20 flex items-center space-x-2 transition-all duration-200"
+                  className={`w-full px-4 py-2 text-left flex items-center space-x-2 transition-all duration-200 ${activeCategories.has(category.id) ? "bg-blue-500/30" : "hover:bg-white/20"}`}
                 >
                   {category.emoji && <span>{category.emoji}</span>}
                   <span className="text-sm font-medium text-gray-900">{category.label}</span>
+                  {activeCategories.has(category.id) && !activeCategories.has("all") && category.id !== "all" && (
+                    <span className="ml-auto text-blue-400 text-xs">✓</span>
+                  )}
                 </button>
               ))}
             </div>
@@ -522,7 +546,7 @@ export default function Home() {
         {/* ── Instagram-style product stories ── */}
         <ProductStories products={affiliateLinks} />
 
-        <CategoryFilter categories={categories} activeCategory={activeCategory} onCategoryChange={setActiveCategory} />
+        <CategoryFilter categories={categories} activeCategories={activeCategories} onCategoryToggle={toggleCategory} />
 
         {/* ── FTC / Affiliate Disclosure ── */}
         <div className="flex items-center justify-center gap-1.5 py-1.5 px-3 mb-4 rounded-lg text-center flex-wrap"
