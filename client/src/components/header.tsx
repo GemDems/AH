@@ -277,7 +277,7 @@ export default function Header({ onSearch }: HeaderProps) {
 
         {/* Hover tooltip */}
         <div
-          className="pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-full mb-2 z-50
+          className="pointer-events-none absolute left-1/2 -translate-x-1/2 top-full mt-2 z-50
             opacity-0 group-hover:opacity-100 transition-opacity duration-200"
         >
           <div
@@ -300,13 +300,13 @@ export default function Header({ onSearch }: HeaderProps) {
             </div>
           </div>
           {/* Caret */}
-          <div className="flex justify-center">
+          <div className="flex justify-center order-first">
             <div style={{
               width: 0, height: 0,
               borderLeft: "7px solid transparent",
               borderRight: "7px solid transparent",
-              borderTop: "7px solid rgba(255,255,255,0.1)",
-              marginTop: -1,
+              borderBottom: "7px solid rgba(255,255,255,0.1)",
+              marginBottom: -1,
             }} />
           </div>
         </div>
