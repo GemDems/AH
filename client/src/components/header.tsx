@@ -40,18 +40,15 @@ function TrustInfoIcon() {
           {/* arrow */}
           <div className="absolute left-1/2 -translate-x-1/2 -bottom-[7px] w-3 h-3 rotate-45 border-r border-b border-white/10" style={{ background: "#1e1b4b" }} />
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-base">🔒</span>
             <span className="text-xs font-bold text-white">100% Safe &amp; Secure</span>
           </div>
           <ul className="space-y-1.5">
             {[
-              { icon: "🏪", text: "Every purchase happens directly on the official retailer's site — Amazon, Walmart, Nike, etc." },
-              { icon: "🚫", text: "We never touch your payment info, address, or personal data. Ever." },
-              { icon: "🔗", text: "Every link sends you straight to the brand's own store — we're just the shortcut." },
-              { icon: "🎁", text: "Access is completely free. No subscriptions, no hidden fees, no catch." },
-            ].map(({ icon, text }) => (
-              <li key={icon} className="flex items-start gap-2">
-                <span className="text-xs mt-px flex-shrink-0">{icon}</span>
+              "Every purchase happens directly on the official retailer's site — Amazon, Walmart, Nike, etc.",
+              "Every link sends you straight to the brand's own store — we're just the shortcut.",
+              "Access is completely free. No subscriptions, no hidden fees, no catch.",
+            ].map((text) => (
+              <li key={text} className="flex items-start gap-2">
                 <span className="text-[11px] leading-relaxed" style={{ color: "#cbd5e1" }}>{text}</span>
               </li>
             ))}
