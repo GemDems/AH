@@ -17,6 +17,7 @@ export default function ScrollMenu({ onCategorySelect, onExit }: ScrollMenuProps
     { id: "fashion", label: "Fashion", emoji: "👔" },
     { id: "health", label: "Health & Fitness", emoji: "💪" },
     { id: "travel", label: "Travel", emoji: "✈️" },
+    { id: "subscriptions", label: "Subscriptions", emoji: "🔄" },
   ];
 
   useEffect(() => {

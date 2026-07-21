@@ -1015,6 +1015,7 @@ export default function AdminPanel({ isOpen, onClose, onSuccess }: AdminPanelPro
                 <SelectItem value="Fashion">Fashion</SelectItem>
                 <SelectItem value="Health & Fitness">Health & Fitness</SelectItem>
                 <SelectItem value="Travel">Travel</SelectItem>
+                <SelectItem value="Subscriptions">🔄 Subscriptions</SelectItem>
               </SelectContent>
             </Select>
           </div>

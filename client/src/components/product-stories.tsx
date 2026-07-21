@@ -18,8 +18,7 @@ function getThumbnailImage(link: AffiliateLink): string {
 }
 
 function buildStories(imgs: string[], link: AffiliateLink): Story[] {
-  const ring = imgs.length > 1 ? imgs : [imgs[0], imgs[0]];
-  return ring.map((src, i) => ({ id: `${link.id}-${i}`, type: "image" as const, src }));
+  return imgs.map((src, i) => ({ id: `${link.id}-${i}`, type: "image" as const, src }));
 }
 
 function RingThumbnail({
@@ -37,7 +36,7 @@ function RingThumbnail({
   isActive: boolean;
   onClick: () => void;
 }) {
-  const count = Math.max(2, segmentCount);
+  const count = Math.max(1, segmentCount);
   const gapDeg = 12;
   const segDeg = (360 - gapDeg * count) / count;
   const r = 46;
@@ -199,7 +198,7 @@ export default function ProductStories({ products }: ProductStoriesProps) {
           {published.map((product, pi) => {
             const thumb = getThumbnailImage(product);
             const fullImgs = loadedImages.get(product.id);
-            const segCount = fullImgs && fullImgs.length > 1 ? fullImgs.length : 2;
+            const segCount = fullImgs ? Math.max(1, fullImgs.length) : 1;
             return (
               <RingThumbnail
                 key={product.id}

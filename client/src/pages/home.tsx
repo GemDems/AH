@@ -221,12 +221,13 @@ export default function Home() {
   })();
 
   const categories = [
-    { id: "all",     label: "All Deals",        emoji: "" },
-    { id: "hot",     label: "Hot Deals",        emoji: "🔥" },
-    { id: "tech",    label: "Tech & Gadgets",   emoji: "📱" },
-    { id: "fashion", label: "Fashion",          emoji: "👔" },
-    { id: "health",  label: "Health & Fitness", emoji: "💪" },
-    { id: "travel",  label: "Travel",           emoji: "✈️" },
+    { id: "all",           label: "All Deals",        emoji: "" },
+    { id: "hot",           label: "Hot Deals",        emoji: "🔥" },
+    { id: "tech",          label: "Tech & Gadgets",   emoji: "📱" },
+    { id: "fashion",       label: "Fashion",          emoji: "👔" },
+    { id: "health",        label: "Health & Fitness", emoji: "💪" },
+    { id: "travel",        label: "Travel",           emoji: "✈️" },
+    { id: "subscriptions", label: "Subscriptions",    emoji: "🔄" },
   ];
 
   const handleNewDropsClick = () => {

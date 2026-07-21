@@ -56,6 +56,18 @@ type HoverPeekProps = {
   | { isStatic?: false; imageSrc?: never }
 );
 
+function useIsDesktop() {
+  const [isDesktop, setIsDesktop] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
+    setIsDesktop(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+  return isDesktop;
+}
+
 export const HoverPeek = ({
   children,
   url,
@@ -66,6 +78,7 @@ export const HoverPeek = ({
   imageSrc = "",
   enableMouseFollow = true,
 }: HoverPeekProps) => {
+  const isDesktop = useIsDesktop();
   const [imageLoadFailed, setImageLoadFailed] = useState(false);
   const finalImageSrc = usePreviewSource(url, peekWidth, peekHeight, isStatic, imageSrc);
   const { isPeeking, handleOpenChange, handlePointerMove, followX } = useHoverState(enableMouseFollow);
@@ -78,6 +91,13 @@ export const HoverPeek = ({
     }
   }, [finalImageSrc]);
   useEffect(() => { if (!isPeeking) setImageLoadFailed(false); }, [isPeeking]);
+
+  // On mobile/touch devices, skip the hover preview entirely — render children as-is
+  if (!isDesktop) {
+    return React.isValidElement(children)
+      ? React.cloneElement(children as React.ReactElement<any>, { className: cn((children.props as any).className, className) })
+      : <span className={className}>{children}</span>;
+  }
 
   const cardMotionVariants = {
     initial: { opacity: 0, rotateY: -90, transition: { duration: 0.15 } },
