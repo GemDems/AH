@@ -114,6 +114,10 @@ export default function ProductStories({ products }: ProductStoriesProps) {
   const handleThumbnailClick = useCallback(async (idx: number) => {
     const product = publishedRef.current[idx];
     if (!product) return;
+    // Sync the ref BEFORE the state update so handleStoryChange can read the
+    // correct index when the modal's first onStoryChange(0) fires (child effects
+    // run before the parent's [activeIdx] ref-sync effect).
+    activeIdxRef.current = idx;
     // Open immediately — don't wait for images
     setActiveIdx(idx);
     // Fetch full imageUrls in the background if not already loaded
