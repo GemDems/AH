@@ -73,6 +73,12 @@ function ProductCardImagesInner({
                 key={0}
                 variants={variants}
                 className="pointer-events-none absolute inset-0 size-full"
+                animate={
+                  activeImage === 1 &&
+                  productImage.id === productImages[activeColor].id
+                    ? "hidden"
+                    : "visible"
+                }
                 exit="hidden"
               >
                 <img
@@ -84,6 +90,7 @@ function ProductCardImagesInner({
               <motion.div
                 key={1}
                 variants={variants}
+                initial="hidden"
                 className="pointer-events-none absolute inset-0 size-full"
                 animate={
                   activeImage === 1 &&
