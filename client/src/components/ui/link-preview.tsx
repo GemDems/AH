@@ -70,7 +70,13 @@ export const HoverPeek = ({
   const finalImageSrc = usePreviewSource(url, peekWidth, peekHeight, isStatic, imageSrc);
   const { isPeeking, handleOpenChange, handlePointerMove, followX } = useHoverState(enableMouseFollow);
 
-  useEffect(() => { setImageLoadFailed(false); }, [finalImageSrc]);
+  useEffect(() => {
+    setImageLoadFailed(false);
+    if (finalImageSrc) {
+      const img = new Image();
+      img.src = finalImageSrc;
+    }
+  }, [finalImageSrc]);
   useEffect(() => { if (!isPeeking) setImageLoadFailed(false); }, [isPeeking]);
 
   const cardMotionVariants = {
