@@ -104,6 +104,26 @@ export default function ProductStories({ products }: ProductStoriesProps) {
   // Cache of fully-loaded imageUrls per product id (fetched lazily on first tap)
   const [loadedImages, setLoadedImages] = useState<Map<number, string[]>>(new Map());
 
+  // Eagerly prefetch image counts for all products so ring segments are correct before tapping
+  useEffect(() => {
+    published.forEach((product) => {
+      if (loadedImages.has(product.id)) return;
+      fetch(`/api/affiliate-links/${product.id}/images`)
+        .then(r => r.ok ? r.json() : null)
+        .then(data => {
+          if (!data) return;
+          setLoadedImages(prev => {
+            if (prev.has(product.id)) return prev;
+            const next = new Map(prev);
+            next.set(product.id, data.imageUrls ?? []);
+            return next;
+          });
+        })
+        .catch(() => {});
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [published]);
+
   // Stable ref so callbacks don't change reference when activeIdx changes
   const activeIdxRef = useRef(activeIdx);
   useEffect(() => { activeIdxRef.current = activeIdx; }, [activeIdx]);
