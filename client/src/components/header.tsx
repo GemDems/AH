@@ -258,7 +258,6 @@ export default function Header({ onSearch }: HeaderProps) {
         </ShinyButton>
         <div className="mt-3 text-xs" style={{ color: "#6b7280" }}>
           <span style={{ color: "#4ade80" }}>98.7%</span> of members got more than they expected &nbsp;|&nbsp; No credit card required
-          <TrustInfoIcon />
         </div>
       </div>
       {/* Guarantee */}
