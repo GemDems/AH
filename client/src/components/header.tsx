@@ -6,6 +6,62 @@ import { BorderRotate } from "@/components/ui/animated-gradient-border";
 import { GlowCard } from "@/components/ui/spotlight-card";
 import { LiquidBadge } from "@/components/ui/liquid-badge";
 
+function TrustInfoIcon() {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [open]);
+
+  return (
+    <span ref={ref} className="relative inline-block align-middle ml-1">
+      <button
+        type="button"
+        aria-label="How purchases work"
+        onMouseEnter={() => setOpen(true)}
+        onMouseLeave={() => setOpen(false)}
+        onClick={() => setOpen(v => !v)}
+        className="inline-flex items-center justify-center w-[14px] h-[14px] rounded-full border border-gray-400 text-gray-400 hover:border-green-400 hover:text-green-400 transition-colors duration-200 leading-none"
+        style={{ fontSize: 9, fontWeight: 700, fontStyle: "italic", verticalAlign: "middle" }}
+      >
+        i
+      </button>
+      {open && (
+        <div
+          className="absolute z-50 bottom-[calc(100%+8px)] left-1/2 -translate-x-1/2 w-64 rounded-xl shadow-2xl border border-white/10 p-4 text-left"
+          style={{ background: "linear-gradient(135deg,#0f172a 0%,#1e1b4b 100%)" }}
+        >
+          {/* arrow */}
+          <div className="absolute left-1/2 -translate-x-1/2 -bottom-[7px] w-3 h-3 rotate-45 border-r border-b border-white/10" style={{ background: "#1e1b4b" }} />
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-base">🔒</span>
+            <span className="text-xs font-bold text-white">100% Safe &amp; Secure</span>
+          </div>
+          <ul className="space-y-1.5">
+            {[
+              { icon: "🏪", text: "Every purchase happens directly on the official retailer's site — Amazon, Walmart, Nike, etc." },
+              { icon: "🚫", text: "We never touch your payment info, address, or personal data. Ever." },
+              { icon: "🔗", text: "Every link sends you straight to the brand's own store — we're just the shortcut." },
+              { icon: "🎁", text: "Access is completely free. No subscriptions, no hidden fees, no catch." },
+            ].map(({ icon, text }) => (
+              <li key={icon} className="flex items-start gap-2">
+                <span className="text-xs mt-px flex-shrink-0">{icon}</span>
+                <span className="text-[11px] leading-relaxed" style={{ color: "#cbd5e1" }}>{text}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </span>
+  );
+}
+
 interface LiveStats {
   viewers: number;
   hourlyBuyers: number;
@@ -202,6 +258,7 @@ export default function Header({ onSearch }: HeaderProps) {
         </ShinyButton>
         <div className="mt-3 text-xs" style={{ color: "#6b7280" }}>
           <span style={{ color: "#4ade80" }}>98.7%</span> of members got more than they expected &nbsp;|&nbsp; No credit card required
+          <TrustInfoIcon />
         </div>
       </div>
       {/* Guarantee */}
