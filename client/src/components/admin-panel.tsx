@@ -27,11 +27,12 @@ export default function AdminPanel({ isOpen, onClose, onSuccess }: AdminPanelPro
   const [showPassword, setShowPassword] = useState(false);
   const [activeTab, setActiveTab] = useState<"create" | "drafts" | "manage" | "ideas" | "messages">("create");
   const [msgAiReplies, setMsgAiReplies] = useState<Record<number, string>>({});
-  const [formData, setFormData] = useState<InsertAffiliateLink & { isVerified?: boolean; isDraft?: boolean; scheduledPublishAt?: Date; scheduledDeleteAt?: Date }>({
+  const [formData, setFormData] = useState<InsertAffiliateLink & { isVerified?: boolean; isDraft?: boolean; scheduledPublishAt?: Date; scheduledDeleteAt?: Date; categories?: string[] }>({
     title: "",
     url: "",
     description: "",
     category: "Hot Deals",
+    categories: ["Hot Deals"],
     imageUrl: "",
     imageUrls: [],
     price: "",
@@ -428,8 +429,12 @@ export default function AdminPanel({ isOpen, onClose, onSuccess }: AdminPanelPro
 
     // Combine all images into imageUrls array for submission
     const allImageUrls = [formData.imageUrl, ...additionalImages].filter(url => url && url.trim());
+    const cats = formData.categories && formData.categories.length > 0 ? formData.categories : [formData.category];
+    const primaryCategory = cats.includes("Hot Deals") ? "Hot Deals" : cats[0];
     const submissionData = {
       ...formData,
+      category: primaryCategory,
+      categories: cats,
       imageUrls: allImageUrls.length > 0 ? allImageUrls : undefined,
       isDraft: isDraft,
       // Convert boolean values to integers for database compatibility
@@ -447,6 +452,7 @@ export default function AdminPanel({ isOpen, onClose, onSuccess }: AdminPanelPro
       url: "",
       description: "",
       category: "Hot Deals",
+      categories: ["Hot Deals"],
       imageUrl: "",
       imageUrls: [],
       price: "",
@@ -1004,20 +1010,39 @@ export default function AdminPanel({ isOpen, onClose, onSuccess }: AdminPanelPro
           </div>
 
           <div>
-            <Label htmlFor="category">Category</Label>
-            <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
-              <SelectTrigger className="mt-1">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Hot Deals">Hot Deals</SelectItem>
-                <SelectItem value="Tech & Gadgets">Tech & Gadgets</SelectItem>
-                <SelectItem value="Fashion">Fashion</SelectItem>
-                <SelectItem value="Health & Fitness">Health & Fitness</SelectItem>
-                <SelectItem value="Travel">Travel</SelectItem>
-                <SelectItem value="Subscriptions">🔄 Subscriptions</SelectItem>
-              </SelectContent>
-            </Select>
+            <Label>Categories <span className="text-gray-400 font-normal">(select all that apply)</span></Label>
+            <div className="mt-2 grid grid-cols-2 gap-2">
+              {[
+                { value: "Hot Deals", emoji: "🔥" },
+                { value: "Tech & Gadgets", emoji: "📱" },
+                { value: "Fashion", emoji: "👔" },
+                { value: "Health & Fitness", emoji: "💪" },
+                { value: "Travel", emoji: "✈️" },
+                { value: "Subscriptions", emoji: "🔄" },
+              ].map(({ value: cat, emoji }) => {
+                const selected = (formData.categories || []).includes(cat);
+                return (
+                  <div
+                    key={cat}
+                    onClick={() => {
+                      const current = formData.categories || [];
+                      const updated = selected ? current.filter(c => c !== cat) : [...current, cat];
+                      if (updated.length === 0) return;
+                      const primary = updated.includes("Hot Deals") ? "Hot Deals" : updated[0];
+                      setFormData({ ...formData, categories: updated, category: primary });
+                    }}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-lg border-2 cursor-pointer transition-all select-none ${selected ? "border-blue-500 bg-blue-50 text-blue-700 font-semibold" : "border-gray-200 hover:border-gray-300 text-gray-700"}`}
+                  >
+                    <span>{emoji}</span>
+                    <span className="text-sm">{cat}</span>
+                    {selected && <span className="ml-auto text-blue-500 text-xs">✓</span>}
+                  </div>
+                );
+              })}
+            </div>
+            {(formData.categories || []).length === 0 && (
+              <p className="text-xs text-red-500 mt-1">Select at least one category</p>
+            )}
           </div>
 
           {/* Verified Source Badge Checkbox */}

@@ -245,10 +245,15 @@ export default function AffiliateCard({ link }: AffiliateCardProps) {
           onTouchEnd={handleTouchEnd}
           data-testid={`container-image-quickview-${link.id}`}
         >
-          <div className="absolute top-3 left-3 z-10">
+          <div className="absolute top-3 left-3 z-10 flex flex-col gap-1">
             <div className="bg-gradient-to-r from-urgency-red to-red-600 text-gray-900 text-xs font-bold px-3 py-1 rounded-full shadow-lg">
               {getCategoryEmoji(link.category || '')} BESTSELLER
             </div>
+            {link.categories && link.categories.length > 1 && link.categories.filter(c => c !== link.category).slice(0, 2).map(cat => (
+              <div key={cat} className="bg-black/65 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full backdrop-blur-sm self-start">
+                {getCategoryEmoji(cat)} {cat}
+              </div>
+            ))}
           </div>
 
           <div className="absolute top-3 right-3 z-10 flex flex-col gap-1">

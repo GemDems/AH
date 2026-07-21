@@ -106,6 +106,7 @@ export class DatabaseStorage implements IStorage {
         url: insertLink.url,
         description: insertLink.description,
         category: insertLink.category,
+        categories: insertLink.categories || [insertLink.category],
         imageUrl: insertLink.imageUrl || null,
         imageUrls: insertLink.imageUrls || null,
         price: insertLink.price || null,

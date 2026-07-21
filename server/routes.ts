@@ -568,6 +568,7 @@ Transform now with maximum conversion power in minimal words:`;
         url: String(url),
         description: String(description),
         category: String(category),
+        categories: Array.isArray(req.body.categories) ? req.body.categories.map(String) : [String(category)],
         imageUrl: req.body.imageUrl || null,
         imageUrls: req.body.imageUrls || null,
         price: req.body.price || null,

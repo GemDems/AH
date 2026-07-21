@@ -194,9 +194,15 @@ export default function Home() {
 
     const scored = affiliateLinks
       .map(link => {
+        const allLinkCategories = [
+          link.category,
+          ...((link as any).categories || []),
+        ].filter(Boolean) as string[];
         const matchesCategory =
           activeCategories.has("all") ||
-          [...activeCategories].some(cat => link.category.toLowerCase().includes(cat.toLowerCase()));
+          [...activeCategories].some(cat =>
+            allLinkCategories.some(lc => lc.toLowerCase().includes(cat.toLowerCase()))
+          );
         if (!matchesCategory) return null;
         if (words.length === 0) return { link, score: 0 };
 
