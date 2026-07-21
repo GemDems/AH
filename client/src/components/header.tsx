@@ -304,7 +304,7 @@ export default function Header({ onSearch }: HeaderProps) {
           CLAIM MY EXCLUSIVE ACCESS →
         </ShinyButton>
         <div className="mt-3 text-xs" style={{ color: "#6b7280" }}>
-          <span style={{ color: "#4ade80" }}>98.7%</span> of members got more than they expected &nbsp;|&nbsp; No credit card required to start
+          <span style={{ color: "#4ade80" }}>98.7%</span> of members got more than they expected &nbsp;|&nbsp; No credit card required
         </div>
       </div>
       {/* Guarantee */}
