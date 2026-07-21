@@ -12,6 +12,7 @@ import { InteractiveProductPopup } from "@/components/ui/interactive-product-pop
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { AffiliateLink } from "@shared/schema";
+import { HoverPeek } from "@/components/ui/link-preview";
 
 interface AffiliateCardProps {
   link: AffiliateLink;
@@ -339,23 +340,25 @@ export default function AffiliateCard({ link }: AffiliateCardProps) {
           </div>
 
           <div className="space-y-3">
-            <Button
-              onClick={(e) => handleClick(e)}
-              disabled={trackClickMutation.isPending}
-              className={`w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 shadow-lg relative overflow-hidden cta-heartbeat ${link.isVerified ? 'verified-glow-button' : ''}`}
-            >
-              <span className="relative z-10 flex items-center justify-center text-lg">
-                {trackClickMutation.isPending ? (
-                  <>Processing...</>
-                ) : (
-                  <>
-                    <ShoppingCart className="w-5 h-5 mr-2" />
-                    Claim This Deal Now
-                    <Zap className="w-5 h-5 ml-2" />
-                  </>
-                )}
-              </span>
-            </Button>
+            <HoverPeek url={link.url} peekWidth={240} peekHeight={150}>
+              <Button
+                onClick={(e) => handleClick(e)}
+                disabled={trackClickMutation.isPending}
+                className={`w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 shadow-lg relative overflow-hidden cta-heartbeat ${link.isVerified ? 'verified-glow-button' : ''}`}
+              >
+                <span className="relative z-10 flex items-center justify-center text-lg">
+                  {trackClickMutation.isPending ? (
+                    <>Processing...</>
+                  ) : (
+                    <>
+                      <ShoppingCart className="w-5 h-5 mr-2" />
+                      Claim This Deal Now
+                      <Zap className="w-5 h-5 ml-2" />
+                    </>
+                  )}
+                </span>
+              </Button>
+            </HoverPeek>
 
             <div className="flex items-center justify-center gap-1 text-xs text-gray-500">
               <Lock className="w-3 h-3 text-green-600" />
