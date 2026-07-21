@@ -45,7 +45,7 @@ function TrustInfoIcon() {
           <ul className="space-y-1.5">
             {[
               "Every purchase happens directly on the official retailer's site — Amazon, Walmart, Nike, etc.",
-              "Every link sends you straight to the brand's own store — we're just the shortcut.",
+              "Every link sends you straight to the brand's own store.",
               "Access is completely free. No subscriptions, no hidden fees, no catch.",
             ].map((text) => (
               <li key={text} className="flex items-start gap-2">
