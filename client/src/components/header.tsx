@@ -269,8 +269,47 @@ export default function Header({ onSearch }: HeaderProps) {
         </div>
       </div>
       {/* Footer strip */}
-      <div className="text-center py-3 text-xs" style={{ background: "#0a0c14", borderTop: "1px solid rgba(255,255,255,0.05)", color: "#4b5563" }}>
+      <div
+        className="relative text-center py-3 text-xs group cursor-default"
+        style={{ background: "#0a0c14", borderTop: "1px solid rgba(255,255,255,0.05)", color: "#4b5563" }}
+      >
         <span style={{ color: "#22c55e" }}>✓</span> Every Deal Verified &nbsp;•&nbsp; No Fake Offers &nbsp;•&nbsp; Secure Checkout &nbsp;•&nbsp; 24/7 Support
+
+        {/* Hover tooltip */}
+        <div
+          className="pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-full mb-2 z-50
+            opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+        >
+          <div
+            className="rounded-xl px-4 py-3 text-left whitespace-nowrap shadow-2xl"
+            style={{
+              background: "#131626",
+              border: "1px solid rgba(255,255,255,0.1)",
+              boxShadow: "0 8px 32px rgba(0,0,0,0.6)",
+            }}
+          >
+            <div className="flex items-start gap-2 mb-1.5">
+              <span style={{ color: "#22c55e", fontSize: 13 }}>🔒</span>
+              <span className="font-semibold" style={{ color: "#f9fafb", fontSize: 12 }}>
+                All purchases happen directly on official retailer sites
+              </span>
+            </div>
+            <div style={{ color: "#9ca3af", fontSize: 11, lineHeight: "1.5" }}>
+              We never handle your payment or personal info.<br />
+              Every link goes straight to the brand's own store.
+            </div>
+          </div>
+          {/* Caret */}
+          <div className="flex justify-center">
+            <div style={{
+              width: 0, height: 0,
+              borderLeft: "7px solid transparent",
+              borderRight: "7px solid transparent",
+              borderTop: "7px solid rgba(255,255,255,0.1)",
+              marginTop: -1,
+            }} />
+          </div>
+        </div>
       </div>
       <style>{`
         @keyframes ctapulse {
