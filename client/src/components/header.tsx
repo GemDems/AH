@@ -35,42 +35,8 @@ interface HeaderProps {
 }
 
 export default function Header({ onSearch }: HeaderProps) {
-  const getInitialCounts = () => {
-    const ONE_HOUR = 60 * 60 * 1000;
-    const stored = localStorage.getItem("edh_live_counts");
-    if (stored) {
-      try {
-        const { viewers, orders, resetAt } = JSON.parse(stored);
-        if (Date.now() - resetAt < ONE_HOUR) {
-          // Only drop 10% of the time; 90% of the time keep or bump up
-          let newViewers: number;
-          if (Math.random() < 0.10) {
-            // Rare drop — small dip, but NEVER below 3,000
-            const dropPct = 0.02 + Math.random() * 0.03; // 2–5% drop
-            newViewers = Math.max(3000, Math.round(viewers * (1 - dropPct)));
-          } else if (Math.random() < 0.15) {
-            // Occasional big jump (15% of non-drop refreshes)
-            newViewers = viewers + Math.floor(Math.random() * 400) + 150;
-          } else {
-            // Normal: tiny creep upward
-            newViewers = viewers + Math.floor(Math.random() * 40) + 5;
-          }
-          newViewers = Math.max(3000, newViewers);
-          localStorage.setItem("edh_live_counts", JSON.stringify({ viewers: newViewers, orders, resetAt }));
-          return { viewers: newViewers, orders, resetAt };
-        }
-      } catch { /* corrupt storage — fall through */ }
-    }
-    // Hourly reset: fresh base 3,000–7,500
-    const base = Math.floor(Math.random() * 4500) + 3000;
-    const counts = { viewers: base, orders: Math.floor(base * 0.35), resetAt: Date.now() };
-    localStorage.setItem("edh_live_counts", JSON.stringify(counts));
-    return counts;
-  };
-
-  const initial = getInitialCounts();
-  const [viewers, setViewers] = useState(initial.viewers);
-  const [orders, setOrders] = useState(initial.orders);
+  const [viewers, setViewers] = useState(4200);
+  const [orders, setOrders] = useState(1470);
   const [reviewPage, setReviewPage] = useState(0);
   const [fadeIn, setFadeIn] = useState(true);
   const [headerSearch, setHeaderSearch] = useState("");
@@ -97,89 +63,20 @@ export default function Header({ onSearch }: HeaderProps) {
 
   const currentReviews = ALL_REVIEWS.slice(reviewPage * 3, reviewPage * 3 + 3);
 
+  // Poll the server every 4 seconds — same source of truth for every tab and device
   useEffect(() => {
-    const ONE_HOUR = 60 * 60 * 1000;
-
-    const save = (v: number, o: number) => {
-      const stored = localStorage.getItem("edh_live_counts");
-      const resetAt = stored ? JSON.parse(stored).resetAt : Date.now();
-      localStorage.setItem("edh_live_counts", JSON.stringify({ viewers: v, orders: o, resetAt }));
+    const fetchStats = () => {
+      fetch("/api/live-stats")
+        .then(r => r.json())
+        .then((data: LiveStats) => {
+          setViewers(data.viewers);
+          setOrders(data.hourlyBuyers);
+        })
+        .catch(() => { /* keep last known values on network hiccup */ });
     };
-
-    const checkReset = () => {
-      const stored = localStorage.getItem("edh_live_counts");
-      if (!stored) return;
-      try {
-        const { resetAt } = JSON.parse(stored);
-        if (Date.now() - resetAt >= ONE_HOUR) {
-          const base = Math.floor(Math.random() * 4500) + 3000; // 3,000–7,500
-          const newOrders = Math.floor(base * 0.35);
-          localStorage.setItem("edh_live_counts", JSON.stringify({ viewers: base, orders: newOrders, resetAt: Date.now() }));
-          setViewers(base);
-          setOrders(newOrders);
-        }
-      } catch { /* ignore */ }
-    };
-
-    let tickCount = 0;
-
-    const iv = setInterval(() => {
-      tickCount++;
-      checkReset();
-
-      // Big jump ~15% of ticks, tiny drop ~5% of ticks, rest creep up
-      const rand = Math.random();
-      const isBigJump = rand < 0.15;
-      const isDrop    = rand > 0.95; // only 5% of ticks can drop
-
-      setViewers(v => {
-        let next: number;
-        if (isBigJump) {
-          next = v + Math.floor(Math.random() * 200) + 80; // +80–279
-        } else if (isDrop) {
-          next = v - (Math.floor(Math.random() * 30) + 10); // -10–39
-        } else {
-          next = v + Math.floor(Math.random() * 15) + 1; // +1–15
-        }
-        next = Math.max(3000, next); // FLOOR: never below 3,000
-        setOrders(o => {
-          const obump = isBigJump
-            ? Math.floor(Math.random() * 20) + 8
-            : (Math.random() < 0.65 ? 1 : 0);
-          const onext = o + obump;
-          save(next, onext);
-          return onext;
-        });
-        return next;
-      });
-    }, 4000);
-
+    fetchStats(); // immediate on mount
+    const iv = setInterval(fetchStats, 4000);
     return () => clearInterval(iv);
-  }, []);
-
-  // ── Scroll → always drop viewers 100-200 ──────────────────────────────────
-  useEffect(() => {
-    let lastDrop = 0;
-    const handleScroll = () => {
-      const now = Date.now();
-      if (now - lastDrop < 320) return;
-      lastDrop = now;
-      const drop = Math.floor(Math.random() * 10) + 1;
-      setViewers(v => {
-        const next = Math.max(3000, v - drop);
-        try {
-          const stored = localStorage.getItem("edh_live_counts");
-          if (stored) {
-            const parsed = JSON.parse(stored);
-            parsed.viewers = next;
-            localStorage.setItem("edh_live_counts", JSON.stringify(parsed));
-          }
-        } catch {}
-        return next;
-      });
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (

@@ -221,20 +221,23 @@ function enforceWindowLimit(req: Request, res: Response, next: NextFunction) {
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
-// Global live stats that persist across sessions
+// Global live stats — single source of truth for ALL tabs/devices
+// Initialized once on server start; all clients poll this via /api/live-stats
 let liveStats = {
-  viewers: Math.floor(Math.random() * 300) + 200,
-  hourlyBuyers: Math.floor(Math.random() * 20) + 15,
+  viewers: Math.floor(Math.random() * 4500) + 3000,       // 3,000–7,500
+  hourlyBuyers: Math.floor(Math.random() * 1500) + 800,   // 800–2,300
   lastHourlyReset: Date.now()
 };
+
+// Seed orders at ~35% of viewers
+liveStats.hourlyBuyers = Math.floor(liveStats.viewers * 0.35);
 
 // Function to check if we need to reset hourly counter
 function checkHourlyReset() {
   const now = Date.now();
-  const oneHour = 60 * 60 * 1000; // 1 hour in milliseconds
-  
+  const oneHour = 60 * 60 * 1000;
   if (now - liveStats.lastHourlyReset >= oneHour) {
-    liveStats.hourlyBuyers = Math.floor(Math.random() * 20) + 15;
+    liveStats.hourlyBuyers = Math.floor(liveStats.viewers * 0.35);
     liveStats.lastHourlyReset = now;
   }
 }
@@ -266,19 +269,29 @@ async function processScheduledOperations() {
   }
 }
 
-// Periodically update counters and process scheduled operations
+// Periodically update counters — drives ALL clients since they poll this
 setInterval(() => {
   checkHourlyReset();
   processScheduledOperations();
-  
-  // Viewers can fluctuate slightly
-  liveStats.viewers = Math.max(150, liveStats.viewers + Math.floor(Math.random() * 10) - 3);
-  
-  // Hourly buyers constantly go up (75% chance every interval)
-  if (Math.random() < 0.75) { // 75% chance every interval
-    liveStats.hourlyBuyers += Math.floor(Math.random() * 3) + 1; // Add 1-3
+
+  const rand = Math.random();
+  if (rand < 0.15) {
+    // Big jump ~15% of ticks
+    liveStats.viewers += Math.floor(Math.random() * 200) + 80;
+  } else if (rand > 0.95) {
+    // Small drop ~5% of ticks
+    liveStats.viewers -= Math.floor(Math.random() * 30) + 10;
+  } else {
+    // Steady creep up
+    liveStats.viewers += Math.floor(Math.random() * 15) + 1;
   }
-}, 3000); // Update every 3 seconds for more frequent increases
+  liveStats.viewers = Math.max(3000, liveStats.viewers);
+
+  // Orders tick up with viewers
+  if (Math.random() < 0.75) {
+    liveStats.hourlyBuyers += Math.floor(Math.random() * 3) + 1;
+  }
+}, 4000);
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Get live statistics
