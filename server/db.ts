@@ -12,4 +12,13 @@ if (!process.env.DATABASE_URL) {
 }
 
 export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+
+// Prevent unhandled 'error' events from crashing the process when Neon
+// terminates an idle connection (FATAL: terminating connection due to
+// administrator command). The pool will create a fresh connection on the
+// next query automatically.
+pool.on('error', (err) => {
+  console.error('DB pool error (handled):', err.message);
+});
+
 export const db = drizzle({ client: pool, schema });
