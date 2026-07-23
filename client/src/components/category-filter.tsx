@@ -124,11 +124,11 @@ export default function CategoryFilter({
                     >
                       <div className="flex items-center gap-2.5">
                         {f.icon === "lucide:Gift" ? (
-                          <Gift size={14} className={isActive ? "text-blue-600" : "text-gray-400"} strokeWidth={2} />
+                          <Gift size={14} className={isActive ? "text-blue-600" : "text-orange-400"} strokeWidth={2} />
                         ) : f.icon === "lucide:Star" ? (
-                          <Star size={14} className={isActive ? "text-blue-600" : "text-gray-400"} strokeWidth={2} />
+                          <Star size={14} className={isActive ? "text-blue-600" : "text-orange-400"} strokeWidth={2} />
                         ) : f.icon === "lucide:ShieldCheck" ? (
-                          <ShieldCheck size={14} className={isActive ? "text-blue-600" : "text-gray-400"} strokeWidth={2} />
+                          <ShieldCheck size={14} className={isActive ? "text-blue-600" : "text-orange-400"} strokeWidth={2} />
                         ) : (
                           <span className="text-sm leading-none">{f.icon}</span>
                         )}
