@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { SlidersHorizontal, X } from "lucide-react";
+import { SlidersHorizontal, X, Check } from "lucide-react";
 
 interface Category {
   id: string;
@@ -16,7 +16,7 @@ export interface SpecialFilter {
 }
 
 export const SPECIAL_FILTERS: SpecialFilter[] = [
-  { id: "free_trial",   label: "Free Trial",   icon: "🆓", description: "Products with a free trial offer" },
+  { id: "free_trial",   label: "Free",         icon: "🆓", description: "Free products & offers" },
   { id: "elite_pick",   label: "Elite Picks",  icon: "🧠", description: "Hand-picked top performers" },
   { id: "verified",     label: "Verified",     icon: "✔️", description: "Verified by our team" },
   { id: "in_stock",     label: "In Stock",     icon: "📦", description: "Available right now" },
@@ -93,50 +93,48 @@ export default function CategoryFilter({
         </button>
 
         {open && (
-          <div className="absolute z-50 top-[calc(100%+10px)] right-0 w-72 rounded-2xl shadow-2xl border border-white/10 p-4"
-            style={{ background: "linear-gradient(135deg,#0f172a 0%,#1e1b4b 100%)" }}>
-            {/* arrow */}
-            <div className="absolute right-5 -top-[7px] w-3 h-3 rotate-45 border-l border-t border-white/10"
-              style={{ background: "#0f172a" }} />
-
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-bold text-white">Filter Deals</span>
+          <div className="absolute z-50 top-[calc(100%+10px)] right-0 w-64 rounded-xl shadow-xl border border-gray-200 bg-white overflow-hidden">
+            {/* header */}
+            <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-100 bg-gray-50">
+              <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Filter by</span>
               {activeFilterCount > 0 && (
                 <button
                   onClick={() => { SPECIAL_FILTERS.forEach(f => { if (activeFilters.has(f.id)) onFilterToggle(f.id); }); }}
-                  className="text-[10px] text-purple-300 hover:text-white flex items-center gap-0.5 transition-colors"
+                  className="flex items-center gap-1 text-[11px] text-red-500 hover:text-red-700 font-medium transition-colors"
                 >
-                  <X size={10} /> Clear all
+                  <X size={11} />
+                  Clear
                 </button>
               )}
             </div>
 
-            <div className="space-y-1.5">
-              {SPECIAL_FILTERS.map(f => {
+            <div className="py-1">
+              {SPECIAL_FILTERS.map((f, i) => {
                 const isActive = activeFilters.has(f.id);
+                const isLast = i === SPECIAL_FILTERS.length - 1;
+                const isDivider = i === 3; // divider before price filters
                 return (
-                  <button
-                    key={f.id}
-                    onClick={() => onFilterToggle(f.id)}
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all duration-200 ${
-                      isActive
-                        ? "bg-purple-600/80 ring-1 ring-purple-400"
-                        : "hover:bg-white/10"
-                    }`}
-                  >
-                    <span className="text-base leading-none">{f.icon}</span>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-[12px] font-semibold text-white leading-tight">{f.label}</div>
-                      <div className="text-[10px] leading-tight mt-0.5" style={{ color: "#94a3b8" }}>{f.description}</div>
-                    </div>
-                    {isActive && (
-                      <div className="w-4 h-4 rounded-full bg-purple-400 flex items-center justify-center flex-shrink-0">
-                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
-                          <path d="M1.5 4L3 5.5L6.5 2" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
+                  <div key={f.id}>
+                    {isDivider && <div className="mx-3 my-1 border-t border-gray-100" />}
+                    <button
+                      onClick={() => onFilterToggle(f.id)}
+                      className={`w-full flex items-center justify-between px-4 py-2 text-left transition-colors duration-150 ${
+                        isActive ? "bg-blue-50" : "hover:bg-gray-50"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <span className="text-sm leading-none">{f.icon}</span>
+                        <span className={`text-[13px] font-medium ${isActive ? "text-blue-700" : "text-gray-700"}`}>
+                          {f.label}
+                        </span>
                       </div>
-                    )}
-                  </button>
+                      <div className={`w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 transition-colors ${
+                        isActive ? "bg-blue-600 border-blue-600" : "border-gray-300 bg-white"
+                      }`}>
+                        {isActive && <Check size={10} color="white" strokeWidth={3} />}
+                      </div>
+                    </button>
+                  </div>
                 );
               })}
             </div>
