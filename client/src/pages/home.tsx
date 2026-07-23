@@ -4,7 +4,7 @@ import type { AffiliateLink } from "@shared/schema";
 import Header from "@/components/header";
 import StatsBar from "@/components/stats-bar";
 import SearchBar from "@/components/search-bar";
-import CategoryFilter from "@/components/category-filter";
+import CategoryFilter, { SPECIAL_FILTERS } from "@/components/category-filter";
 import AffiliateCard from "@/components/affiliate-card";
 import AdminPanel from "@/components/admin-panel";
 import TrustIndicators from "@/components/trust-indicators";
@@ -30,6 +30,16 @@ import { Settings } from "lucide-react";
 export default function Home() {
   const [showAdmin, setShowAdmin] = useState(false);
   const [activeCategories, setActiveCategories] = useState<Set<string>>(new Set(["all"]));
+  const [activeFilters, setActiveFilters] = useState<Set<string>>(new Set());
+
+  const toggleFilter = (id: string) => {
+    setActiveFilters(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
 
   const toggleCategory = (id: string) => {
     setActiveCategories(prev => {
@@ -204,6 +214,22 @@ export default function Home() {
             allLinkCategories.some(lc => lc.toLowerCase().includes(cat.toLowerCase()))
           );
         if (!matchesCategory) return null;
+
+        // Special filters
+        if (activeFilters.size > 0) {
+          const searchable = `${link.title} ${link.description || ""} ${link.aiPrivateInfo || ""}`.toLowerCase();
+          const price = parseFloat(link.price || "0") || 0;
+          for (const f of activeFilters) {
+            if (f === "free_trial" && !searchable.includes("free trial") && !searchable.includes("free plan") && !searchable.includes("try free")) return null;
+            if (f === "elite_pick" && !link.isElitePick) return null;
+            if (f === "verified" && !link.isVerified) return null;
+            if (f === "in_stock" && !(link.stock && link.stock > 0)) return null;
+            if (f === "under_25" && !(price > 0 && price < 25)) return null;
+            if (f === "under_50" && !(price > 0 && price < 50)) return null;
+            if (f === "under_100" && !(price > 0 && price < 100)) return null;
+          }
+        }
+
         if (words.length === 0) return { link, score: 0 };
 
         const title = link.title.toLowerCase();
@@ -552,7 +578,7 @@ export default function Home() {
         {/* ── Instagram-style product stories ── */}
         <ProductStories products={affiliateLinks} />
 
-        <CategoryFilter categories={categories} activeCategories={activeCategories} onCategoryToggle={toggleCategory} />
+        <CategoryFilter categories={categories} activeCategories={activeCategories} onCategoryToggle={toggleCategory} activeFilters={activeFilters} onFilterToggle={toggleFilter} />
 
         {/* ── FTC / Affiliate Disclosure ── */}
         <div className="flex items-center justify-center gap-1.5 py-1.5 px-3 mb-4 rounded-lg text-center flex-wrap"
