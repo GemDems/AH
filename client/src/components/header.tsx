@@ -32,26 +32,30 @@ function GuaranteeInfoIcon() {
       >
         i
       </button>
-      {open && <InfoPopup />}
+      {open && (
+        <div
+          className="absolute z-50 bottom-[calc(100%+8px)] left-1/2 -translate-x-1/2 w-64 rounded-xl shadow-2xl border border-white/10 p-4 text-left"
+          style={{ background: "linear-gradient(135deg,#0f172a 0%,#1e1b4b 100%)" }}
+        >
+          {/* arrow */}
+          <div className="absolute left-1/2 -translate-x-1/2 -bottom-[7px] w-3 h-3 rotate-45 border-r border-b border-white/10" style={{ background: "#1e1b4b" }} />
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-xs font-bold text-white">100% Safe &amp; Secure</span>
+          </div>
+          <ul className="space-y-1.5">
+            {[
+              "Every purchase happens directly on the official retailer's site — Amazon, Walmart, Nike, etc.",
+              "Every link sends you straight to the brand's own store.",
+              "Access is completely free. No subscriptions, no hidden fees, no catch.",
+            ].map((text) => (
+              <li key={text} className="flex items-start gap-2">
+                <span className="text-[11px] leading-relaxed" style={{ color: "#cbd5e1" }}>{text}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </span>
-  );
-}
-
-function InfoPopup() {
-  return (
-    <div
-      className="absolute z-50 bottom-[calc(100%+10px)] left-1/2 -translate-x-1/2 w-72 rounded-2xl shadow-2xl p-4 text-left"
-      style={{ background: "#1c2033", border: "1px solid rgba(255,255,255,0.08)" }}
-    >
-      {/* arrow */}
-      <div className="absolute left-1/2 -translate-x-1/2 -bottom-[7px] w-3 h-3 rotate-45" style={{ background: "#1c2033", borderRight: "1px solid rgba(255,255,255,0.08)", borderBottom: "1px solid rgba(255,255,255,0.08)" }} />
-      <div className="flex items-center gap-2 mb-2.5">
-        <span className="text-base leading-none">🔒</span>
-        <span className="text-[13px] font-bold text-white leading-tight">All purchases happen directly on official retailer sites</span>
-      </div>
-      <p className="text-[11.5px] leading-relaxed mb-1" style={{ color: "#94a3b8" }}>We never handle your payment or personal info.</p>
-      <p className="text-[11.5px] leading-relaxed" style={{ color: "#94a3b8" }}>Every link goes straight to the brand's own store.</p>
-    </div>
   );
 }
 
@@ -81,7 +85,29 @@ function TrustInfoIcon() {
       >
         i
       </button>
-      {open && <InfoPopup />}
+      {open && (
+        <div
+          className="absolute z-50 bottom-[calc(100%+8px)] left-1/2 -translate-x-1/2 w-64 rounded-xl shadow-2xl border border-white/10 p-4 text-left"
+          style={{ background: "linear-gradient(135deg,#0f172a 0%,#1e1b4b 100%)" }}
+        >
+          {/* arrow */}
+          <div className="absolute left-1/2 -translate-x-1/2 -bottom-[7px] w-3 h-3 rotate-45 border-r border-b border-white/10" style={{ background: "#1e1b4b" }} />
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-xs font-bold text-white">100% Safe &amp; Secure</span>
+          </div>
+          <ul className="space-y-1.5">
+            {[
+              "Every purchase happens directly on the official retailer's site — Amazon, Walmart, Nike, etc.",
+              "Every link sends you straight to the brand's own store.",
+              "Access is completely free. No subscriptions, no hidden fees, no catch.",
+            ].map((text) => (
+              <li key={text} className="flex items-start gap-2">
+                <span className="text-[11px] leading-relaxed" style={{ color: "#cbd5e1" }}>{text}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </span>
   );
 }
