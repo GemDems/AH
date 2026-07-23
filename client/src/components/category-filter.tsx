@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { SlidersHorizontal, X, Check } from "lucide-react";
+import { SlidersHorizontal, X, Check, Gift, Star, ShieldCheck } from "lucide-react";
 
 interface Category {
   id: string;
@@ -16,9 +16,9 @@ export interface SpecialFilter {
 }
 
 export const SPECIAL_FILTERS: SpecialFilter[] = [
-  { id: "free_trial",   label: "Free",         icon: "🆓", description: "Free products & offers" },
-  { id: "elite_pick",   label: "Elite Picks",  icon: "🧠", description: "Hand-picked top performers" },
-  { id: "verified",     label: "Verified",     icon: "✔️", description: "Verified by our team" },
+  { id: "free_trial",   label: "Free",         icon: "lucide:Gift",        description: "Free products & offers" },
+  { id: "elite_pick",   label: "Elite Picks",  icon: "lucide:Star",        description: "Hand-picked top performers" },
+  { id: "verified",     label: "Verified",     icon: "lucide:ShieldCheck", description: "Verified by our team" },
   { id: "in_stock",     label: "In Stock",     icon: "📦", description: "Available right now" },
   { id: "under_25",     label: "Under $25",    icon: "💵", description: "Deals priced under $25" },
   { id: "under_50",     label: "Under $50",    icon: "💰", description: "Deals priced under $50" },
@@ -123,7 +123,15 @@ export default function CategoryFilter({
                       }`}
                     >
                       <div className="flex items-center gap-2.5">
-                        <span className="text-sm leading-none">{f.icon}</span>
+                        {f.icon === "lucide:Gift" ? (
+                          <Gift size={14} className={isActive ? "text-blue-600" : "text-gray-400"} strokeWidth={2} />
+                        ) : f.icon === "lucide:Star" ? (
+                          <Star size={14} className={isActive ? "text-blue-600" : "text-gray-400"} strokeWidth={2} />
+                        ) : f.icon === "lucide:ShieldCheck" ? (
+                          <ShieldCheck size={14} className={isActive ? "text-blue-600" : "text-gray-400"} strokeWidth={2} />
+                        ) : (
+                          <span className="text-sm leading-none">{f.icon}</span>
+                        )}
                         <span className={`text-[13px] font-medium ${isActive ? "text-blue-700" : "text-gray-700"}`}>
                           {f.label}
                         </span>
