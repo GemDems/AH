@@ -222,23 +222,66 @@ function enforceWindowLimit(req: Request, res: Response, next: NextFunction) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 // Global live stats — single source of truth for ALL tabs/devices
-// Initialized once on server start; all clients poll this via /api/live-stats
+// ---------------------------------------------------------------------------
+// Live stats — deterministic per-hour seed so every browser/device/restart
+// sees the same number for the same hour. Drifts ±small each tick but is
+// pulled back toward the hourly target, never growing forever.
+// Each hour the target drops ~8-12%; midnight resets to a fresh "morning"
+// baseline so numbers never climb without bound.
+// ---------------------------------------------------------------------------
+
+/** Simple seedable pseudo-random 0..1 (same input → same output always) */
+function seededRand(seed: number): number {
+  const x = Math.sin(seed * 127.1 + 311.7) * 43758.5453123;
+  return x - Math.floor(x);
+}
+
+/** Hour-index since Unix epoch (e.g. 484_200 at a given hour) */
+function hourKey(): number {
+  return Math.floor(Date.now() / (1000 * 60 * 60));
+}
+
+/**
+ * Deterministic viewer target for a given hour.
+ * Range 3 200–6 800 — feels active but not unbelievable.
+ * Varies smoothly: the seed changes every 6 hours so consecutive hours
+ * are usually close to each other.
+ */
+function targetForHour(h: number): number {
+  // Slow-moving base: seeded on 6-hour blocks
+  const blockBase = 3200 + Math.floor(seededRand(Math.floor(h / 6)) * 3600); // 3200–6800
+  // Hourly jitter: ±300 so adjacent hours aren't identical
+  const jitter = Math.floor((seededRand(h + 9999) - 0.5) * 600);
+  return Math.max(3000, blockBase + jitter);
+}
+
+// Initialise from the current hour — survives server restarts with same value
+let _hourKey = hourKey();
+let _target  = targetForHour(_hourKey);
+
 let liveStats = {
-  viewers: Math.floor(Math.random() * 4500) + 3000,       // 3,000–7,500
-  hourlyBuyers: Math.floor(Math.random() * 1500) + 800,   // 800–2,300
-  lastHourlyReset: Date.now()
+  viewers:          _target + Math.floor((seededRand(_hourKey + 1) - 0.5) * 400),
+  hourlyBuyers:     0,
+  lastHourKey:      _hourKey,
 };
+liveStats.viewers     = Math.max(3000, liveStats.viewers);
+liveStats.hourlyBuyers = Math.floor(liveStats.viewers * (0.28 + seededRand(_hourKey + 2) * 0.08));
 
-// Seed orders at ~35% of viewers
-liveStats.hourlyBuyers = Math.floor(liveStats.viewers * 0.35);
-
-// Function to check if we need to reset hourly counter
 function checkHourlyReset() {
-  const now = Date.now();
-  const oneHour = 60 * 60 * 1000;
-  if (now - liveStats.lastHourlyReset >= oneHour) {
-    liveStats.hourlyBuyers = Math.floor(liveStats.viewers * 0.35);
-    liveStats.lastHourlyReset = now;
+  const h = hourKey();
+  if (h !== liveStats.lastHourKey) {
+    const isNewDay = new Date().getHours() === 0; // just ticked past midnight
+    // Every hour: pull target down 8-12% from previous target, then re-seed
+    const prevTarget = targetForHour(liveStats.lastHourKey);
+    const decayPct   = isNewDay ? 0.85 : (0.88 + seededRand(h + 7) * 0.04); // 88-92% kept each hour, 85% at midnight
+    _target = Math.max(3000, Math.floor(prevTarget * decayPct));
+    // Clamp viewers toward new (lower) target if they drifted above it
+    if (liveStats.viewers > _target + 500) {
+      liveStats.viewers = _target + Math.floor(seededRand(h + 3) * 400);
+    }
+    // Reset hourly order counter
+    liveStats.hourlyBuyers = Math.floor(liveStats.viewers * (0.28 + seededRand(h + 4) * 0.08));
+    liveStats.lastHourKey  = h;
   }
 }
 
@@ -270,26 +313,31 @@ async function processScheduledOperations() {
 }
 
 // Periodically update counters — drives ALL clients since they poll this
+// Net drift: viewers stay within ±400 of the hourly target; no infinite growth.
 setInterval(() => {
   checkHourlyReset();
   processScheduledOperations();
 
+  const diff = liveStats.viewers - _target;
   const rand = Math.random();
-  if (rand < 0.15) {
-    // Big jump ~15% of ticks
-    liveStats.viewers += Math.floor(Math.random() * 200) + 80;
-  } else if (rand > 0.95) {
-    // Small drop ~5% of ticks
-    liveStats.viewers -= Math.floor(Math.random() * 30) + 10;
+
+  if (diff > 300) {
+    // Too far above target — nudge down
+    liveStats.viewers -= Math.floor(rand * 25) + 5;
+  } else if (diff < -300) {
+    // Too far below target — nudge up
+    liveStats.viewers += Math.floor(rand * 25) + 5;
   } else {
-    // Steady creep up
-    liveStats.viewers += Math.floor(Math.random() * 15) + 1;
+    // Near target — small balanced random walk (±1 to ±12)
+    const step = Math.floor(rand * 12) + 1;
+    liveStats.viewers += rand < 0.5 ? step : -step;
   }
   liveStats.viewers = Math.max(3000, liveStats.viewers);
 
-  // Orders tick up with viewers
-  if (Math.random() < 0.75) {
-    liveStats.hourlyBuyers += Math.floor(Math.random() * 3) + 1;
+  // Orders: small occasional uptick, but capped at ~38% of current viewers
+  const orderCap = Math.floor(liveStats.viewers * 0.38);
+  if (Math.random() < 0.40 && liveStats.hourlyBuyers < orderCap) {
+    liveStats.hourlyBuyers += Math.floor(Math.random() * 2) + 1;
   }
 }, 4000);
 
