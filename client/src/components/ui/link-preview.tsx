@@ -168,6 +168,15 @@ export const HoverPeek = ({
                     />
                   )}
 
+                  {/* View Site button overlaid on preview */}
+                  <button
+                    onClick={(e) => { e.stopPropagation(); window.open(url, '_blank'); }}
+                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white text-[11px] font-bold px-3.5 py-1.5 rounded-full z-20 shadow-lg whitespace-nowrap hover:scale-105 active:scale-95 transition-transform duration-150"
+                    style={{ background: "linear-gradient(135deg,#6366f1 0%,#8b5cf6 50%,#a855f7 100%)", boxShadow: "0 2px 12px rgba(139,92,246,0.5)" }}
+                  >
+                    🌐 View Site →
+                  </button>
+
                   {/* URL label at the bottom of the image */}
                   <div
                     className="absolute bottom-0 left-0 right-0 px-2 py-1.5"
