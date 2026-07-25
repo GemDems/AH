@@ -826,27 +826,42 @@ export default function Home() {
                 onChange={e => setReviewMsg(e.target.value)}
                 maxLength={300}
               />
-              <button
-                disabled={reviewSubmitting || !reviewName.trim() || !reviewMsg.trim()}
-                onClick={async () => {
-                  if (!reviewName.trim() || !reviewMsg.trim()) return;
-                  setReviewSubmitting(true);
-                  try {
-                    const deviceId = localStorage.getItem("deviceId") || `anon_${Date.now()}`;
-                    await fetch("/api/reviews", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ name: reviewName.trim(), rating: reviewRating, message: reviewMsg.trim(), deviceId })
-                    });
-                    setReviewSuccess(true);
-                    setTimeout(() => { setShowReviewPopup(false); setReviewDone(true); }, 2500);
-                  } catch { setReviewSubmitting(false); }
-                }}
-                className="w-full py-2.5 rounded-xl text-sm font-semibold text-white transition-all"
-                style={{ background: reviewSubmitting ? "#9ca3af" : "linear-gradient(135deg,#1a237e,#3949ab)", border: "none", cursor: reviewSubmitting ? "not-allowed" : "pointer" }}
-              >
-                {reviewSubmitting ? "Submitting..." : "Submit Review"}
-              </button>
+              <div className="relative w-full">
+                <button
+                  disabled={reviewSubmitting || !reviewName.trim() || !reviewMsg.trim()}
+                  onClick={async () => {
+                    if (!reviewName.trim() || !reviewMsg.trim()) return;
+                    setReviewSubmitting(true);
+                    try {
+                      const deviceId = localStorage.getItem("deviceId") || `anon_${Date.now()}`;
+                      await fetch("/api/reviews", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ name: reviewName.trim(), rating: reviewRating, message: reviewMsg.trim(), deviceId })
+                      });
+                      setReviewSuccess(true);
+                      setTimeout(() => { setShowReviewPopup(false); setReviewDone(true); }, 2500);
+                    } catch { setReviewSubmitting(false); }
+                  }}
+                  className="w-full py-2.5 rounded-full text-sm font-semibold text-white transition-all"
+                  style={{
+                    background: reviewSubmitting || !reviewName.trim() || !reviewMsg.trim() ? "#374151" : "#0f0f0f",
+                    border: "none",
+                    cursor: reviewSubmitting || !reviewName.trim() || !reviewMsg.trim() ? "not-allowed" : "pointer",
+                    letterSpacing: "0.01em",
+                  }}
+                >
+                  {reviewSubmitting ? "Submitting..." : "Submit Review"}
+                </button>
+                {!reviewSubmitting && (
+                  <span
+                    className="absolute -top-2.5 -right-1 text-[9px] font-bold text-white px-2 py-[3px] rounded-full pointer-events-none select-none"
+                    style={{ background: "linear-gradient(90deg,#7c3aed,#06b6d4)", lineHeight: 1 }}
+                  >
+                    free
+                  </span>
+                )}
+              </div>
             </>
           )}
         </div>
