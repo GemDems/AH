@@ -28,8 +28,6 @@ export default function AffiliateCard({ link }: AffiliateCardProps) {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showQuickView, setShowQuickView] = useState(false);
-  const [isCardTouched, setIsCardTouched] = useState(false);
-  const touchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { toast } = useToast();
 
   // Pinch-to-zoom: track initial finger distance for touch events
@@ -211,19 +209,7 @@ export default function AffiliateCard({ link }: AffiliateCardProps) {
 
   return (
     <>
-      <Card
-        className="bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-[box-shadow,transform,border-color,opacity] duration-500 transform hover:-translate-y-2 hover:scale-[1.02] border-2 border-gray-100 hover:border-conversion-blue/30 overflow-hidden group relative backdrop-blur-sm"
-        style={{ ['--tw-shadow-colored' as any]: '0 25px 50px -12px rgba(249,115,22,0.05)' }}
-        onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 20px 40px -8px rgba(0,0,0,0.18), 0 8px 20px -4px rgba(249,115,22,0.05)')}
-        onMouseLeave={e => (e.currentTarget.style.boxShadow = '')}
-        onTouchStart={() => {
-          if (touchTimeoutRef.current) clearTimeout(touchTimeoutRef.current);
-          setIsCardTouched(true);
-        }}
-        onTouchEnd={() => {
-          touchTimeoutRef.current = setTimeout(() => setIsCardTouched(false), 2500);
-        }}
-      >
+      <Card className="bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-[box-shadow,transform,border-color,opacity] duration-500 transform hover:-translate-y-2 hover:scale-[1.02] border-2 border-gray-100 hover:border-conversion-blue/30 overflow-hidden group relative backdrop-blur-sm" style={{ ['--tw-shadow-colored' as any]: '0 25px 50px -12px rgba(249,115,22,0.05)' }} onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 20px 40px -8px rgba(0,0,0,0.18), 0 8px 20px -4px rgba(249,115,22,0.05)')} onMouseLeave={e => (e.currentTarget.style.boxShadow = '')}>
         <div className="absolute inset-0 pointer-events-none z-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" style={{ backgroundColor: 'rgba(0,0,139,0.011)' }} />
 
         <div className="absolute top-2 right-2 z-30" style={{ opacity: 0, visibility: 'hidden' }}>
@@ -373,29 +359,6 @@ export default function AffiliateCard({ link }: AffiliateCardProps) {
                 </span>
               </Button>
             </HoverPeek>
-
-            {/* View Site pill — blurs in on hover (desktop) or touch (mobile) */}
-            <div
-              className="transition-all duration-300 ease-out group-hover:opacity-100 group-hover:[filter:blur(0px)] group-hover:translate-y-0 group-hover:scale-100"
-              style={{
-                opacity: isCardTouched ? 1 : undefined,
-                filter: isCardTouched ? 'blur(0px)' : undefined,
-                transform: isCardTouched ? 'translateY(0) scale(1)' : undefined,
-              }}
-            >
-              <div
-                className="opacity-0 [filter:blur(6px)] translate-y-1 scale-95 group-hover:opacity-100 group-hover:[filter:blur(0px)] group-hover:translate-y-0 group-hover:scale-100 transition-all duration-300 ease-out"
-                style={isCardTouched ? { opacity: 1, filter: 'blur(0px)', transform: 'translateY(0) scale(1)' } : {}}
-              >
-                <button
-                  onClick={(e) => handleClick(e as any)}
-                  className="w-full flex items-center justify-center gap-2 text-white text-sm font-semibold py-2 px-4 rounded-full shadow-md hover:scale-105 active:scale-95 transition-transform duration-150"
-                  style={{ background: "linear-gradient(135deg,#6366f1 0%,#8b5cf6 50%,#a855f7 100%)", boxShadow: "0 2px 14px rgba(139,92,246,0.45)" }}
-                >
-                  🌐 View Site
-                </button>
-              </div>
-            </div>
 
             <div className="flex items-center justify-center gap-1 text-xs text-gray-500">
               <Lock className="w-3 h-3 text-green-600" />
