@@ -146,6 +146,11 @@ export default function Header({ onSearch }: HeaderProps) {
   const [reviewPage, setReviewPage] = useState(0);
   const [fadeIn, setFadeIn] = useState(true);
   const [headerSearch, setHeaderSearch] = useState("");
+  const [flippedCards, setFlippedCards] = useState<Record<number, boolean>>({});
+  const [subtitleHovered, setSubtitleHovered] = useState(false);
+  const [subtitleClicked, setSubtitleClicked] = useState(false);
+
+  const toggleCard = (i: number) => setFlippedCards(prev => ({ ...prev, [i]: !prev[i] }));
   const totalPages = Math.ceil(ALL_REVIEWS.length / 3);
 
   const goToPage = (next: number) => {
@@ -238,8 +243,14 @@ export default function Header({ onSearch }: HeaderProps) {
           ELITE<br />
           <span style={{ color: "#2563eb" }}>DEALS</span>
         </h1>
-        <div className="mt-2 text-sm font-normal tracking-[0.2em]" style={{ color: "#9ca3af" }}>
-          PREMIUM MARKETPLACE
+        <div
+          className="mt-2 text-sm font-normal tracking-[0.2em] cursor-pointer select-none transition-colors duration-200"
+          style={{ color: "#9ca3af" }}
+          onMouseEnter={() => setSubtitleHovered(true)}
+          onMouseLeave={() => setSubtitleHovered(false)}
+          onClick={() => setSubtitleClicked(v => !v)}
+        >
+          {subtitleHovered || subtitleClicked ? "HAND-CHECKED AFFILIATE DEALS" : "PREMIUM MARKETPLACE"}
         </div>
         {/* Trust pills */}
         <div className="flex flex-wrap justify-center gap-2 mt-5 max-w-lg mx-auto">
@@ -251,19 +262,39 @@ export default function Header({ onSearch }: HeaderProps) {
       {/* Stats grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl mx-auto px-4 mt-5">
         {[
-          { icon: "✅", label: "Verified", desc: "Every product vetted", color: "#4ade80", bg: "rgba(34,197,94,0.15)" },
-          { icon: "⭐", label: "4.9/5 Rating", desc: "78K+ reviews", color: "#fbbf24", bg: "rgba(251,191,36,0.15)" },
-          { icon: "🏆", label: "#1 Marketplace", desc: "Industry leader", color: "#a78bfa", bg: "rgba(139,92,246,0.15)" },
-          { icon: "🔒", label: "Bank-Level", desc: "256-bit encryption", color: "#60a5fa", bg: "rgba(96,165,250,0.15)" },
-        ].map((s) => (
-          <div key={s.label} className="rounded-xl p-4 text-center" style={{ background: "#151929", border: "1px solid rgba(255,255,255,0.07)" }}>
-            <div className="w-11 h-11 rounded-full flex items-center justify-center mx-auto mb-2 text-xl" style={{ background: s.bg }}>
-              {s.icon}
+          {
+            default: { icon: "✅", label: "Hand-Checked", desc: "Every link opened and tested", color: "#4ade80", bg: "rgba(34,197,94,0.15)" },
+            flipped: { icon: "✅", label: "Verified", desc: "Every product vetted", color: "#4ade80", bg: "rgba(34,197,94,0.15)" },
+          },
+          {
+            default: { icon: "💲", label: "Honest Pricing", desc: "Price shown as of posting date", color: "#fbbf24", bg: "rgba(251,191,36,0.15)" },
+            flipped: { icon: "⭐", label: "4.9/5 Rating", desc: "78K+ reviews", color: "#fbbf24", bg: "rgba(251,191,36,0.15)" },
+          },
+          {
+            default: { icon: "🔓", label: "No Signup", desc: "Browse without an account", color: "#a78bfa", bg: "rgba(139,92,246,0.15)" },
+            flipped: { icon: "🏆", label: "#1 Marketplace", desc: "Industry leader", color: "#a78bfa", bg: "rgba(139,92,246,0.15)" },
+          },
+          {
+            default: { icon: "📋", label: "Always Disclosed", desc: "Affiliate links marked, every time", color: "#60a5fa", bg: "rgba(96,165,250,0.15)" },
+            flipped: { icon: "🔒", label: "Bank-Level", desc: "256-bit encryption", color: "#60a5fa", bg: "rgba(96,165,250,0.15)" },
+          },
+        ].map((card, i) => {
+          const s = flippedCards[i] ? card.flipped : card.default;
+          return (
+            <div
+              key={i}
+              className="rounded-xl p-4 text-center cursor-pointer select-none transition-transform duration-150 active:scale-95"
+              style={{ background: "#151929", border: "1px solid rgba(255,255,255,0.07)" }}
+              onClick={() => toggleCard(i)}
+            >
+              <div className="w-11 h-11 rounded-full flex items-center justify-center mx-auto mb-2 text-xl" style={{ background: s.bg }}>
+                {s.icon}
+              </div>
+              <div className="text-sm font-bold mb-0.5" style={{ color: s.color }}>{s.label}</div>
+              <div className="text-xs" style={{ color: "#6b7280" }}>{s.desc}</div>
             </div>
-            <div className="text-sm font-bold mb-0.5" style={{ color: s.color }}>{s.label}</div>
-            <div className="text-xs" style={{ color: "#6b7280" }}>{s.desc}</div>
-          </div>
-        ))}
+          );
+        })}
       </div>
       {/* Live bar */}
       <div className="max-w-lg mx-auto px-4 mt-4">
