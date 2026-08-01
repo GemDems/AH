@@ -1,7 +1,38 @@
 import { useState, useEffect } from "react";
-import { Trophy, Star, Crown, TrendingUp } from "lucide-react";
+import { Trophy, Star, Crown, TrendingUp, Lock, Users } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import SavingsProgress from "./savings-progress";
+
+const getDeviceId = () => {
+  let deviceId = localStorage.getItem('elite_device_id');
+  if (!deviceId) {
+    deviceId = `device_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    localStorage.setItem('elite_device_id', deviceId);
+  }
+  return deviceId;
+};
+
+// Blur + lock overlay shown on top of a leaderboard list until the visitor
+// has invited enough friends. The underlying list is left fully intact
+// underneath — only visually blurred — and unlocks automatically once
+// invitesNeeded reaches 0.
+function LeaderboardLockOverlay({ invitesNeeded }: { invitesNeeded: number }) {
+  return (
+    <div className="absolute inset-0 flex items-center justify-center bg-white/50 backdrop-blur-[3px] rounded-b-2xl z-10">
+      <div className="text-center px-6 py-5 mx-4 max-w-xs bg-white/95 rounded-2xl shadow-xl border border-gray-200">
+        <Lock className="w-7 h-7 mx-auto mb-2 text-gray-400" />
+        <h4 className="font-bold text-gray-900 mb-1">Leaderboard unlocks at 3 invites</h4>
+        <p className="text-sm text-gray-600 mb-3">
+          Invite {invitesNeeded} more friend{invitesNeeded !== 1 ? "s" : ""} to unlock and see the full leaderboard.
+        </p>
+        <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-full">
+          <Users className="w-3.5 h-3.5" />
+          Invite friends to unlock it faster
+        </div>
+      </div>
+    </div>
+  );
+}
 
 // Realistic static leaderboard data that persists
 const STATIC_LEADERBOARD_DATA = {
@@ -34,12 +65,24 @@ const STATIC_LEADERBOARD_DATA = {
 export default function Leaderboard() {
   const [topSavers, setTopSavers] = useState(STATIC_LEADERBOARD_DATA.topSavers);
   const [topReferrers, setTopReferrers] = useState(STATIC_LEADERBOARD_DATA.topReferrers);
+  const deviceId = getDeviceId();
 
   // Fetch real VIP users with 3+ invites and usernames
   const { data: realVipUsers } = useQuery({
     queryKey: ["/api/leaderboard"],
     refetchInterval: 30000, // Check every 30 seconds for new VIP members
   });
+
+  // Fetch this visitor's own invite count to gate the leaderboard lists —
+  // both lists unlock together once they've invited 3 friends.
+  const { data: referralStatus } = useQuery({
+    queryKey: ["/api/referral/status", deviceId],
+    queryFn: () => fetch(`/api/referral/status?userId=${deviceId}`).then(res => res.json()),
+    refetchInterval: 10000,
+  });
+  const inviteCount = referralStatus?.usedCount || 0;
+  const invitesNeeded = Math.max(0, 3 - inviteCount);
+  const isLeaderboardUnlocked = inviteCount >= 3;
 
   // Random states for VIP users
   const vipStates = ["California", "Texas", "Florida", "New York", "Illinois", "Arizona", "Ohio", "Georgia", "Michigan", "Nevada"];
@@ -146,34 +189,37 @@ export default function Leaderboard() {
             </div>
           </div>
           
-          <div className="p-6">
-            {topSavers.map((saver, index) => (
-              <div key={index} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0">
-                <div className="flex items-center">
-                  <div className="flex items-center mr-4">
-                    {index === 0 && <Crown className="w-6 h-6 text-yellow-500 mr-2" />}
-                    {index === 1 && <Trophy className="w-6 h-6 text-gray-400 mr-2" />}
-                    {index === 2 && <Trophy className="w-6 h-6 text-amber-600 mr-2" />}
-                    {index > 2 && <span className="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center text-sm font-bold text-gray-600 mr-2">{index + 1}</span>}
+          <div className="p-6 relative">
+            <div className={isLeaderboardUnlocked ? "" : "filter blur-sm pointer-events-none select-none"}>
+              {topSavers.map((saver, index) => (
+                <div key={index} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0">
+                  <div className="flex items-center">
+                    <div className="flex items-center mr-4">
+                      {index === 0 && <Crown className="w-6 h-6 text-yellow-500 mr-2" />}
+                      {index === 1 && <Trophy className="w-6 h-6 text-gray-400 mr-2" />}
+                      {index === 2 && <Trophy className="w-6 h-6 text-amber-600 mr-2" />}
+                      {index > 2 && <span className="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center text-sm font-bold text-gray-600 mr-2">{index + 1}</span>}
+                    </div>
+                    
+                    <div>
+                      <div className="flex items-center">
+                        <span className="font-bold text-blue-900">{saver.name}</span>
+                        {saver.isVip && <Crown className="w-4 h-4 text-yellow-500 ml-2" />}
+                      </div>
+                      {saver.location ? <div className="text-sm text-gray-500">{saver.location}</div> : null}
+                    </div>
                   </div>
                   
-                  <div>
-                    <div className="flex items-center">
-                      <span className="font-bold text-blue-900">{saver.name}</span>
-                      {saver.isVip && <Crown className="w-4 h-4 text-yellow-500 ml-2" />}
+                  <div className="text-right">
+                    <div className="text-lg font-bold text-green-600">
+                      ${saver.savings.toLocaleString()}
                     </div>
-                    {saver.location ? <div className="text-sm text-gray-500">{saver.location}</div> : null}
+                    <div className="text-xs text-gray-500">saved</div>
                   </div>
                 </div>
-                
-                <div className="text-right">
-                  <div className="text-lg font-bold text-green-600">
-                    ${saver.savings.toLocaleString()}
-                  </div>
-                  <div className="text-xs text-gray-500">saved</div>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
+            {!isLeaderboardUnlocked && <LeaderboardLockOverlay invitesNeeded={invitesNeeded} />}
           </div>
         </div>
       </div>
@@ -194,36 +240,39 @@ export default function Leaderboard() {
             </div>
           </div>
           
-          <div className="p-6">
-            {topReferrers.map((referrer, index) => (
-              <div key={index} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0">
-                <div className="flex items-center">
-                  <div className="flex items-center mr-4">
-                    {index === 0 && <Crown className="w-6 h-6 text-yellow-500 mr-2" />}
-                    {index === 1 && <Trophy className="w-6 h-6 text-gray-400 mr-2" />}
-                    {index === 2 && <Trophy className="w-6 h-6 text-amber-600 mr-2" />}
-                    {index > 2 && <span className="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center text-sm font-bold text-gray-600 mr-2">{index + 1}</span>}
+          <div className="p-6 relative">
+            <div className={isLeaderboardUnlocked ? "" : "filter blur-sm pointer-events-none select-none"}>
+              {topReferrers.map((referrer, index) => (
+                <div key={index} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0">
+                  <div className="flex items-center">
+                    <div className="flex items-center mr-4">
+                      {index === 0 && <Crown className="w-6 h-6 text-yellow-500 mr-2" />}
+                      {index === 1 && <Trophy className="w-6 h-6 text-gray-400 mr-2" />}
+                      {index === 2 && <Trophy className="w-6 h-6 text-amber-600 mr-2" />}
+                      {index > 2 && <span className="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center text-sm font-bold text-gray-600 mr-2">{index + 1}</span>}
+                    </div>
+                    
+                    <div>
+                      <div className="flex items-center">
+                        <span className="font-bold text-blue-900">{referrer.name}</span>
+                        <Crown className="w-4 h-4 text-yellow-500 ml-2" />
+                      </div>
+                      {referrer.location ? <div className="text-sm text-gray-500">{referrer.location}</div> : null}
+                    </div>
                   </div>
                   
-                  <div>
-                    <div className="flex items-center">
-                      <span className="font-bold text-blue-900">{referrer.name}</span>
-                      <Crown className="w-4 h-4 text-yellow-500 ml-2" />
+                  <div className="text-right">
+                    <div className="text-lg font-bold text-purple-600">
+                      {referrer.referrals} invites
                     </div>
-                    {referrer.location ? <div className="text-sm text-gray-500">{referrer.location}</div> : null}
+                    <div className="text-xs text-gray-500">
+                      ${referrer.earnings} earned
+                    </div>
                   </div>
                 </div>
-                
-                <div className="text-right">
-                  <div className="text-lg font-bold text-purple-600">
-                    {referrer.referrals} invites
-                  </div>
-                  <div className="text-xs text-gray-500">
-                    ${referrer.earnings} earned
-                  </div>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
+            {!isLeaderboardUnlocked && <LeaderboardLockOverlay invitesNeeded={invitesNeeded} />}
           </div>
         </div>
       </div>
