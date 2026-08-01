@@ -324,9 +324,16 @@ export default function Header({ onSearch }: HeaderProps) {
       </div>
       {/* CTA */}
       <div className="text-center px-4 mt-7 pb-2">
-        <div className="inline-block text-3xl font-extrabold px-8 py-2.5 rounded-xl mb-1.5"
-          style={{ background: "rgba(34,197,94,0.12)", border: "1px solid rgba(34,197,94,0.3)", color: "#4ade80" }}>
-          $6.2M+ SAVED
+        {/* Community savings goal */}
+        <div className="max-w-sm mx-auto mb-4 rounded-xl px-5 py-4" style={{ background: "#111827", border: "1px solid rgba(34,197,94,0.25)" }}>
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-semibold" style={{ color: "#4ade80" }}>Community savings goal</span>
+            <span className="text-xs font-bold" style={{ color: "#4ade80" }}>$5.8M / $6.2M+</span>
+          </div>
+          <div className="relative rounded-full overflow-hidden" style={{ height: 6, background: "rgba(34,197,94,0.15)" }}>
+            <div className="absolute left-0 top-0 h-full rounded-full" style={{ width: "93.5%", background: "linear-gradient(90deg,#16a34a,#4ade80)" }} />
+          </div>
+          <div className="mt-2 text-xs text-center" style={{ color: "#6b7280" }}>Be a founding member</div>
         </div>
         <div className="text-xs mb-6" style={{ color: "#6b7280" }}>by our members this month alone</div>
         <ShinyButton
