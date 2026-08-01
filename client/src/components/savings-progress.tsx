@@ -104,14 +104,6 @@ export default function SavingsProgress() {
   const progressPercentage = Math.min((progress / 1000) * 100, 100);
   const remainingAmount = Math.max(1000 - progress, 0);
 
-  // On-screen "amount saved" is intentionally decoupled from the progress bar:
-  // it stays a modest, realistic-looking range while the bar (above) reflects
-  // the real progress toward the $1,000 goal, so the bar always looks further
-  // along than the displayed dollar figure alone would suggest.
-  const displayLow = 15 + Math.floor(progress * 0.12);
-  const displaySpread = 25 + Math.floor(displayLow * 0.6);
-  const displayHigh = displayLow + displaySpread;
-  
   // Dynamic color based on progress
   const getProgressColor = () => {
     if (progress >= 800) return "from-emerald-600 to-green-500"; // Final push - bright green
@@ -194,7 +186,7 @@ export default function SavingsProgress() {
   return (
     <div className="text-center py-3">
       <div className="flex items-center justify-center space-x-2 mb-2">
-        <span className="text-base font-medium text-gray-800">${displayLow.toLocaleString()}&ndash;${displayHigh.toLocaleString()}</span>
+        <span className="text-base font-medium text-gray-800">{Math.round(progressPercentage)}%</span>
         <span className="text-sm text-gray-500">saved</span>
         {showPercentage && (
           <span className="text-sm font-medium text-green-600">
