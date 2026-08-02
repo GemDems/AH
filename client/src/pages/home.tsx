@@ -21,11 +21,20 @@ import ContactPopup from "@/components/contact-popup";
 import ProductStories from "@/components/product-stories";
 import { DiscoverButton, type DiscoverTab } from "@/components/ui/discover-button";
 import { ServiceCard } from "@/components/ui/service-card";
+import { ProgressiveFluxLoader } from "@/components/ui/progressive-flux-loader";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "wouter";
 
 import { Button } from "@/components/ui/button";
 import { Settings } from "lucide-react";
+
+const DEALS_LOADER_PHASES = [
+  { at: 0, label: "reaching out to brands" },
+  { at: 30, label: "negotiating partnerships" },
+  { at: 60, label: "verifying new deals" },
+  { at: 85, label: "adding real products" },
+  { at: 100, label: "almost live" },
+];
 
 export default function Home() {
   const [showAdmin, setShowAdmin] = useState(false);
@@ -596,9 +605,18 @@ export default function Home() {
           <p className="text-sm font-medium text-gray-800">
             🚧 More deals coming soon — I'm personally reaching out to major affiliate brands and retailers to bring on new partners and real products.
           </p>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-gray-500 mt-1 mb-4">
             New brands, companies, and deals are being added as partnerships close. Check back shortly — the good stuff is on its way.
           </p>
+          <div style={{ "--flux-from": "#2563eb", "--flux-to": "#38bdf8" } as React.CSSProperties}>
+            <ProgressiveFluxLoader
+              phases={DEALS_LOADER_PHASES}
+              duration={12}
+              className="max-w-sm gap-3"
+              barClassName="h-[10px] shadow-none dark:shadow-none"
+              textClassName="text-sm sm:text-base text-gray-600 font-medium"
+            />
+          </div>
         </div>
 
         {isLoading ? (
