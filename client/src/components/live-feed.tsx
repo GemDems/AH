@@ -13,12 +13,14 @@ interface LiveActivity {
 }
 
 /**
- * Returns today's date as MM/DD — always current, updates at midnight.
+ * Returns a "Last Updated" date that is always 2 days behind today's local date.
+ * Updates automatically at midnight via the hourly interval in the component.
  */
 function getLastUpdatedLabel(): string {
   const now = new Date();
-  const mm = String(now.getMonth() + 1).padStart(2, "0");
-  const dd = String(now.getDate()).padStart(2, "0");
+  const twoDaysAgo = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 2);
+  const mm = String(twoDaysAgo.getMonth() + 1).padStart(2, "0");
+  const dd = String(twoDaysAgo.getDate()).padStart(2, "0");
   return `${mm}/${dd}`;
 }
 
