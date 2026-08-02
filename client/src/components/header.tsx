@@ -491,7 +491,7 @@ export default function Header({ onSearch }: HeaderProps) {
                 duration={0.6}
                 className="font-bold text-white"
               />
-              <span style={{ color: "#9ca3af" }}>live viewers</span>
+              <span style={{ color: "#9ca3af" }}><span style={{ fontSize: "9px" }}>avg</span> live viewers</span>
               <EstimateInfoIcon label="live viewer count" />
             </div>
             <div style={{ width: 1, background: "rgba(255,255,255,0.07)", height: 28 }}></div>
@@ -503,7 +503,7 @@ export default function Header({ onSearch }: HeaderProps) {
                 duration={0.6}
                 className="font-bold text-white"
               />
-              <span style={{ color: "#9ca3af" }}>orders this hour</span>
+              <span style={{ color: "#9ca3af" }}><span style={{ fontSize: "9px" }}>avg</span> orders this hour</span>
               <EstimateInfoIcon label="orders this hour" />
             </div>
           </div>

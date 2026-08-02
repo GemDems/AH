@@ -591,6 +591,16 @@ export default function Home() {
           </Link>
         </div>
 
+        {/* ── Temporary "more deals coming" notice — text-only, no button/CTA ── */}
+        <div className="text-center mb-6 px-4">
+          <p className="text-sm font-medium text-gray-800">
+            🚧 More deals coming soon — I'm personally reaching out to major affiliate brands and retailers to bring on new partners and real products.
+          </p>
+          <p className="text-xs text-gray-500 mt-1">
+            New brands, companies, and deals are being added as partnerships close. Check back shortly — the good stuff is on its way.
+          </p>
+        </div>
+
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
