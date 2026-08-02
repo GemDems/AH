@@ -27,6 +27,14 @@ export default function About() {
           </section>
 
           <section className="rounded-xl p-5 space-y-2" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+            <h2 className="font-bold text-white text-base">About Our Live Stats & Savings Figures</h2>
+            <p>
+              <strong className="text-white">Please note:</strong> figures shown around the site — including "live viewers," "orders this hour," the community savings goal/progress bar, and the percentage of members who "got more than they expected" — are <strong className="text-white">estimates and rounded averages</strong> based on aggregate site activity, not exact real-time counts.
+            </p>
+            <p>They're intended as a general, directional sense of activity and community engagement, not a precise audit figure. They may not exactly reflect the number of people on the site, the exact dollar amount saved, or the exact order count at any given moment, and progress bars may not be drawn to a strict linear scale of the number shown beside them.</p>
+          </section>
+
+          <section className="rounded-xl p-5 space-y-2" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
             <h2 className="font-bold text-white text-base">Affiliate Disclosure</h2>
             <p>
               <strong className="text-white">Important:</strong> Elite Deals Hub participates in affiliate marketing programs. This means that when you click on product links on this site and make a purchase, we may earn a commission at <em>no additional cost to you</em>.

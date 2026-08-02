@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from "react";
+import { Link } from "wouter";
+import { Search } from "lucide-react";
 import { ShinyButton } from "@/components/ui/shiny-button";
 import { NumberTicker } from "@/components/ui/number-ticker";
 import { AnimatedGlowingSearchBar } from "@/components/ui/animated-glowing-search-bar";
@@ -112,6 +114,97 @@ function TrustInfoIcon() {
   );
 }
 
+/** Small "i" icon with a hover/click tooltip disclosing that a stat is an estimate, linking to /about. */
+function EstimateInfoIcon({ label }: { label: string }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [open]);
+
+  return (
+    <span ref={ref} className="relative inline-block align-middle ml-1.5" style={{ verticalAlign: "middle" }}>
+      <button
+        type="button"
+        aria-label={`About this ${label} figure`}
+        onMouseEnter={() => setOpen(true)}
+        onMouseLeave={() => setOpen(false)}
+        onClick={() => setOpen(v => !v)}
+        className="inline-flex items-center justify-center w-[13px] h-[13px] rounded-full border border-gray-500 text-gray-400 hover:border-blue-400 hover:text-blue-400 transition-colors duration-200 leading-none"
+        style={{ fontSize: 8, fontWeight: 700, fontStyle: "italic", verticalAlign: "middle" }}
+      >
+        i
+      </button>
+      {open && (
+        <div
+          className="absolute z-50 bottom-[calc(100%+8px)] left-1/2 -translate-x-1/2 w-60 rounded-xl shadow-2xl border border-white/10 p-3.5 text-left"
+          style={{ background: "linear-gradient(135deg,#0f172a 0%,#1e1b4b 100%)" }}
+        >
+          <div className="absolute left-1/2 -translate-x-1/2 -bottom-[7px] w-3 h-3 rotate-45 border-r border-b border-white/10" style={{ background: "#1e1b4b" }} />
+          <p className="text-[11px] leading-relaxed" style={{ color: "#cbd5e1" }}>
+            {label} is an estimate based on aggregate activity, rounded for display — it may not reflect an exact real-time count.
+          </p>
+          <Link
+            href="/about"
+            onClick={() => setOpen(false)}
+            className="inline-block mt-2 text-[11px] font-semibold hover:opacity-80 transition-opacity"
+            style={{ color: "#93c5fd", textDecoration: "none" }}
+          >
+            Learn more →
+          </Link>
+        </div>
+      )}
+    </span>
+  );
+}
+
+/** Scroll-triggered alternate to the live viewers/orders bar — a "scanning for deals" animation. */
+function LiveDealsTracker() {
+  const [scanned, setScanned] = useState(() => 12400 + Math.floor(Math.random() * 900));
+  const [categoryIdx, setCategoryIdx] = useState(0);
+  const categories = ["Electronics", "Home & Kitchen", "Fashion", "Toys & Games", "Fitness", "Beauty"];
+
+  useEffect(() => {
+    const iv = setInterval(() => setScanned(v => v + Math.floor(Math.random() * 4) + 1), 250);
+    return () => clearInterval(iv);
+  }, []);
+
+  useEffect(() => {
+    const iv = setInterval(() => setCategoryIdx(v => (v + 1) % categories.length), 1800);
+    return () => clearInterval(iv);
+  }, []);
+
+  return (
+    <div
+      className="h-full rounded-xl px-6 py-3 flex items-center gap-3.5"
+      style={{ background: "#151929", border: "1px solid rgba(124,58,237,0.3)" }}
+    >
+      <div className="relative flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center" style={{ background: "rgba(124,58,237,0.15)" }}>
+        <span className="absolute inset-0 rounded-full animate-ping" style={{ background: "rgba(124,58,237,0.35)" }} />
+        <Search className="w-4 h-4 relative" style={{ color: "#a78bfa" }} />
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-baseline gap-1.5">
+          <span className="font-bold text-white tabular-nums text-sm">{scanned.toLocaleString()}</span>
+          <span className="text-xs" style={{ color: "#9ca3af" }}>deals scanned today</span>
+        </div>
+        <div className="text-[11px] mt-0.5 truncate" style={{ color: "#a78bfa" }}>
+          Scanning {categories[categoryIdx]}...
+        </div>
+        <div className="relative h-[3px] rounded-full overflow-hidden mt-1.5" style={{ background: "rgba(124,58,237,0.18)" }}>
+          <div className="absolute top-0 h-full w-1/3 rounded-full" style={{ background: "linear-gradient(90deg,transparent,#a78bfa,transparent)", animation: "edh-scanline 1.6s ease-in-out infinite" }} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 interface LiveStats {
   viewers: number;
   hourlyBuyers: number;
@@ -149,6 +242,29 @@ export default function Header({ onSearch }: HeaderProps) {
   const [flippedCards, setFlippedCards] = useState<Record<number, boolean>>({});
   const [subtitleHovered, setSubtitleHovered] = useState(false);
   const [subtitleClicked, setSubtitleClicked] = useState(false);
+  const [goalBarFilled, setGoalBarFilled] = useState(false);
+  const [showTracker, setShowTracker] = useState(false);
+
+  // Animate the community savings bar filling in on first load
+  useEffect(() => {
+    const t = setTimeout(() => setGoalBarFilled(true), 350);
+    return () => clearTimeout(t);
+  }, []);
+
+  // Scroll down far enough → cross-fade the live viewers/orders bar into the
+  // "deals scanning" tracker; scroll back up → cross-fade back. Hysteresis
+  // (different show/hide thresholds) avoids flicker right at the boundary.
+  useEffect(() => {
+    const onScroll = () => {
+      setShowTracker(prev => {
+        if (!prev && window.scrollY > 480) return true;
+        if (prev && window.scrollY < 260) return false;
+        return prev;
+      });
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const toggleCard = (i: number) => setFlippedCards(prev => ({ ...prev, [i]: !prev[i] }));
   const totalPages = Math.ceil(ALL_REVIEWS.length / 3);
@@ -296,29 +412,54 @@ export default function Header({ onSearch }: HeaderProps) {
           );
         })}
       </div>
-      {/* Live bar */}
+      {/* Live bar — cross-fades into the deals-scanning tracker on scroll */}
       <div className="max-w-lg mx-auto px-4 mt-4">
-        <div className="rounded-xl px-6 py-3.5 flex justify-around items-center" style={{ background: "#151929", border: "1px solid rgba(255,255,255,0.07)" }}>
-          <div className="flex items-center gap-2 text-sm">
-            <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#22c55e" }}></div>
-            <NumberTicker
-              value={viewers}
-              locale
-              duration={0.6}
-              className="font-bold text-white"
-            />
-            <span style={{ color: "#9ca3af" }}>live viewers</span>
+        <div className="relative" style={{ height: 66 }}>
+          <div
+            className="absolute inset-0 rounded-xl px-6 py-3.5 flex justify-around items-center"
+            style={{
+              background: "#151929",
+              border: "1px solid rgba(255,255,255,0.07)",
+              opacity: showTracker ? 0 : 1,
+              filter: showTracker ? "blur(8px)" : "blur(0px)",
+              pointerEvents: showTracker ? "none" : "auto",
+              transition: "opacity 500ms ease, filter 500ms ease",
+            }}
+          >
+            <div className="flex items-center gap-2 text-sm">
+              <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#22c55e" }}></div>
+              <NumberTicker
+                value={viewers}
+                locale
+                duration={0.6}
+                className="font-bold text-white"
+              />
+              <span style={{ color: "#9ca3af" }}>live viewers</span>
+              <EstimateInfoIcon label="live viewer count" />
+            </div>
+            <div style={{ width: 1, background: "rgba(255,255,255,0.07)", height: 28 }}></div>
+            <div className="flex items-center gap-2 text-sm">
+              <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#60a5fa", animationDelay: "0.4s" }}></div>
+              <NumberTicker
+                value={orders}
+                locale
+                duration={0.6}
+                className="font-bold text-white"
+              />
+              <span style={{ color: "#9ca3af" }}>orders this hour</span>
+              <EstimateInfoIcon label="orders this hour" />
+            </div>
           </div>
-          <div style={{ width: 1, background: "rgba(255,255,255,0.07)", height: 28 }}></div>
-          <div className="flex items-center gap-2 text-sm">
-            <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#60a5fa", animationDelay: "0.4s" }}></div>
-            <NumberTicker
-              value={orders}
-              locale
-              duration={0.6}
-              className="font-bold text-white"
-            />
-            <span style={{ color: "#9ca3af" }}>orders this hour</span>
+          <div
+            className="absolute inset-0"
+            style={{
+              opacity: showTracker ? 1 : 0,
+              filter: showTracker ? "blur(0px)" : "blur(8px)",
+              pointerEvents: showTracker ? "auto" : "none",
+              transition: "opacity 500ms ease, filter 500ms ease",
+            }}
+          >
+            <LiveDealsTracker />
           </div>
         </div>
       </div>
@@ -327,11 +468,21 @@ export default function Header({ onSearch }: HeaderProps) {
         {/* Community savings goal */}
         <div className="max-w-sm mx-auto mb-4 rounded-xl px-5 py-4" style={{ background: "#111827", border: "1px solid rgba(34,197,94,0.25)" }}>
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-semibold" style={{ color: "#4ade80" }}>Community savings goal</span>
-            <span className="text-xs font-bold" style={{ color: "#4ade80" }}>$5.8M / $6.2M+</span>
+            <span className="text-xs font-semibold inline-flex items-center" style={{ color: "#4ade80" }}>
+              Community savings goal
+              <EstimateInfoIcon label="community savings goal" />
+            </span>
+            <span className="text-xs font-bold" style={{ color: "#4ade80" }}>$2.4M–$2.7M / $6.2M+</span>
           </div>
           <div className="relative rounded-full overflow-hidden" style={{ height: 6, background: "rgba(34,197,94,0.15)" }}>
-            <div className="absolute left-0 top-0 h-full rounded-full" style={{ width: "93.5%", background: "linear-gradient(90deg,#16a34a,#4ade80)" }} />
+            <div
+              className="absolute left-0 top-0 h-full rounded-full"
+              style={{
+                width: goalBarFilled ? "92%" : "0%",
+                background: "linear-gradient(90deg,#16a34a,#4ade80)",
+                transition: "width 1400ms cubic-bezier(0.16,1,0.3,1)",
+              }}
+            />
           </div>
           <div className="mt-2 text-xs text-center" style={{ color: "#6b7280" }}>Be a founding member</div>
         </div>
@@ -460,6 +611,10 @@ export default function Header({ onSearch }: HeaderProps) {
         @keyframes ctapulse {
           0%,100% { box-shadow: 0 0 0 0 rgba(124,58,237,0.5); }
           50% { box-shadow: 0 0 0 14px rgba(124,58,237,0); }
+        }
+        @keyframes edh-scanline {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(400%); }
         }
         div::-webkit-scrollbar { display: none; }
       `}</style>
