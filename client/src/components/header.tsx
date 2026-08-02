@@ -138,7 +138,7 @@ function EstimateInfoIcon({ label, pulse }: { label: string; pulse?: boolean }) 
         onMouseEnter={() => setOpen(true)}
         onMouseLeave={() => setOpen(false)}
         onClick={() => setOpen(v => !v)}
-        className="inline-flex items-center justify-center w-[13px] h-[13px] rounded-full border border-[#e5007a] text-[#e5007a] hover:border-[#ff0055] hover:text-[#ff0055] transition-colors duration-200 leading-none"
+        className="inline-flex items-center justify-center w-[13px] h-[13px] rounded-full border border-gray-500 text-gray-400 hover:border-blue-400 hover:text-blue-400 transition-colors duration-200 leading-none"
         style={{ fontSize: 8, fontWeight: 700, fontStyle: "italic", verticalAlign: "middle" }}
       >
         i
