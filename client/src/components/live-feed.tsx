@@ -137,9 +137,7 @@ export default function LiveFeed() {
         </div>
         
         <div className="mt-4 text-center">
-          <p className="text-xs text-gray-500">
-            Real customers making real purchases • Updates every few seconds
-          </p>
+          <p className="text-xs text-gray-500">Real customers making real purchases • Last Updated 07/31</p>
         </div>
       </Card>
     </div>
