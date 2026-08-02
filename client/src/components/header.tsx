@@ -193,7 +193,7 @@ function LiveDealsTracker() {
       <div className="min-w-0 flex-1">
         <div className="flex items-baseline gap-1.5">
           <span className="font-bold text-white tabular-nums text-sm">{scanned.toLocaleString()}</span>
-          <span className="text-xs" style={{ color: "#9ca3af" }}>deals scanned today</span>
+          <span className="text-xs" style={{ color: "#9ca3af" }}>deals scanned month</span>
         </div>
         <div className="text-[11px] mt-0.5 truncate" style={{ color: "#a78bfa" }}>
           Scanning {categories[categoryIdx]}...
@@ -368,7 +368,7 @@ export default function Header({ onSearch }: HeaderProps) {
         <div className="mb-3 flex justify-center">
           <LiquidBadge className="sm:w-44 w-40">
             <span className="tracking-[0.06em] sm:tracking-[0.14em] whitespace-nowrap font-black border-t-[0px] border-r-[0px] border-b-[0px] border-l-[0px] sm:text-[8px] text-[8px]" style={{ WebkitTextStroke: "0.5px currentColor" }}>
-              #1 PREMIUM MARKETPLACE
+              DEALS SCANNED THIS MONTH
             </span>
           </LiquidBadge>
         </div>
