@@ -423,7 +423,7 @@ export default function Header({ onSearch }: HeaderProps) {
               opacity: showTracker ? 0 : 1,
               filter: showTracker ? "blur(8px)" : "blur(0px)",
               pointerEvents: showTracker ? "none" : "auto",
-              transition: "opacity 500ms ease, filter 500ms ease",
+              transition: "opacity 120ms ease, filter 120ms ease",
             }}
           >
             <div className="flex items-center gap-2 text-sm">
@@ -456,7 +456,7 @@ export default function Header({ onSearch }: HeaderProps) {
               opacity: showTracker ? 1 : 0,
               filter: showTracker ? "blur(0px)" : "blur(8px)",
               pointerEvents: showTracker ? "auto" : "none",
-              transition: "opacity 500ms ease, filter 500ms ease",
+              transition: "opacity 120ms ease, filter 120ms ease",
             }}
           >
             <LiveDealsTracker />
@@ -472,7 +472,7 @@ export default function Header({ onSearch }: HeaderProps) {
               Community savings goal
               <EstimateInfoIcon label="community savings goal" />
             </span>
-            <span className="text-xs font-bold" style={{ color: "#4ade80" }}>$2.4M–$2.7M / $6.2M+</span>
+            <span className="text-xs font-bold" style={{ color: "#4ade80" }}>$6,200–$13,800 / $34,500+</span>
           </div>
           <div className="relative rounded-full overflow-hidden" style={{ height: 6, background: "rgba(34,197,94,0.15)" }}>
             <div
