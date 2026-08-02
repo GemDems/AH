@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { Search } from "lucide-react";
 import { ShinyButton } from "@/components/ui/shiny-button";
+import LoadingLines from "@/components/ui/loading-lines";
 import { NumberTicker } from "@/components/ui/number-ticker";
 import { AnimatedGlowingSearchBar } from "@/components/ui/animated-glowing-search-bar";
 import { BorderRotate } from "@/components/ui/animated-gradient-border";
@@ -186,9 +187,18 @@ function LiveDealsTracker() {
       className="h-full rounded-xl px-6 py-3 flex items-center gap-3.5"
       style={{ background: "#151929", border: "1px solid rgba(124,58,237,0.3)" }}
     >
-      <div className="relative flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center" style={{ background: "rgba(124,58,237,0.15)" }}>
-        <span className="absolute inset-0 rounded-full animate-ping" style={{ background: "rgba(124,58,237,0.35)" }} />
-        <Search className="w-4 h-4 relative" style={{ color: "#a78bfa" }} />
+      {/* LoadingLines animation replaces the static search icon */}
+      <div className="relative flex-shrink-0 overflow-hidden rounded-lg" style={{ width: 72, height: 36 }}>
+        <div style={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%) scale(0.28)",
+          transformOrigin: "center",
+          pointerEvents: "none",
+        }}>
+          <LoadingLines />
+        </div>
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-baseline gap-1.5">
