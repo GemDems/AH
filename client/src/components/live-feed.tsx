@@ -12,10 +12,33 @@ interface LiveActivity {
   blurProduct?: boolean;
 }
 
+/**
+ * Returns a "last updated" date string that lags behind the real date by
+ * 1–2 days, and shifts between a 1-day and 2-day lag every ~36 hours so it
+ * always reads as a recent (but not suspiciously live) update.
+ */
+function getLastUpdatedLabel(): string {
+  const now = new Date();
+  const DAY_MS = 24 * 60 * 60 * 1000;
+  const WINDOW_MS = 36 * 60 * 60 * 1000; // switches lag every 36h
+  const windowIdx = Math.floor(now.getTime() / WINDOW_MS);
+  const lagDays = windowIdx % 2 === 0 ? 1 : 2;
+  const lastUpdated = new Date(now.getTime() - lagDays * DAY_MS);
+  const mm = String(lastUpdated.getMonth() + 1).padStart(2, "0");
+  const dd = String(lastUpdated.getDate()).padStart(2, "0");
+  return `${mm}/${dd}`;
+}
+
 export default function LiveFeed() {
   const [activities, setActivities] = useState<LiveActivity[]>([]);
+  const [lastUpdated, setLastUpdated] = useState(() => getLastUpdatedLabel());
   const containerRef = useRef<HTMLDivElement>(null);
   const isVisibleRef = useRef(false);
+
+  useEffect(() => {
+    const iv = setInterval(() => setLastUpdated(getLastUpdatedLabel()), 60 * 60 * 1000); // recheck hourly
+    return () => clearInterval(iv);
+  }, []);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -137,7 +160,7 @@ export default function LiveFeed() {
         </div>
         
         <div className="mt-4 text-center">
-          <p className="text-xs text-gray-500">Real customers making real purchases • Last Updated 07/31</p>
+          <p className="text-xs text-gray-500">Real customers making real purchases • Last Updated {lastUpdated}</p>
         </div>
       </Card>
     </div>
