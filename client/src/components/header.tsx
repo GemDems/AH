@@ -195,10 +195,10 @@ function LiveDealsTracker() {
       } else {
         setScanned(v => v >= SCAN_MAX ? v : v + Math.floor(Math.random() * 3) + 1);
       }
-      // Next tick: 1.2–2.8 seconds — fast scan feel, still believable
-      timeout = window.setTimeout(tick, 1200 + Math.floor(Math.random() * 1600));
+      // Next tick: 300–700ms — rapid scan feel, believable
+      timeout = window.setTimeout(tick, 300 + Math.floor(Math.random() * 400));
     }
-    timeout = window.setTimeout(tick, 1200 + Math.floor(Math.random() * 1600));
+    timeout = window.setTimeout(tick, 300 + Math.floor(Math.random() * 400));
     return () => window.clearTimeout(timeout);
   }, []);
 
