@@ -130,26 +130,14 @@ function EstimateInfoIcon({ label, pulse }: { label: string; pulse?: boolean }) 
 
   return (
     <span ref={ref} className="relative inline-block align-middle ml-1.5" style={{ verticalAlign: "middle" }}>
-      {pulse && (
-        <>
-          <span
-            className="absolute rounded-full animate-ping pointer-events-none"
-            style={{ top: -4, left: -4, right: -4, bottom: -4, background: "rgba(74,222,128,0.35)", animationDuration: "1.8s" }}
-          />
-          <span
-            className="absolute rounded-full pointer-events-none"
-            style={{ top: -2, left: -2, right: -2, bottom: -2, background: "rgba(74,222,128,0.08)", boxShadow: "0 0 7px 2px rgba(74,222,128,0.35)" }}
-          />
-        </>
-      )}
       <button
         type="button"
         aria-label={`About this ${label} figure`}
         onMouseEnter={() => setOpen(true)}
         onMouseLeave={() => setOpen(false)}
         onClick={() => setOpen(v => !v)}
-        className="inline-flex items-center justify-center w-[13px] h-[13px] rounded-full border transition-colors duration-200 leading-none"
-        style={{ fontSize: 8, fontWeight: 700, fontStyle: "italic", verticalAlign: "middle", borderColor: pulse ? "#4ade80" : "#6b7280", color: pulse ? "#4ade80" : "#9ca3af", boxShadow: pulse ? "0 0 5px rgba(74,222,128,0.5)" : undefined }}
+        className="inline-flex items-center justify-center w-[13px] h-[13px] rounded-full border border-gray-500 text-gray-400 hover:border-blue-400 hover:text-blue-400 transition-colors duration-200 leading-none"
+        style={{ fontSize: 8, fontWeight: 700, fontStyle: "italic", verticalAlign: "middle" }}
       >
         i
       </button>
@@ -494,7 +482,14 @@ export default function Header({ onSearch }: HeaderProps) {
       {/* CTA */}
       <div className="text-center px-4 mt-7 pb-2">
         {/* Community savings goal */}
-        <div className="max-w-sm mx-auto mb-4 rounded-xl px-5 py-4" style={{ background: "#111827", border: "1px solid rgba(34,197,94,0.25)" }}>
+        <div className="relative max-w-sm mx-auto mb-4 rounded-xl px-5 py-4" style={{ background: "#111827", border: "1px solid rgba(34,197,94,0.25)" }}>
+          {/* Live pulse — bottom-left corner */}
+          <span className="absolute bottom-2.5 left-3 flex items-center gap-1 pointer-events-none">
+            <span className="relative flex h-[6px] w-[6px]">
+              <span className="absolute inline-flex h-full w-full rounded-full animate-ping" style={{ background: "rgba(74,222,128,0.5)", animationDuration: "2s" }} />
+              <span className="relative inline-flex h-[6px] w-[6px] rounded-full" style={{ background: "#4ade80" }} />
+            </span>
+          </span>
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-semibold inline-flex items-center" style={{ color: "#4ade80" }}>
               Community savings goal
