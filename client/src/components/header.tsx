@@ -274,8 +274,8 @@ export default function Header({ onSearch }: HeaderProps) {
   useEffect(() => {
     const onScroll = () => {
       setShowTracker(prev => {
-        if (!prev && window.scrollY > 480) return true;
-        if (prev && window.scrollY < 260) return false;
+        if (!prev && window.scrollY > 100) return true;
+        if (prev && window.scrollY < 40) return false;
         return prev;
       });
     };
@@ -516,7 +516,8 @@ export default function Header({ onSearch }: HeaderProps) {
               value={92}
               showLabel={false}
               className="w-full gap-0"
-              barClassName="h-[6px] bg-[rgba(34,197,94,0.15)] shadow-none dark:shadow-none"
+              barClassName="h-[10px] shadow-none dark:shadow-none"
+              gradient="linear-gradient(90deg, #16a34a 0%, #22c55e 35%, #4ade80 55%, #22c55e 78%, #16a34a 100%)"
             />
           </div>
           <div className="mt-2 text-xs text-center" style={{ color: "#6b7280" }}>Be a founding member</div>
