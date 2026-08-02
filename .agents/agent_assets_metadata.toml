@@ -6,3 +6,10 @@ id = "9VDd8kqwd9DeZIfhT7N70"
 uri = "file://marketplace-ambient.wav"
 type = "audio"
 title = "Marketplace Ambient — Conversion Optimized (10 sec preview)"
+
+[[outputs]]
+id = "uSYZ7e6fEGiOAvNunoRgx"
+uri = "file://elite-deals-hub.zip"
+type = "unspecified"
+title = "Elite Deals Hub — Full Project"
+description = "Complete project zip with all changes. Upload this to GitHub to sync everything."
