@@ -4,6 +4,7 @@ import { Search } from "lucide-react";
 import { ShinyButton } from "@/components/ui/shiny-button";
 import BarLoader from "@/components/ui/bar-loader";
 import { NumberTicker } from "@/components/ui/number-ticker";
+import { NumberTicker as ScanTicker } from "@/components/ui/be-ui-number-animation";
 import { AnimatedGlowingSearchBar } from "@/components/ui/animated-glowing-search-bar";
 import { BorderRotate } from "@/components/ui/animated-gradient-border";
 import { GlowCard } from "@/components/ui/spotlight-card";
@@ -166,15 +167,39 @@ function EstimateInfoIcon({ label, pulse, blue }: { label: string; pulse?: boole
   );
 }
 
+// Cap and reset logic for deals scanned counter
+const SCAN_MAX = 18500;
+const SCAN_WINDOW_MS = 3 * 60 * 60 * 1000; // 3-hour reset windows
+
+function getScanWindowStart(): number {
+  const windowIdx = Math.floor(Date.now() / SCAN_WINDOW_MS);
+  // Deterministic pseudo-random per window, range 11,000–15,499
+  const h = ((windowIdx * 2654435761) >>> 0) % 4500;
+  return 11000 + h;
+}
+
 /** Scroll-triggered alternate to the live viewers/orders bar — a "scanning for deals" animation. */
 function LiveDealsTracker() {
-  const [scanned, setScanned] = useState(() => 12400 + Math.floor(Math.random() * 900));
+  const [scanned, setScanned] = useState(() => getScanWindowStart());
   const [categoryIdx, setCategoryIdx] = useState(0);
   const categories = ["Electronics", "Home & Kitchen", "Fashion", "Toys & Games", "Fitness", "Beauty"];
+  const currentWindowRef = useRef(Math.floor(Date.now() / SCAN_WINDOW_MS));
 
   useEffect(() => {
-    const iv = setInterval(() => setScanned(v => v + Math.floor(Math.random() * 4) + 1), 250);
-    return () => clearInterval(iv);
+    let timeout: number;
+    function tick() {
+      const newWindow = Math.floor(Date.now() / SCAN_WINDOW_MS);
+      if (newWindow !== currentWindowRef.current) {
+        currentWindowRef.current = newWindow;
+        setScanned(getScanWindowStart());
+      } else {
+        setScanned(v => v >= SCAN_MAX ? v : v + Math.floor(Math.random() * 3) + 1);
+      }
+      // Next tick: 5–9 seconds — slow scan feel
+      timeout = window.setTimeout(tick, 5000 + Math.floor(Math.random() * 4000));
+    }
+    timeout = window.setTimeout(tick, 5000 + Math.floor(Math.random() * 4000));
+    return () => window.clearTimeout(timeout);
   }, []);
 
   useEffect(() => {
@@ -199,7 +224,15 @@ function LiveDealsTracker() {
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-baseline gap-1.5">
-          <span className="font-bold text-white tabular-nums text-sm">{scanned.toLocaleString()}</span>
+          <ScanTicker
+            value={scanned}
+            format={(n) => n.toLocaleString()}
+            duration={0.45}
+            stagger={0.03}
+            startOnView={false}
+            blur={true}
+            className="font-bold text-white tabular-nums text-sm"
+          />
           <span className="text-xs" style={{ color: "#9ca3af" }}>deals scanned month</span>
         </div>
         <div className="text-[11px] mt-0.5 truncate" style={{ color: "#a78bfa" }}>
