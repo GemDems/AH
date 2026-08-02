@@ -18,6 +18,7 @@ import IdeaSubmission from "@/components/idea-submission";
 import WishlistSection from "@/components/wishlist-section";
 import AIChatbot from "@/components/ai-chatbot";
 import ContactPopup from "@/components/contact-popup";
+import { RuixenGradientFooter } from "@/components/ui/ruixen-gradient-footer";
 import ProductStories from "@/components/product-stories";
 import { DiscoverButton, type DiscoverTab } from "@/components/ui/discover-button";
 import { ServiceCard } from "@/components/ui/service-card";
@@ -874,17 +875,24 @@ export default function Home() {
       <AIChatbot />
       <WishlistSection />
       {/* Site footer */}
-      <div className="mt-10 pb-6 text-center space-y-2">
-        <div className="flex items-center justify-center gap-3 flex-wrap">
-          <ContactPopup />
-          <Link href="/about" className="text-xs hover:opacity-70 transition-opacity" style={{ color: "#4b5563", textDecoration: "none" }}>
-            About Us &amp; Legal
-          </Link>
+      <RuixenGradientFooter gradientHeight="50vh" className="mt-10">
+        <div className="mx-auto w-full max-w-lg px-6 pt-6 pb-4 text-center space-y-3">
+          <div className="flex items-center justify-center gap-1 mb-1">
+            <span className="text-base font-black tracking-tight text-white">ELITE</span>
+            <span className="text-base font-black tracking-tight" style={{ color: "#4ade80" }}>DEALS</span>
+            <span className="text-base font-black tracking-tight text-white">HUB</span>
+          </div>
+          <div className="flex items-center justify-center gap-4 flex-wrap">
+            <ContactPopup />
+            <Link href="/about" className="text-xs hover:opacity-70 transition-opacity" style={{ color: "#6b7280", textDecoration: "none" }}>
+              About Us &amp; Legal
+            </Link>
+          </div>
+          <p className="text-xs" style={{ color: "#4b5563" }}>
+            © {new Date().getFullYear()} Elite Deals Hub · Affiliate links may earn us a commission at no cost to you
+          </p>
         </div>
-        <p className="text-xs" style={{ color: "#374151" }}>
-          © {new Date().getFullYear()} Elite Deals Hub · Affiliate links may earn us a commission at no cost to you
-        </p>
-      </div>
+      </RuixenGradientFooter>
     </div>
   );
 }
