@@ -117,7 +117,7 @@ function TrustInfoIcon() {
 }
 
 /** Small "i" icon with a hover/click tooltip disclosing that a stat is an estimate, linking to /about. */
-function EstimateInfoIcon({ label, pulse }: { label: string; pulse?: boolean }) {
+function EstimateInfoIcon({ label, pulse, blue }: { label: string; pulse?: boolean; blue?: boolean }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLSpanElement>(null);
 
@@ -138,7 +138,7 @@ function EstimateInfoIcon({ label, pulse }: { label: string; pulse?: boolean }) 
         onMouseEnter={() => setOpen(true)}
         onMouseLeave={() => setOpen(false)}
         onClick={() => setOpen(v => !v)}
-        className="inline-flex items-center justify-center w-[13px] h-[13px] rounded-full border border-sky-400 text-sky-400 hover:border-sky-300 hover:text-sky-300 transition-colors duration-200 leading-none"
+        className={`inline-flex items-center justify-center w-[13px] h-[13px] rounded-full border transition-colors duration-200 leading-none ${blue ? "border-sky-400 text-sky-400 hover:border-sky-300 hover:text-sky-300" : "border-gray-500 text-gray-400 hover:border-blue-400 hover:text-blue-400"}`}
         style={{ fontSize: 8, fontWeight: 700, fontStyle: "italic", verticalAlign: "middle" }}
       >
         i
@@ -501,7 +501,7 @@ export default function Header({ onSearch }: HeaderProps) {
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-semibold inline-flex items-center" style={{ color: "#4ade80" }}>
               Community savings goal
-              <EstimateInfoIcon label="community savings goal" pulse />
+              <EstimateInfoIcon label="community savings goal" pulse blue />
             </span>
             <span className="text-xs font-bold" style={{ color: "#4ade80" }}>
               $6.2k–$13.8k&nbsp;/&nbsp;
