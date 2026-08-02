@@ -88,11 +88,16 @@ export default {
           from: { transform: "translate(-50%, -50%) rotate(0deg)" },
           to: { transform: "translate(-50%, -50%) rotate(360deg)" },
         },
+        "barLoader": {
+          "0%, 100%": { transform: "scaleY(0.1)", opacity: "0.2" },
+          "50%": { transform: "scaleY(1)", opacity: "1" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "spin-slow": "spin-slow 4s linear infinite",
+        "barLoader": "barLoader 1.2s ease-in-out infinite",
       },
     },
   },
