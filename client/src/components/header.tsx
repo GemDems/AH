@@ -7,6 +7,7 @@ import { AnimatedGlowingSearchBar } from "@/components/ui/animated-glowing-searc
 import { BorderRotate } from "@/components/ui/animated-gradient-border";
 import { GlowCard } from "@/components/ui/spotlight-card";
 import { LiquidBadge } from "@/components/ui/liquid-badge";
+import { ProgressiveFluxLoader } from "@/components/ui/progressive-flux-loader";
 
 function GuaranteeInfoIcon() {
   const [open, setOpen] = useState(false);
@@ -510,14 +511,12 @@ export default function Header({ onSearch }: HeaderProps) {
               </span>
             </span>
           </div>
-          <div className="relative rounded-full overflow-hidden" style={{ height: 6, background: "rgba(34,197,94,0.15)" }}>
-            <div
-              className="absolute left-0 top-0 h-full rounded-full"
-              style={{
-                width: goalBarFilled ? "92%" : "0%",
-                background: "linear-gradient(90deg,#16a34a,#4ade80)",
-                transition: "width 1400ms cubic-bezier(0.16,1,0.3,1)",
-              }}
+          <div style={{ "--flux-from": "#16a34a", "--flux-to": "#4ade80" } as React.CSSProperties}>
+            <ProgressiveFluxLoader
+              value={92}
+              showLabel={false}
+              className="w-full gap-0"
+              barClassName="h-[6px] bg-[rgba(34,197,94,0.15)] shadow-none dark:shadow-none"
             />
           </div>
           <div className="mt-2 text-xs text-center" style={{ color: "#6b7280" }}>Be a founding member</div>
