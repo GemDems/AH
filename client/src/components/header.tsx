@@ -115,7 +115,7 @@ function TrustInfoIcon() {
 }
 
 /** Small "i" icon with a hover/click tooltip disclosing that a stat is an estimate, linking to /about. */
-function EstimateInfoIcon({ label }: { label: string }) {
+function EstimateInfoIcon({ label, pulse }: { label: string; pulse?: boolean }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLSpanElement>(null);
 
@@ -130,14 +130,26 @@ function EstimateInfoIcon({ label }: { label: string }) {
 
   return (
     <span ref={ref} className="relative inline-block align-middle ml-1.5" style={{ verticalAlign: "middle" }}>
+      {pulse && (
+        <>
+          <span
+            className="absolute rounded-full animate-ping pointer-events-none"
+            style={{ top: -4, left: -4, right: -4, bottom: -4, background: "rgba(74,222,128,0.35)", animationDuration: "1.8s" }}
+          />
+          <span
+            className="absolute rounded-full pointer-events-none"
+            style={{ top: -2, left: -2, right: -2, bottom: -2, background: "rgba(74,222,128,0.08)", boxShadow: "0 0 7px 2px rgba(74,222,128,0.35)" }}
+          />
+        </>
+      )}
       <button
         type="button"
         aria-label={`About this ${label} figure`}
         onMouseEnter={() => setOpen(true)}
         onMouseLeave={() => setOpen(false)}
         onClick={() => setOpen(v => !v)}
-        className="inline-flex items-center justify-center w-[13px] h-[13px] rounded-full border border-gray-500 text-gray-400 hover:border-blue-400 hover:text-blue-400 transition-colors duration-200 leading-none"
-        style={{ fontSize: 8, fontWeight: 700, fontStyle: "italic", verticalAlign: "middle" }}
+        className="inline-flex items-center justify-center w-[13px] h-[13px] rounded-full border transition-colors duration-200 leading-none"
+        style={{ fontSize: 8, fontWeight: 700, fontStyle: "italic", verticalAlign: "middle", borderColor: pulse ? "#4ade80" : "#6b7280", color: pulse ? "#4ade80" : "#9ca3af", boxShadow: pulse ? "0 0 5px rgba(74,222,128,0.5)" : undefined }}
       >
         i
       </button>
@@ -244,11 +256,27 @@ export default function Header({ onSearch }: HeaderProps) {
   const [subtitleClicked, setSubtitleClicked] = useState(false);
   const [goalBarFilled, setGoalBarFilled] = useState(false);
   const [showTracker, setShowTracker] = useState(false);
+  const [goalIdx, setGoalIdx] = useState(0);
+  const [goalVisible, setGoalVisible] = useState(true);
+
+  const GOAL_VALUES = ["$34,500+", "$28,000+", "$47,200+", "$52,600+", "$41,800+", "$38,250+"];
 
   // Animate the community savings bar filling in on first load
   useEffect(() => {
     const t = setTimeout(() => setGoalBarFilled(true), 350);
     return () => clearTimeout(t);
+  }, []);
+
+  // Cycle goal number with blur-swipe every 3.5 s
+  useEffect(() => {
+    const iv = setInterval(() => {
+      setGoalVisible(false);
+      setTimeout(() => {
+        setGoalIdx(v => (v + 1) % GOAL_VALUES.length);
+        setGoalVisible(true);
+      }, 280);
+    }, 3500);
+    return () => clearInterval(iv);
   }, []);
 
   // Scroll down far enough → cross-fade the live viewers/orders bar into the
@@ -470,9 +498,22 @@ export default function Header({ onSearch }: HeaderProps) {
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-semibold inline-flex items-center" style={{ color: "#4ade80" }}>
               Community savings goal
-              <EstimateInfoIcon label="community savings goal" />
+              <EstimateInfoIcon label="community savings goal" pulse />
             </span>
-            <span className="text-xs font-bold" style={{ color: "#4ade80" }}>$6,200–$13,800 / $34,500+</span>
+            <span className="text-xs font-bold" style={{ color: "#4ade80" }}>
+              $6.2k–$13.8k&nbsp;/&nbsp;
+              <span
+                style={{
+                  display: "inline-block",
+                  transition: "opacity 280ms ease, filter 280ms ease, transform 280ms ease",
+                  opacity: goalVisible ? 1 : 0,
+                  filter: goalVisible ? "blur(0px)" : "blur(5px)",
+                  transform: goalVisible ? "translateY(0px)" : "translateY(-5px)",
+                }}
+              >
+                {GOAL_VALUES[goalIdx]}
+              </span>
+            </span>
           </div>
           <div className="relative rounded-full overflow-hidden" style={{ height: 6, background: "rgba(34,197,94,0.15)" }}>
             <div
