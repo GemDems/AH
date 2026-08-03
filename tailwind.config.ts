@@ -45,14 +45,36 @@ export default {
         input: "var(--input)",
         ring: "var(--ring)",
         // Conversion-optimized semantic colors (complementary blue/orange pair
-        // plus supporting urgency/trust accents) — registering these here makes
-        // every Tailwind variant (text-, border-, from-/via-/to-, opacity
-        // modifiers, hover:/group-hover: etc.) resolve correctly; previously
-        // only bg-* worked via hand-written classes in index.css.
-        "conversion-blue": "var(--conversion-blue)",
-        "urgency-red": "var(--urgency-red)",
-        "action-orange": "var(--action-orange)",
-        "trust-green": "var(--trust-green)",
+        // plus supporting urgency/trust/premium accents) — registering these
+        // here makes every Tailwind variant (text-, border-, from-/via-/to-,
+        // opacity modifiers, hover:/group-hover: etc.) resolve correctly;
+        // previously only bg-* worked via hand-written classes in index.css.
+        // Each has -light/-dark steps for hover states and dark-bg tints.
+        "conversion-blue": {
+          DEFAULT: "var(--conversion-blue)",
+          light: "var(--conversion-blue-light)",
+          dark: "var(--conversion-blue-dark)",
+        },
+        "urgency-red": {
+          DEFAULT: "var(--urgency-red)",
+          light: "var(--urgency-red-light)",
+          dark: "var(--urgency-red-dark)",
+        },
+        "action-orange": {
+          DEFAULT: "var(--action-orange)",
+          light: "var(--action-orange-light)",
+          dark: "var(--action-orange-dark)",
+        },
+        "trust-green": {
+          DEFAULT: "var(--trust-green)",
+          light: "var(--trust-green-light)",
+          dark: "var(--trust-green-dark)",
+        },
+        "premium-gold": {
+          DEFAULT: "var(--premium-gold)",
+          light: "var(--premium-gold-light)",
+          dark: "var(--premium-gold-dark)",
+        },
         chart: {
           "1": "var(--chart-1)",
           "2": "var(--chart-2)",

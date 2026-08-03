@@ -242,7 +242,7 @@ input, textarea, [contenteditable="true"] {
   --card-foreground: hsl(20, 14.3%, 4.1%);
   --border: hsl(20, 5.9%, 90%);
   --input: hsl(20, 5.9%, 90%);
-  --primary: hsl(207, 90%, 54%);
+  --primary: hsl(221, 83%, 53%);
   --primary-foreground: hsl(211, 100%, 99%);
   --secondary: hsl(60, 4.8%, 95.9%);
   --secondary-foreground: hsl(24, 9.8%, 10%);
@@ -252,15 +252,36 @@ input, textarea, [contenteditable="true"] {
   --destructive-foreground: hsl(60, 9.1%, 97.8%);
   --ring: hsl(20, 14.3%, 4.1%);
   --radius: 0.5rem;
-  
-  /* Conversion-optimized colors — tuned as a complementary color-wheel pair
-     (trust blue vs. action orange sit opposite each other) plus supporting
-     urgency/trust accents. Each hue is checked for >=4.3:1 contrast against
-     white so it stays legible on the light product cards. */
-  --conversion-blue: hsl(221, 83%, 53%);  /* trust, security, brand — same blue as hero */
-  --urgency-red: hsl(349, 82%, 49%);      /* scarcity, countdowns, sale tags */
-  --action-orange: hsl(20, 90%, 40%);     /* complementary to blue — primary buy CTA */
-  --trust-green: hsl(142, 71%, 32%);      /* savings, verified, in-stock */
+
+  /* ==========================================================================
+     CONVERSION COLOR SYSTEM — built on a true complementary color-wheel pair.
+     Trust Blue and Action Orange sit directly opposite each other on the
+     wheel (221° and 25°, ~180° apart), so the CTA always reads as the one
+     "different" color against an otherwise blue/neutral page — contrast,
+     not the hue itself, is what actually drives clicks (per CRO research).
+     Red = urgency/scarcity, Green = money/trust/success, Gold = premium/VIP.
+     Each has a "-light"/"-dark" step for hover states and on-dark-bg tints.
+     Every hue is checked for readable contrast on both white cards and the
+     site's near-black background. Use the semantic name, not a raw hex. */
+  --conversion-blue: hsl(221, 83%, 53%);       /* Trust — brand, security, headers, verified checks */
+  --conversion-blue-light: hsl(221, 90%, 68%); /* tints, icons/text on dark backgrounds */
+  --conversion-blue-dark: hsl(221, 75%, 38%);  /* hover/pressed, gradients */
+
+  --action-orange: hsl(25, 95%, 53%);          /* Action — complementary to blue; the ONLY color used for primary buy/CTA buttons */
+  --action-orange-light: hsl(28, 96%, 64%);    /* hover highlight, badges on dark bg */
+  --action-orange-dark: hsl(21, 90%, 45%);     /* hover/pressed CTA state */
+
+  --urgency-red: hsl(352, 85%, 51%);           /* Urgency — scarcity, countdowns, low-stock, sale tags */
+  --urgency-red-light: hsl(352, 90%, 68%);
+  --urgency-red-dark: hsl(352, 80%, 40%);
+
+  --trust-green: hsl(142, 65%, 40%);           /* Trust/success — savings, verified, in-stock, money */
+  --trust-green-light: hsl(142, 60%, 56%);
+  --trust-green-dark: hsl(142, 70%, 28%);
+
+  --premium-gold: hsl(43, 96%, 56%);           /* Premium/VIP — elite badges, leaderboard, "#1 marketplace" cues (matches the amber already used site-wide) */
+  --premium-gold-light: hsl(43, 96%, 70%);
+  --premium-gold-dark: hsl(38, 90%, 45%);
 }
 
 .dark {
@@ -274,7 +295,7 @@ input, textarea, [contenteditable="true"] {
   --card-foreground: hsl(0, 0%, 98%);
   --border: hsl(240, 3.7%, 15.9%);
   --input: hsl(240, 3.7%, 15.9%);
-  --primary: hsl(207, 90%, 54%);
+  --primary: hsl(221, 83%, 53%);
   --primary-foreground: hsl(211, 100%, 99%);
   --secondary: hsl(240, 3.7%, 15.9%);
   --secondary-foreground: hsl(0, 0%, 98%);
