@@ -612,6 +612,7 @@ export default function Home() {
             <ProgressiveFluxLoader
               phases={DEALS_LOADER_PHASES}
               duration={12}
+              loop={false}
               className="max-w-sm gap-3"
               barClassName="h-[10px] shadow-none dark:shadow-none"
               textClassName="text-sm sm:text-base text-gray-600 font-medium"
