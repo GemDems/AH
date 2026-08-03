@@ -6,8 +6,6 @@ import StatsBar from "@/components/stats-bar";
 import SearchBar from "@/components/search-bar";
 import CategoryFilter, { SPECIAL_FILTERS } from "@/components/category-filter";
 import AffiliateCard from "@/components/affiliate-card";
-import AffiliateCardClassic from "@/components/affiliate-card-classic";
-import { useCardStyle } from "@/hooks/use-card-style";
 import AdminPanel from "@/components/admin-panel";
 import TrustIndicators from "@/components/trust-indicators";
 import { ChevronDown, Dice6, Gift, Search, X } from "lucide-react";
@@ -87,7 +85,6 @@ function dismissDealsBanner() {
 }
 
 export default function Home() {
-  const { cardStyle } = useCardStyle();
   const [showAdmin, setShowAdmin] = useState(false);
   const [activeCategories, setActiveCategories] = useState<Set<string>>(new Set(["all"]));
   const [activeFilters, setActiveFilters] = useState<Set<string>>(new Set());
@@ -793,7 +790,7 @@ export default function Home() {
                   <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
                     {first.map((link, i) => (
                       <div key={link.id} data-product-card={i === 0 ? "first" : undefined} data-product-id={link.id}>
-                        {cardStyle === "classic" ? <AffiliateCardClassic link={link} /> : <AffiliateCard link={link} />}
+                        <AffiliateCard link={link} />
                       </div>
                     ))}
                   </div>
@@ -852,7 +849,7 @@ export default function Home() {
                     <div className={`grid gap-6 ${restCols}`}>
                       {rest.map((link) => (
                         <div key={link.id} data-product-id={link.id}>
-                          {cardStyle === "classic" ? <AffiliateCardClassic link={link} /> : <AffiliateCard link={link} />}
+                          <AffiliateCard link={link} />
                         </div>
                       ))}
                     </div>

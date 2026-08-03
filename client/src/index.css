@@ -253,14 +253,11 @@ input, textarea, [contenteditable="true"] {
   --ring: hsl(20, 14.3%, 4.1%);
   --radius: 0.5rem;
   
-  /* Conversion-optimized colors — tuned as a complementary color-wheel pair
-     (trust blue vs. action orange sit opposite each other) plus supporting
-     urgency/trust accents. Each hue is checked for >=4.3:1 contrast against
-     white so it stays legible on the light product cards. */
-  --conversion-blue: hsl(221, 83%, 53%);  /* trust, security, brand — same blue as hero */
-  --urgency-red: hsl(349, 82%, 49%);      /* scarcity, countdowns, sale tags */
-  --action-orange: hsl(20, 90%, 40%);     /* complementary to blue — primary buy CTA */
-  --trust-green: hsl(142, 71%, 32%);      /* savings, verified, in-stock */
+  /* Conversion-optimized colors */
+  --conversion-blue: hsl(213, 82%, 54%);
+  --urgency-red: hsl(0, 73%, 50%);
+  --action-orange: hsl(43, 96%, 48%);
+  --trust-green: hsl(159, 93%, 34%);
 }
 
 .dark {

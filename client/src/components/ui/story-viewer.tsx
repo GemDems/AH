@@ -237,7 +237,7 @@ function StoryContent({
       )}
       {story.type === "video" ? (
         <video
-          ref={videoRef as React.RefObject<HTMLVideoElement>}
+          ref={videoRef}
           src={story.src}
           className={cn(
             "w-full h-full object-contain transition-opacity duration-200",

@@ -44,15 +44,6 @@ export default {
         border: "var(--border)",
         input: "var(--input)",
         ring: "var(--ring)",
-        // Conversion-optimized semantic colors (complementary blue/orange pair
-        // plus supporting urgency/trust accents) — registering these here makes
-        // every Tailwind variant (text-, border-, from-/via-/to-, opacity
-        // modifiers, hover:/group-hover: etc.) resolve correctly; previously
-        // only bg-* worked via hand-written classes in index.css.
-        "conversion-blue": "var(--conversion-blue)",
-        "urgency-red": "var(--urgency-red)",
-        "action-orange": "var(--action-orange)",
-        "trust-green": "var(--trust-green)",
         chart: {
           "1": "var(--chart-1)",
           "2": "var(--chart-2)",
