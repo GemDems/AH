@@ -27,12 +27,12 @@ export default function AIChatbot() {
   const formatMessageLinks = (content: string): string => {
     // Step 1: convert markdown links [text](url) → HTML, preserving exact URL
     let result = content.replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, (_, linkText, url) => {
-      return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color: #3b82f6; font-weight: bold; text-decoration: underline;">${linkText} →</a>`;
+      return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color: var(--conversion-blue-light); font-weight: bold; text-decoration: underline;">${linkText} →</a>`;
     });
 
     // Step 2: convert any remaining bare raw URLs (not already inside an <a> tag)
     result = result.replace(/(?<!href=")(https?:\/\/[^\s<"]+)/g, (url) => {
-      return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color: #3b82f6; font-weight: bold; text-decoration: underline;">Get This Deal →</a>`;
+      return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color: var(--conversion-blue-light); font-weight: bold; text-decoration: underline;">Get This Deal →</a>`;
     });
 
     return result;
@@ -676,7 +676,7 @@ Can I help you find something excellent in one of these available categories?`
       if (intent.features?.length) parts.push(`with ${intent.features.join(', ')} features`);
       
       // Add Search Now button HTML
-      const searchButton = `<div style="margin-top: 12px;"><button onclick="window.triggerChatSearch && window.triggerChatSearch()" style="background: linear-gradient(45deg, #3b82f6, #1d4ed8); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 14px;">🔍 Search Now</button></div>`;
+      const searchButton = `<div style="margin-top: 12px;"><button onclick="window.triggerChatSearch && window.triggerChatSearch()" style="background: linear-gradient(45deg, #1A64FF, #0041C7); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 14px;">🔍 Search Now</button></div>`;
       
       return parts.join('. ') + '. Ready to find the perfect deals for you!' + searchButton;
     }
@@ -2079,8 +2079,8 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
             isButtonFading && !isSlideUp ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
           } ${isSlideUp ? 'transform translate-y-32' : 'transform translate-y-0'}`}
           style={{
-            boxShadow: '0 10px 30px rgba(59, 130, 246, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1) inset',
-            background: 'linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #8b5cf6 100%)'
+            boxShadow: '0 10px 30px rgba(26, 100, 255, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.1) inset',
+            background: 'linear-gradient(135deg, #1A64FF 0%, #5B42D4 50%, #8b5cf6 100%)'
           }}
         >
           <div className="relative flex items-center justify-center">
@@ -2354,7 +2354,7 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
                         disabled={pitchBlocked}
                         className={`text-xs transition-colors font-medium ${pitchBlocked ? 'opacity-40 cursor-not-allowed' : ''}`}
                         style={pitchBlocked ? { color: '#6b7280' } : {
-                          background: 'linear-gradient(45deg, #3b82f6, #eab308, #22c55e, #a855f7)',
+                          background: 'linear-gradient(45deg, #1A64FF, #FFB800, #00B849, #a855f7)',
                           backgroundSize: '300% 300%',
                           animation: 'gradient-fade 3s ease-in-out infinite',
                           WebkitBackgroundClip: 'text',

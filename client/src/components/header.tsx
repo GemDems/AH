@@ -219,7 +219,7 @@ function LiveDealsTracker({ onClick }: { onClick?: () => void }) {
         }
       }}
       className="h-full rounded-xl px-6 py-3 flex items-center gap-3.5 cursor-pointer transition-transform duration-150 hover:scale-[1.015] active:scale-[0.985]"
-      style={{ background: "#151929", border: "1px solid rgba(124,58,237,0.3)" }}
+      style={{ background: "#0E1428", border: "1px solid rgba(124,58,237,0.35)" }}
     >
       {/* BarLoader animation for the deals scanned icon */}
       <div className="relative flex-shrink-0 flex items-end justify-center" style={{ width: 36, height: 36 }}>
@@ -423,7 +423,7 @@ export default function Header({ onSearch, onScanClick }: HeaderProps) {
   }, []);
 
   return (
-    <header style={{ background: "#0d0f1a" }} className="w-full">
+    <header style={{ background: "#080D1A" }} className="w-full">
       {/* Flash sale ticker */}
       <div style={{ background: "linear-gradient(90deg,var(--urgency-red),var(--urgency-red-dark))" }} className="w-full py-2.5 text-center text-xs font-semibold tracking-widest text-white opacity-[0.01]">
         ⚡ FLASH SALE ENDING SOON — {viewers.toLocaleString()} MEMBERS ACTIVE TODAY &nbsp;|&nbsp; SPOTS FILLING FAST ⚡
@@ -516,7 +516,7 @@ export default function Header({ onSearch, onScanClick }: HeaderProps) {
             <div
               key={i}
               className="rounded-xl p-4 text-center cursor-pointer select-none transition-transform duration-150 active:scale-95"
-              style={{ background: "#151929", border: "1px solid rgba(255,255,255,0.07)" }}
+              style={{ background: "#0E1428", border: "1px solid rgba(255,255,255,0.09)" }}
               onClick={() => toggleCard(i)}
             >
               <div className="w-11 h-11 rounded-full flex items-center justify-center mx-auto mb-2 text-xl" style={{ background: s.bg }}>
@@ -534,8 +534,8 @@ export default function Header({ onSearch, onScanClick }: HeaderProps) {
           <div
             className="absolute inset-0 rounded-xl px-6 py-3.5 flex justify-around items-center"
             style={{
-              background: "#151929",
-              border: "1px solid rgba(255,255,255,0.07)",
+              background: "#0E1428",
+              border: "1px solid rgba(255,255,255,0.09)",
               opacity: showTracker ? 0 : 1,
               filter: showTracker ? "blur(8px)" : "blur(0px)",
               pointerEvents: showTracker ? "none" : "auto",
@@ -582,7 +582,7 @@ export default function Header({ onSearch, onScanClick }: HeaderProps) {
       {/* CTA */}
       <div className="text-center px-4 mt-7 pb-2">
         {/* Community savings goal */}
-        <div className="relative max-w-sm mx-auto mb-4 rounded-xl px-5 py-4" style={{ background: "#111827", border: "1px solid rgba(34,197,94,0.25)" }}>
+        <div className="relative max-w-sm mx-auto mb-4 rounded-xl px-5 py-4" style={{ background: "#0B1020", border: "1px solid rgba(0,235,94,0.28)" }}>
           {/* Live pulse — bottom-left corner */}
           <span className="absolute bottom-2.5 left-3 flex items-center gap-1 pointer-events-none">
             <span className="relative flex h-[6px] w-[6px]">
@@ -672,7 +672,7 @@ export default function Header({ onSearch, onScanClick }: HeaderProps) {
               glowColor="purple"
               customSize
               className="p-4"
-              style={{ background: "#151929", border: "1px solid rgba(255,255,255,0.06)" }}
+              style={{ background: "#0E1428", border: "1px solid rgba(255,255,255,0.08)" }}
             >
               <div className="text-xs mb-1.5" style={{ color: "var(--premium-gold)" }}>★★★★★</div>
               <div className="text-xs leading-relaxed mb-2" style={{ color: "#d1d5db" }}>{r.text}</div>
@@ -702,7 +702,7 @@ export default function Header({ onSearch, onScanClick }: HeaderProps) {
       {/* Footer strip */}
       <div
         className="relative text-center py-3 text-xs group cursor-default"
-        style={{ background: "#0a0c14", borderTop: "1px solid rgba(255,255,255,0.05)", color: "#4b5563" }}
+        style={{ background: "#060914", borderTop: "1px solid rgba(255,255,255,0.06)", color: "#4b5563" }}
       >
         <span style={{ color: "var(--trust-green)" }}>✓</span> Every Deal Verified &nbsp;•&nbsp; No Fake Offers &nbsp;•&nbsp; Support
 
@@ -714,7 +714,7 @@ export default function Header({ onSearch, onScanClick }: HeaderProps) {
           <div
             className="rounded-xl px-4 py-3 text-left whitespace-nowrap shadow-2xl"
             style={{
-              background: "#131626",
+              background: "#0B1020",
               border: "1px solid rgba(255,255,255,0.1)",
               boxShadow: "0 8px 32px rgba(0,0,0,0.6)",
             }}

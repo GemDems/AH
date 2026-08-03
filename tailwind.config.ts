@@ -75,6 +75,59 @@ export default {
           light: "var(--premium-gold-light)",
           dark: "var(--premium-gold-dark)",
         },
+        // ── L99 palette: override Tailwind's built-in shades so every
+        // `text-blue-600`, `bg-green-500`, `from-orange-400`, etc. across ALL
+        // components auto-resolves to the complementary-wheel palette without
+        // touching each file individually. 50/100/200 light tints are kept for
+        // white-card stat-badge backgrounds. 300-900 are vivid palette values.
+        blue: {
+          50: "#EEF3FF", 100: "#DDEAFF", 200: "#B8D2FF",
+          300: "#5BA3FF", 400: "#5BA3FF",
+          500: "#1A64FF", 600: "#1A64FF",
+          700: "#0041C7", 800: "#0041C7", 900: "#002B8A",
+        },
+        indigo: {
+          50: "#EEF1FF", 100: "#DDEAFF", 200: "#B8CBFF",
+          300: "#5BA3FF", 400: "#5BA3FF",
+          500: "#1A64FF", 600: "#1A64FF",
+          700: "#0041C7", 800: "#0041C7", 900: "#002B8A",
+        },
+        green: {
+          50: "#EDFFF4", 100: "#D4FFE5", 200: "#A3F7C4",
+          300: "#00EB5E", 400: "#00EB5E",
+          500: "#00B849", 600: "#00B849",
+          700: "#008533", 800: "#008533", 900: "#005522",
+        },
+        emerald: {
+          50: "#EDFFF4", 100: "#D4FFE5", 200: "#A3F7C4",
+          300: "#00EB5E", 400: "#00EB5E",
+          500: "#00B849", 600: "#00B849",
+          700: "#008533", 800: "#008533", 900: "#005522",
+        },
+        orange: {
+          50: "#FFF3EC", 100: "#FFE4D0", 200: "#FFC9A3",
+          300: "#FF7E33", 400: "#FF7E33",
+          500: "#FF5E00", 600: "#FF5E00",
+          700: "#CC3D00", 800: "#CC3D00", 900: "#8A2800",
+        },
+        red: {
+          50: "#FFF0F2", 100: "#FFD9DD", 200: "#FFB3BB",
+          300: "#FF3F56", 400: "#FF3F56",
+          500: "#FF0422", 600: "#FF0422",
+          700: "#C2001A", 800: "#C2001A", 900: "#8A0012",
+        },
+        yellow: {
+          50: "#FFFBEB", 100: "#FFF4CC", 200: "#FFE99A",
+          300: "#FFCE47", 400: "#FFCE47",
+          500: "#FFB800", 600: "#FFB800",
+          700: "#C28C00", 800: "#C28C00", 900: "#7A5800",
+        },
+        amber: {
+          50: "#FFFBEB", 100: "#FFF4CC", 200: "#FFE99A",
+          300: "#FFCE47", 400: "#FFCE47",
+          500: "#FFB800", 600: "#FFB800",
+          700: "#C28C00", 800: "#C28C00", 900: "#7A5800",
+        },
         chart: {
           "1": "var(--chart-1)",
           "2": "var(--chart-2)",

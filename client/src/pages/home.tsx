@@ -494,7 +494,7 @@ export default function Home() {
       {/* ── WELCOME BACK NOTIFICATION ──────────────────────────────────── */}
       {showWelcomeBack && (
         <div className="fixed top-4 right-4 z-[9997] max-w-xs float-notif">
-          <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl shadow-2xl p-4 flex items-center gap-3">
+          <div className="bg-gradient-to-r from-conversion-blue to-conversion-blue-dark text-white rounded-xl shadow-2xl p-4 flex items-center gap-3">
             <Gift className="w-8 h-8 flex-shrink-0" />
             <div>
               <div className="font-bold text-sm">Welcome back! 🎉</div>
@@ -524,12 +524,12 @@ export default function Home() {
                 <button
                   key={category.id}
                   onClick={() => handleDropdownCategorySelect(category.id)}
-                  className={`w-full px-4 py-2 text-left flex items-center space-x-2 transition-all duration-200 ${activeCategories.has(category.id) ? "bg-blue-500/30" : "hover:bg-white/20"}`}
+                  className={`w-full px-4 py-2 text-left flex items-center space-x-2 transition-all duration-200 ${activeCategories.has(category.id) ? "bg-conversion-blue/30" : "hover:bg-white/20"}`}
                 >
                   {category.emoji && <span>{category.emoji}</span>}
                   <span className="text-sm font-medium text-gray-900">{category.label}</span>
                   {activeCategories.has(category.id) && !activeCategories.has("all") && category.id !== "all" && (
-                    <span className="ml-auto text-blue-400 text-xs">✓</span>
+                    <span className="ml-auto text-conversion-blue-light text-xs">✓</span>
                   )}
                 </button>
               ))}
@@ -652,11 +652,11 @@ export default function Home() {
             screens — bumped size, weight, and contrast so it actually reads
             as a real disclosure rather than legal fine print people skip. */}
         <div className="flex items-center justify-center gap-2 py-2.5 px-4 mb-4 rounded-lg text-center flex-wrap"
-          style={{ background: "#eff6ff", border: "1px solid #bfdbfe" }}>
-          <span className="text-xs sm:text-[13px] leading-snug" style={{ color: "#1f2937" }}>
-            📋 <strong style={{ color: "#111827" }}>Affiliate Disclosure:</strong> Links on this page may earn us a commission at no extra cost to you. Prices shown at time of listing and may vary.
+          style={{ background: "rgba(26,100,255,0.07)", border: "1px solid rgba(26,100,255,0.2)" }}>
+          <span className="text-xs sm:text-[13px] leading-snug" style={{ color: "#c8d6f8" }}>
+            📋 <strong style={{ color: "#e8eeff" }}>Affiliate Disclosure:</strong> Links on this page may earn us a commission at no extra cost to you. Prices shown at time of listing and may vary.
           </span>
-          <Link href="/about" className="text-xs sm:text-[13px] font-semibold hover:underline whitespace-nowrap" style={{ color: "#2563eb", textDecoration: "none" }}>
+          <Link href="/about" className="text-xs sm:text-[13px] font-semibold hover:underline whitespace-nowrap" style={{ color: "var(--conversion-blue-light)", textDecoration: "none" }}>
             Full Legal Disclosure →
           </Link>
         </div>
@@ -689,7 +689,7 @@ export default function Home() {
               <p className="text-xs text-gray-500 mt-1 mb-4 leading-snug">
                 New brands, companies, and deals are being added as partnerships close. <span className="font-semibold">Check back shortly</span> — the good stuff is on its way.
               </p>
-              <div style={{ "--flux-from": "#2563eb", "--flux-to": "#38bdf8" } as React.CSSProperties}>
+              <div style={{ "--flux-from": "var(--conversion-blue)", "--flux-to": "var(--conversion-blue-light)" } as React.CSSProperties}>
                 <ProgressiveFluxLoader
                   phases={DEALS_LOADER_PHASES}
                   value={dealsLoaderSeen ? 100 : undefined}
