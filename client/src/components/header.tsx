@@ -301,6 +301,7 @@ export default function Header({ onSearch, onScanClick }: HeaderProps) {
   const [goalVisible, setGoalVisible] = useState(true);
   const isMobile = useIsMobile();
   const mobileTrackerTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const mobileInitialDelayPending = useRef(true);
 
   const GOAL_VALUES = ["$34,500+", "$28,000+", "$47,200+", "$52,600+", "$41,800+", "$38,250+"];
 
@@ -344,9 +345,12 @@ export default function Header({ onSearch, onScanClick }: HeaderProps) {
       }
 
       if (scrollY > showAt) {
-        if (!isMobile) {
+        if (!isMobile || !mobileInitialDelayPending.current) {
           setShowTracker(true);
         } else if (!mobileTrackerTimer.current) {
+          // Consume the one-time mobile delay as soon as the first qualifying
+          // downward scroll starts; later scroll cycles should be immediate.
+          mobileInitialDelayPending.current = false;
           mobileTrackerTimer.current = setTimeout(() => {
             mobileTrackerTimer.current = null;
             if (window.scrollY > showAt) setShowTracker(true);
