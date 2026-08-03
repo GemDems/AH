@@ -463,7 +463,6 @@ export default function Home() {
           }}
         />
       </div>
-
       {/* ── WELCOME BACK NOTIFICATION ──────────────────────────────────── */}
       {showWelcomeBack && (
         <div className="fixed top-4 right-4 z-[9997] max-w-xs float-notif">
@@ -640,9 +639,7 @@ export default function Home() {
             panel rather than an unstyled paragraph sitting awkwardly between
             the disclosure bar and the deal grid. */}
         <div className="text-center mb-6 mx-auto max-w-lg rounded-xl border border-gray-200 bg-white px-4 py-5 sm:px-6 shadow-sm">
-          <p className="text-sm sm:text-[15px] font-semibold text-gray-900">
-            🚧 More deals coming soon
-          </p>
+          <p className="text-sm sm:text-[15px] font-semibold text-gray-900">🚧 Deals coming soon</p>
           <p className="text-sm text-gray-600 mt-1.5 leading-snug">
             I'm personally reaching out to major affiliate brands and retailers to bring on new partners and real products.
           </p>
