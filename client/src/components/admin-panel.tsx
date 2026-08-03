@@ -352,9 +352,14 @@ export default function AdminPanel({ isOpen, onClose, onSuccess }: AdminPanelPro
       queryClient.invalidateQueries({ queryKey: ["/api/admin/drafts"] });
       
       const isDraft = variables.isDraft;
+      const isScheduled = Boolean(isDraft && variables.scheduledPublishAt);
       toast({
         title: "Success!",
-        description: isDraft ? "Draft saved successfully" : "Product published successfully",
+        description: isScheduled
+          ? `Scheduled to publish on ${new Date(variables.scheduledPublishAt as unknown as string).toLocaleString()}`
+          : isDraft
+          ? "Draft saved successfully"
+          : "Product published successfully",
       });
       
       resetForm();
@@ -372,13 +377,22 @@ export default function AdminPanel({ isOpen, onClose, onSuccess }: AdminPanelPro
     },
   });
 
-  const handleSubmit = (e: React.FormEvent, isDraft = false) => {
+  const handleSubmit = (e: React.FormEvent, mode: "publish" | "schedule" | "draft" = "publish") => {
     e.preventDefault();
     
     if (!formData.title || !formData.url || !formData.description) {
       toast({
         title: "Validation Error",
         description: "Please fill in all required fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (mode === "schedule" && !formData.scheduledPublishAt) {
+      toast({
+        title: "Pick a publish date first",
+        description: "Set a date in Schedule Publish above, or use Publish Now instead.",
         variant: "destructive",
       });
       return;
@@ -436,7 +450,12 @@ export default function AdminPanel({ isOpen, onClose, onSuccess }: AdminPanelPro
       category: primaryCategory,
       categories: cats,
       imageUrls: allImageUrls.length > 0 ? allImageUrls : undefined,
-      isDraft: isDraft,
+      isDraft: mode !== "publish",
+      // Each button has one unambiguous outcome, independent of whatever date
+      // happens to still be sitting in the Schedule Publish field: "Publish Now"
+      // always goes live immediately, "Save as Draft" never auto-schedules, and
+      // only the explicit "Publish Later" action carries the schedule date.
+      scheduledPublishAt: mode === "schedule" ? formData.scheduledPublishAt : undefined,
       // Convert boolean values to integers for database compatibility
       isVerified: formData.isVerified ? 1 : 0,
       isElitePick: formData.isElitePick ? 1 : 0,
@@ -657,7 +676,7 @@ export default function AdminPanel({ isOpen, onClose, onSuccess }: AdminPanelPro
                   <CardDescription>Add a new affiliate link to your site</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <form onSubmit={(e) => handleSubmit(e, false)} className="space-y-4">
+                  <form onSubmit={(e) => handleSubmit(e, "publish")} className="space-y-4">
           <div>
             <Label htmlFor="title">Link Title *</Label>
             <Input
@@ -1069,7 +1088,7 @@ export default function AdminPanel({ isOpen, onClose, onSuccess }: AdminPanelPro
                 onChange={(e) => setFormData({ ...formData, scheduledPublishAt: e.target.value ? new Date(e.target.value) : undefined })}
                 className="mt-1"
               />
-              <p className="text-xs text-gray-500 mt-1">Set when this product should automatically go live</p>
+              <p className="text-xs text-gray-500 mt-1">Pick a date, then use the "Publish Later" button below. "Publish Now" always goes live immediately, regardless of this date.</p>
             </div>
 
             <div>
@@ -1085,7 +1104,7 @@ export default function AdminPanel({ isOpen, onClose, onSuccess }: AdminPanelPro
             </div>
           </div>
 
-                    <div className="flex gap-2">
+                    <div className="flex flex-col sm:flex-row gap-2">
                       <Button 
                         type="submit" 
                         className="flex-1 bg-conversion-blue hover:bg-blue-700"
@@ -1095,9 +1114,19 @@ export default function AdminPanel({ isOpen, onClose, onSuccess }: AdminPanelPro
                       </Button>
                       <Button 
                         type="button"
+                        className="flex-1 bg-amber-500 hover:bg-amber-600 text-white disabled:opacity-50"
+                        onClick={(e) => handleSubmit(e, "schedule")}
+                        disabled={createLinkMutation.isPending || !formData.scheduledPublishAt}
+                        title={!formData.scheduledPublishAt ? 'Set a "Schedule Publish" date above first' : undefined}
+                      >
+                        <Clock className="w-4 h-4 mr-2" />
+                        Publish Later
+                      </Button>
+                      <Button 
+                        type="button"
                         variant="outline"
                         className="flex-1"
-                        onClick={(e) => handleSubmit(e, true)}
+                        onClick={(e) => handleSubmit(e, "draft")}
                         disabled={createLinkMutation.isPending}
                       >
                         <FileText className="w-4 h-4 mr-2" />

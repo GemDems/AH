@@ -622,8 +622,8 @@ Transform now with maximum conversion power in minimal words:`;
         isElitePick: req.body.isElitePick ? 1 : 0,
         isVerified: req.body.isVerified ? 1 : 0,
         isDraft: req.body.isDraft ? 1 : 0,
-        scheduledPublishAt: req.body.scheduledPublishAt || null,
-        scheduledDeleteAt: req.body.scheduledDeleteAt || null,
+        scheduledPublishAt: req.body.scheduledPublishAt ? new Date(req.body.scheduledPublishAt) : null,
+        scheduledDeleteAt: req.body.scheduledDeleteAt ? new Date(req.body.scheduledDeleteAt) : null,
         aiPrivateInfo: req.body.aiPrivateInfo || null, // AI Assistant Info from creator dashboard
       };
       
