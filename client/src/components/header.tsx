@@ -10,6 +10,7 @@ import { BorderRotate } from "@/components/ui/animated-gradient-border";
 import { GlowCard } from "@/components/ui/spotlight-card";
 import { LiquidBadge } from "@/components/ui/liquid-badge";
 import { ProgressiveFluxLoader } from "@/components/ui/progressive-flux-loader";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 function GuaranteeInfoIcon() {
   const [open, setOpen] = useState(false);
@@ -298,6 +299,7 @@ export default function Header({ onSearch, onScanClick }: HeaderProps) {
   const [showTracker, setShowTracker] = useState(false);
   const [goalIdx, setGoalIdx] = useState(0);
   const [goalVisible, setGoalVisible] = useState(true);
+  const isMobile = useIsMobile();
 
   const GOAL_VALUES = ["$34,500+", "$28,000+", "$47,200+", "$52,600+", "$41,800+", "$38,250+"];
 
@@ -322,17 +324,21 @@ export default function Header({ onSearch, onScanClick }: HeaderProps) {
   // Scroll down far enough → cross-fade the live viewers/orders bar into the
   // "deals scanning" tracker; scroll back up → cross-fade back. Hysteresis
   // (different show/hide thresholds) avoids flicker right at the boundary.
+  // On mobile the swap fired after only a tiny flick, so it needs more scroll
+  // distance before it triggers; desktop thresholds are left exactly as-is.
   useEffect(() => {
+    const showAt = isMobile ? 280 : 100;
+    const hideAt = isMobile ? 120 : 40;
     const onScroll = () => {
       setShowTracker(prev => {
-        if (!prev && window.scrollY > 100) return true;
-        if (prev && window.scrollY < 40) return false;
+        if (!prev && window.scrollY > showAt) return true;
+        if (prev && window.scrollY < hideAt) return false;
         return prev;
       });
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [isMobile]);
 
   // Clicking the "scanning" tracker (only reachable while it's actually showing,
   // since its wrapper sets pointer-events:none while the live-viewers bar is up)
