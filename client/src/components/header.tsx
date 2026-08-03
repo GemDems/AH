@@ -300,6 +300,7 @@ export default function Header({ onSearch, onScanClick }: HeaderProps) {
   const [goalIdx, setGoalIdx] = useState(0);
   const [goalVisible, setGoalVisible] = useState(true);
   const isMobile = useIsMobile();
+  const mobileTrackerTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const GOAL_VALUES = ["$34,500+", "$28,000+", "$47,200+", "$52,600+", "$41,800+", "$38,250+"];
 
@@ -325,19 +326,42 @@ export default function Header({ onSearch, onScanClick }: HeaderProps) {
   // "deals scanning" tracker; scroll back up → cross-fade back. Hysteresis
   // (different show/hide thresholds) avoids flicker right at the boundary.
   // On mobile the swap fired after only a tiny flick, so it needs more scroll
-  // distance before it triggers; desktop thresholds are left exactly as-is.
+  // distance and a two-second dwell before it triggers; desktop thresholds and
+  // timing are left exactly as-is.
   useEffect(() => {
     const showAt = isMobile ? 280 : 100;
     const hideAt = isMobile ? 120 : 40;
     const onScroll = () => {
-      setShowTracker(prev => {
-        if (!prev && window.scrollY > showAt) return true;
-        if (prev && window.scrollY < hideAt) return false;
-        return prev;
-      });
+      const scrollY = window.scrollY;
+
+      if (scrollY < hideAt) {
+        if (mobileTrackerTimer.current) {
+          clearTimeout(mobileTrackerTimer.current);
+          mobileTrackerTimer.current = null;
+        }
+        setShowTracker(false);
+        return;
+      }
+
+      if (scrollY > showAt) {
+        if (!isMobile) {
+          setShowTracker(true);
+        } else if (!mobileTrackerTimer.current) {
+          mobileTrackerTimer.current = setTimeout(() => {
+            mobileTrackerTimer.current = null;
+            if (window.scrollY > showAt) setShowTracker(true);
+          }, 2000);
+        }
+      }
     };
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (mobileTrackerTimer.current) {
+        clearTimeout(mobileTrackerTimer.current);
+        mobileTrackerTimer.current = null;
+      }
+    };
   }, [isMobile]);
 
   // Clicking the "scanning" tracker (only reachable while it's actually showing,
