@@ -638,8 +638,13 @@ export default function Home() {
           <div style={{ "--flux-from": "#2563eb", "--flux-to": "#38bdf8" } as React.CSSProperties}>
             <ProgressiveFluxLoader
               phases={DEALS_LOADER_PHASES}
+              value={dealsLoaderSeen ? 100 : undefined}
               duration={12}
               loop={false}
+              onComplete={() => {
+                markDealsLoaderSeen();
+                setDealsLoaderSeen(true);
+              }}
               className="max-w-sm gap-3"
               barClassName="h-[10px] shadow-none dark:shadow-none"
               textClassName="text-sm sm:text-base text-gray-600 font-medium"
