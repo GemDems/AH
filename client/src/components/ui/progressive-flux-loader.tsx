@@ -158,7 +158,6 @@ function FluxLabel({ label, reduced, className }: FluxLabelProps) {
             <motion.span
               key={`${label}-${index}`}
               className="inline-block"
-              style={{ color: "#F87415" }}
               initial={{ opacity: 0, y: 12, filter: "blur(8px)" }}
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               transition={{ ...LETTER_TRANSITION, delay: 0.18 + index * 0.035 }}
