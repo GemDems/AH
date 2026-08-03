@@ -704,7 +704,7 @@ export default function Header({ onSearch, onScanClick }: HeaderProps) {
         className="relative text-center py-3 text-xs group cursor-default"
         style={{ background: "#0a0c14", borderTop: "1px solid rgba(255,255,255,0.05)", color: "#4b5563" }}
       >
-        <span style={{ color: "#22c55e" }}>✓</span> Every Deal Verified &nbsp;•&nbsp; No Fake Offers &nbsp;•&nbsp; Secure Checkout &nbsp;•&nbsp; 24/7 Support
+        <span style={{ color: "#22c55e" }}>✓</span> Every Deal Verified &nbsp;•&nbsp; No Fake Offers &nbsp;•&nbsp; Secure Checkout &nbsp;•&nbsp; Support
 
         {/* Hover tooltip */}
         <div
