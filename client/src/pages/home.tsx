@@ -547,7 +547,7 @@ export default function Home() {
           <Settings className="w-2 h-2 opacity-0" />
         </Button>
       </div>
-      <Header onSearch={setSearchQuery} />
+      <Header onSearch={setSearchQuery} onScanClick={() => setDealsBannerDismissed(false)} />
       {/* Smooth color fade from dark header (#0d0f1a) to white page body */}
       <div
         style={{

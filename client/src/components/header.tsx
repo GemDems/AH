@@ -179,7 +179,7 @@ function getScanWindowStart(): number {
 }
 
 /** Scroll-triggered alternate to the live viewers/orders bar — a "scanning for deals" animation. */
-function LiveDealsTracker() {
+function LiveDealsTracker({ onClick }: { onClick?: () => void }) {
   const [scanned, setScanned] = useState(() => getScanWindowStart());
   const [categoryIdx, setCategoryIdx] = useState(0);
   const categories = ["Electronics", "Home & Kitchen", "Fashion", "Toys & Games", "Fitness", "Beauty"];
@@ -209,7 +209,16 @@ function LiveDealsTracker() {
 
   return (
     <div
-      className="h-full rounded-xl px-6 py-3 flex items-center gap-3.5"
+      onClick={onClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onClick?.();
+        }
+      }}
+      className="h-full rounded-xl px-6 py-3 flex items-center gap-3.5 cursor-pointer transition-transform duration-150 hover:scale-[1.015] active:scale-[0.985]"
       style={{ background: "#151929", border: "1px solid rgba(124,58,237,0.3)" }}
     >
       {/* BarLoader animation for the deals scanned icon */}
@@ -272,9 +281,11 @@ const ALL_REVIEWS = [
 
 interface HeaderProps {
   onSearch?: (query: string) => void;
+  /** Fired when the "deals scanning" tracker (not the live-viewers bar) is clicked. */
+  onScanClick?: () => void;
 }
 
-export default function Header({ onSearch }: HeaderProps) {
+export default function Header({ onSearch, onScanClick }: HeaderProps) {
   const [viewers, setViewers] = useState(4200);
   const [orders, setOrders] = useState(1470);
   const [reviewPage, setReviewPage] = useState(0);
@@ -322,6 +333,16 @@ export default function Header({ onSearch }: HeaderProps) {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  // Clicking the "scanning" tracker (only reachable while it's actually showing,
+  // since its wrapper sets pointer-events:none while the live-viewers bar is up)
+  // jumps straight to the deals grid and forces the "coming soon" banner back
+  // open, even if the visitor already dismissed it with its X button.
+  const handleScanClick = () => {
+    const el = document.querySelector('[data-section="products"]') as HTMLElement | null;
+    el?.scrollIntoView({ behavior: "smooth", block: "start" });
+    onScanClick?.();
+  };
 
   const toggleCard = (i: number) => setFlippedCards(prev => ({ ...prev, [i]: !prev[i] }));
   const totalPages = Math.ceil(ALL_REVIEWS.length / 3);
@@ -516,7 +537,7 @@ export default function Header({ onSearch }: HeaderProps) {
               transition: "opacity 120ms ease, filter 120ms ease",
             }}
           >
-            <LiveDealsTracker />
+            <LiveDealsTracker onClick={handleScanClick} />
           </div>
         </div>
       </div>
