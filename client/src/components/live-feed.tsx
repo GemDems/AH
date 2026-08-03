@@ -156,6 +156,7 @@ export default function LiveFeed() {
         
         <div className="mt-4 text-center">
           <p className="text-xs text-gray-500">Real customers making real purchases • Last Updated {lastUpdated}</p>
+           <p className="mt-1 text-[11px] text-gray-400">* Not all customer purchases are shown.</p>
         </div>
       </Card>
     </div>
