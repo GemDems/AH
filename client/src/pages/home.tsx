@@ -8,7 +8,7 @@ import CategoryFilter, { SPECIAL_FILTERS } from "@/components/category-filter";
 import AffiliateCard from "@/components/affiliate-card";
 import AdminPanel from "@/components/admin-panel";
 import TrustIndicators from "@/components/trust-indicators";
-import { ChevronDown, Dice6, Gift, Search } from "lucide-react";
+import { ChevronDown, Dice6, Gift, Search, X } from "lucide-react";
 
 import Leaderboard from "@/components/leaderboard";
 import ReferralSystem from "@/components/referral-system";
@@ -62,11 +62,39 @@ function markDealsLoaderSeen() {
   }
 }
 
+// Lets a visitor permanently dismiss the "deals coming soon" notice once
+// they've seen it. localStorage (not sessionStorage) so it stays gone on
+// later visits too — wrapped in try/catch for the same privacy-mode reasons
+// as above.
+const DEALS_BANNER_DISMISSED_KEY = "edh_deals_banner_dismissed";
+
+function hasDismissedDealsBanner(): boolean {
+  try {
+    return localStorage.getItem(DEALS_BANNER_DISMISSED_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function dismissDealsBanner() {
+  try {
+    localStorage.setItem(DEALS_BANNER_DISMISSED_KEY, "1");
+  } catch {
+    // Storage unavailable — non-critical, see note above.
+  }
+}
+
 export default function Home() {
   const [showAdmin, setShowAdmin] = useState(false);
   const [activeCategories, setActiveCategories] = useState<Set<string>>(new Set(["all"]));
   const [activeFilters, setActiveFilters] = useState<Set<string>>(new Set());
   const [dealsLoaderSeen, setDealsLoaderSeen] = useState(hasSeenDealsLoader);
+  const [dealsBannerDismissed, setDealsBannerDismissed] = useState(hasDismissedDealsBanner);
+
+  const handleDismissDealsBanner = () => {
+    dismissDealsBanner();
+    setDealsBannerDismissed(true);
+  };
 
   const toggleFilter = (id: string) => {
     setActiveFilters(prev => {
@@ -638,30 +666,47 @@ export default function Home() {
             text, so on narrow/iPhone widths it reads as a deliberate status
             panel rather than an unstyled paragraph sitting awkwardly between
             the disclosure bar and the deal grid. */}
-        <div className="text-center mb-6 mx-auto max-w-lg rounded-xl border border-gray-200 bg-white px-4 py-5 sm:px-6 shadow-sm">
-          <p className="text-sm sm:text-[15px] font-semibold text-gray-900">🚧 Deals coming soon</p>
-          <p className="text-sm text-gray-600 mt-1.5 leading-snug">
-            I'm personally reaching out to major affiliate brands and retailers to bring on new partners and real products.
-          </p>
-          <p className="text-xs text-gray-500 mt-1 mb-4 leading-snug">
-            New brands, companies, and deals are being added as partnerships close. Check back shortly — the good stuff is on its way.
-          </p>
-          <div style={{ "--flux-from": "#2563eb", "--flux-to": "#38bdf8" } as React.CSSProperties}>
-            <ProgressiveFluxLoader
-              phases={DEALS_LOADER_PHASES}
-              value={dealsLoaderSeen ? 100 : undefined}
-              duration={12}
-              loop={false}
-              onComplete={() => {
-                markDealsLoaderSeen();
-                setDealsLoaderSeen(true);
-              }}
-              className="max-w-sm mx-auto gap-3"
-              barClassName="h-[10px] shadow-none dark:shadow-none"
-              textClassName="text-sm sm:text-base text-gray-600 font-medium"
-            />
-          </div>
-        </div>
+        <AnimatePresence>
+          {!dealsBannerDismissed && (
+            <motion.div
+              initial={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.98 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className="relative text-center mb-6 mx-auto max-w-lg rounded-xl border border-gray-200 bg-white px-4 py-5 sm:px-6 shadow-sm"
+            >
+              <button
+                type="button"
+                onClick={handleDismissDealsBanner}
+                aria-label="Dismiss deals coming soon notice"
+                className="absolute top-2.5 right-2.5 w-7 h-7 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+              <p className="text-sm sm:text-[15px] font-semibold text-gray-900">🚧 Deals coming soon</p>
+              <p className="text-sm text-gray-600 mt-1.5 leading-snug">
+                I'm personally reaching out to major affiliate brands and retailers to bring on new partners and real products.
+              </p>
+              <p className="text-xs text-gray-500 mt-1 mb-4 leading-snug">
+                New brands, companies, and deals are being added as partnerships close. Check back shortly — the good stuff is on its way.
+              </p>
+              <div style={{ "--flux-from": "#2563eb", "--flux-to": "#38bdf8" } as React.CSSProperties}>
+                <ProgressiveFluxLoader
+                  phases={DEALS_LOADER_PHASES}
+                  value={dealsLoaderSeen ? 100 : undefined}
+                  duration={12}
+                  loop={false}
+                  onComplete={() => {
+                    markDealsLoaderSeen();
+                    setDealsLoaderSeen(true);
+                  }}
+                  className="max-w-sm mx-auto gap-3"
+                  barClassName="h-[10px] shadow-none dark:shadow-none"
+                  textClassName="text-sm sm:text-base text-gray-600 font-medium"
+                />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
