@@ -10,7 +10,6 @@ import { BorderRotate } from "@/components/ui/animated-gradient-border";
 import { GlowCard } from "@/components/ui/spotlight-card";
 import { LiquidBadge } from "@/components/ui/liquid-badge";
 import { ProgressiveFluxLoader } from "@/components/ui/progressive-flux-loader";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 function GuaranteeInfoIcon() {
   const [open, setOpen] = useState(false);
@@ -299,7 +298,6 @@ export default function Header({ onSearch, onScanClick }: HeaderProps) {
   const [showTracker, setShowTracker] = useState(false);
   const [goalIdx, setGoalIdx] = useState(0);
   const [goalVisible, setGoalVisible] = useState(true);
-  const isMobile = useIsMobile();
   const mobileTrackerTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mobileInitialDelayPending = useRef(true);
 
@@ -326,26 +324,29 @@ export default function Header({ onSearch, onScanClick }: HeaderProps) {
   // Scroll down far enough → cross-fade the live viewers/orders bar into the
   // "deals scanning" tracker; scroll back up → cross-fade back. Hysteresis
   // (different show/hide thresholds) avoids flicker right at the boundary.
-  // On mobile the swap fired after only a tiny flick, so it needs more scroll
-  // distance and a two-second dwell before it triggers; desktop thresholds and
-  // timing are left exactly as-is.
+  // On mobile, the first qualifying downward scroll waits two seconds before
+  // showing the tracker. That first delay is consumed for the rest of the page
+  // session; later scroll cycles are immediate. Desktop remains unchanged.
   useEffect(() => {
-    const showAt = isMobile ? 280 : 100;
-    const hideAt = isMobile ? 120 : 40;
     const onScroll = () => {
+      const isMobileViewport = window.innerWidth < 768;
+      const showAt = isMobileViewport ? 280 : 100;
+      const hideAt = isMobileViewport ? 120 : 40;
       const scrollY = window.scrollY;
 
       if (scrollY < hideAt) {
-        if (mobileTrackerTimer.current) {
-          clearTimeout(mobileTrackerTimer.current);
-          mobileTrackerTimer.current = null;
-        }
         setShowTracker(false);
         return;
       }
 
       if (scrollY > showAt) {
-        if (!isMobile || !mobileInitialDelayPending.current) {
+        if (!isMobileViewport) {
+          setShowTracker(true);
+        } else if (mobileTrackerTimer.current) {
+          // Keep the first mobile transition hidden until the full delay ends,
+          // even while the phone continues emitting scroll events.
+          return;
+        } else if (!mobileInitialDelayPending.current) {
           setShowTracker(true);
         } else if (!mobileTrackerTimer.current) {
           // Consume the one-time mobile delay as soon as the first qualifying
@@ -353,12 +354,15 @@ export default function Header({ onSearch, onScanClick }: HeaderProps) {
           mobileInitialDelayPending.current = false;
           mobileTrackerTimer.current = setTimeout(() => {
             mobileTrackerTimer.current = null;
-            if (window.scrollY > showAt) setShowTracker(true);
+            if (window.innerWidth < 768 && window.scrollY > 280) {
+              setShowTracker(true);
+            }
           }, 2000);
         }
       }
     };
     window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
     return () => {
       window.removeEventListener("scroll", onScroll);
       if (mobileTrackerTimer.current) {
@@ -366,7 +370,7 @@ export default function Header({ onSearch, onScanClick }: HeaderProps) {
         mobileTrackerTimer.current = null;
       }
     };
-  }, [isMobile]);
+  }, []);
 
   // Clicking the "scanning" tracker (only reachable while it's actually showing,
   // since its wrapper sets pointer-events:none while the live-viewers bar is up)
