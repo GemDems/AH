@@ -36,10 +36,37 @@ const DEALS_LOADER_PHASES = [
   { at: 100, label: "almost live" },
 ];
 
+// The "more deals coming soon" loader should only play its full reveal once
+// per browser session. Without this, every reload/back-navigation replays
+// "reaching out to brands" → "almost live" from scratch, which reads as fake
+// once a visitor notices it never actually changes — hurting the exact trust
+// it's meant to build. sessionStorage is wrapped in try/catch because it can
+// throw in privacy-restricted contexts (e.g. Safari private browsing, some
+// embedded/iframed previews); falling back to "not seen" just means the
+// reveal plays again, which is harmless.
+const DEALS_LOADER_SESSION_KEY = "edh_deals_loader_seen";
+
+function hasSeenDealsLoader(): boolean {
+  try {
+    return sessionStorage.getItem(DEALS_LOADER_SESSION_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function markDealsLoaderSeen() {
+  try {
+    sessionStorage.setItem(DEALS_LOADER_SESSION_KEY, "1");
+  } catch {
+    // Storage unavailable — non-critical, see note above.
+  }
+}
+
 export default function Home() {
   const [showAdmin, setShowAdmin] = useState(false);
   const [activeCategories, setActiveCategories] = useState<Set<string>>(new Set(["all"]));
   const [activeFilters, setActiveFilters] = useState<Set<string>>(new Set());
+  const [dealsLoaderSeen, setDealsLoaderSeen] = useState(hasSeenDealsLoader);
 
   const toggleFilter = (id: string) => {
     setActiveFilters(prev => {

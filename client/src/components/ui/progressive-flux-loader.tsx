@@ -133,18 +133,22 @@ function FluxLabel({ label, reduced, className }: FluxLabelProps) {
         aria-hidden
         className={base}
         style={{ transformStyle: "preserve-3d" }}
-        initial={{ opacity: 0, z: -380, scale: 0.65, filter: "blur(14px)" }}
+        // NOTE: intentionally no `filter` on this node. Animating `filter`
+        // together with a 3D `z` transform inside a `perspective` parent is a
+        // well-known WebKit/Safari (incl. iOS) fragility — it can clip,
+        // flicker, or flatten the 3D depth mid-animation. The blur-in reveal
+        // is handled per-letter below instead (2D transform + filter only),
+        // which Safari renders reliably.
+        initial={{ opacity: 0, z: -380, scale: 0.65 }}
         animate={{
           opacity: [0, 1, 1, 1],
           z: [-380, 60, -8, 0],
           scale: [0.65, 1.08, 0.985, 1],
-          filter: ["blur(14px)", "blur(0px)", "blur(0px)", "blur(0px)"],
         }}
         exit={{
           opacity: 0,
           z: 220,
           scale: 1.35,
-          filter: "blur(10px)",
           transition: { duration: 0.45, ease: [0.7, 0, 0.84, 0] },
         }}
         transition={Z_TRANSITION}
