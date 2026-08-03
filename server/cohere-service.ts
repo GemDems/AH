@@ -27,7 +27,7 @@ interface ProductAnalysisResult {
 function buildProductCatalog(products: AffiliateLink[]): string {
   if (!products.length) return "No products available right now.";
   return products.map((p, i) => {
-    const stock = p.stock > 0 ? `⚡ ${p.stock} left` : "✅ In stock";
+    const stock = (p.stock ?? 0) > 0 ? `⚡ ${p.stock} left` : "✅ In stock";
     const verified = p.isVerified ? " ✔️ Verified" : "";
     const elite = p.isElitePick ? " 🧠 Elite Pick" : "";
     const privateData = p.aiPrivateInfo ? `\n  🔒 PRIVATE INTEL: ${p.aiPrivateInfo}` : "";
@@ -233,7 +233,7 @@ function generateBuiltInResponse(
         `okay okay i see you, check this out 👀 →`
       ];
       const intro = intros[Math.floor(Math.random() * intros.length)];
-      const stock = bestMatch.stock > 0 ? ` ⚡ only ${bestMatch.stock} left` : "";
+      const stock = (bestMatch.stock ?? 0) > 0 ? ` ⚡ only ${bestMatch.stock} left` : "";
       const response = `${intro} [${bestMatch.title}](${bestMatch.url})${verified}${elite} — ${price}${stock} 🔥`;
       return { recommendedProduct: bestMatch, response, confidence: Math.min(0.95, 0.55 + bestScore * 0.04) };
     }
@@ -242,7 +242,7 @@ function generateBuiltInResponse(
     if (isGeneralBrowse) {
       const top = products.find(p => p.isElitePick) || products.find(p => p.isVerified) || products[0];
       const price = top.price ? `$${top.price}` : "great price";
-      const stock = top.stock > 0 ? ` ⚡ only ${top.stock} left` : "";
+      const stock = (top.stock ?? 0) > 0 ? ` ⚡ only ${top.stock} left` : "";
       const elite = top.isElitePick ? " 🧠 Elite Pick" : "";
       const browseIntros = [
         `okay our hottest one rn is this 👇`,

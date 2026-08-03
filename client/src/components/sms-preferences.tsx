@@ -32,7 +32,7 @@ export default function SMSPreferences({ userId }: SMSPreferencesProps) {
   });
 
   // Check SMS service status
-  const { data: smsStatus } = useQuery({
+  const { data: smsStatus } = useQuery<{ isConfigured: boolean }>({
     queryKey: ['/api/sms/status'],
   });
 
@@ -50,10 +50,7 @@ export default function SMSPreferences({ userId }: SMSPreferencesProps) {
   // Create new SMS preferences
   const createPreferencesMutation = useMutation({
     mutationFn: async (data: any) => {
-      return apiRequest('/api/sms/preferences', {
-        method: 'POST',
-        body: JSON.stringify(data),
-      });
+      return apiRequest('POST', '/api/sms/preferences', data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/sms/preferences/${userId}`] });
@@ -72,10 +69,7 @@ export default function SMSPreferences({ userId }: SMSPreferencesProps) {
   // Update existing SMS preferences
   const updatePreferencesMutation = useMutation({
     mutationFn: async (data: any) => {
-      return apiRequest(`/api/sms/preferences/${userId}`, {
-        method: 'PUT',
-        body: JSON.stringify(data),
-      });
+      return apiRequest('PUT', `/api/sms/preferences/${userId}`, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/sms/preferences/${userId}`] });
@@ -94,9 +88,7 @@ export default function SMSPreferences({ userId }: SMSPreferencesProps) {
   // Opt out from SMS
   const optOutMutation = useMutation({
     mutationFn: async () => {
-      return apiRequest(`/api/sms/opt-out/${userId}`, {
-        method: 'POST',
-      });
+      return apiRequest('POST', `/api/sms/opt-out/${userId}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/sms/preferences/${userId}`] });

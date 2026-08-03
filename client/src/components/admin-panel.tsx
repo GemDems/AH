@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
+import { useCardStyle } from "@/hooks/use-card-style";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,12 +23,13 @@ interface AdminPanelProps {
 }
 
 export default function AdminPanel({ isOpen, onClose, onSuccess }: AdminPanelProps) {
+  const { cardStyle, setCardStyle } = useCardStyle();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [activeTab, setActiveTab] = useState<"create" | "drafts" | "manage" | "ideas" | "messages">("create");
   const [msgAiReplies, setMsgAiReplies] = useState<Record<number, string>>({});
-  const [formData, setFormData] = useState<InsertAffiliateLink & { isVerified?: boolean; isDraft?: boolean; scheduledPublishAt?: Date; scheduledDeleteAt?: Date; categories?: string[] }>({
+  const [formData, setFormData] = useState<Omit<InsertAffiliateLink, 'isVerified' | 'isDraft'> & { isVerified?: boolean; isDraft?: boolean; scheduledPublishAt?: Date; scheduledDeleteAt?: Date; categories?: string[] }>({
     title: "",
     url: "",
     description: "",
@@ -36,6 +38,8 @@ export default function AdminPanel({ isOpen, onClose, onSuccess }: AdminPanelPro
     imageUrl: "",
     imageUrls: [],
     price: "",
+    stock: 0,
+    isElitePick: 0,
     isVerified: false,
     isDraft: false,
     scheduledPublishAt: undefined,
@@ -51,13 +55,13 @@ export default function AdminPanel({ isOpen, onClose, onSuccess }: AdminPanelPro
   const { toast } = useToast();
 
   // Fetch all products and drafts for management
-  const { data: allProducts = [] } = useQuery({
+  const { data: allProducts = [] } = useQuery<AffiliateLink[]>({
     queryKey: ["/api/admin/affiliate-links"],
     enabled: isAuthenticated,
     refetchInterval: 5000,
   });
 
-  const { data: drafts = [] } = useQuery({
+  const { data: drafts = [] } = useQuery<AffiliateLink[]>({
     queryKey: ["/api/admin/drafts"],
     enabled: isAuthenticated,
     refetchInterval: 5000,
@@ -199,7 +203,8 @@ export default function AdminPanel({ isOpen, onClose, onSuccess }: AdminPanelPro
   // Publish all drafts mutation
   const publishAllDraftsMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest("POST", "/api/admin/publish-all");
+      const res = await apiRequest("POST", "/api/admin/publish-all");
+      return res.json() as Promise<{ published: number }>;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/drafts"] });
@@ -450,7 +455,7 @@ export default function AdminPanel({ isOpen, onClose, onSuccess }: AdminPanelPro
       category: primaryCategory,
       categories: cats,
       imageUrls: allImageUrls.length > 0 ? allImageUrls : undefined,
-      isDraft: mode !== "publish",
+      isDraft: mode !== "publish" ? 1 : 0,
       // Each button has one unambiguous outcome, independent of whatever date
       // happens to still be sitting in the Schedule Publish field: "Publish Now"
       // always goes live immediately, "Save as Draft" never auto-schedules, and
@@ -462,7 +467,7 @@ export default function AdminPanel({ isOpen, onClose, onSuccess }: AdminPanelPro
       stock: formData.stock || 0,
       aiPrivateInfo: formData.aiPrivateInfo || null
     };
-    createLinkMutation.mutate(submissionData);
+    createLinkMutation.mutate(submissionData as InsertAffiliateLink);
   };
 
   const resetForm = () => {
@@ -475,6 +480,8 @@ export default function AdminPanel({ isOpen, onClose, onSuccess }: AdminPanelPro
       imageUrl: "",
       imageUrls: [],
       price: "",
+      stock: 0,
+      isElitePick: 0,
       isVerified: false,
       isDraft: false,
       scheduledPublishAt: undefined,
@@ -653,7 +660,7 @@ export default function AdminPanel({ isOpen, onClose, onSuccess }: AdminPanelPro
             </div>
           </form>
         ) : (
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <Tabs value={activeTab} onValueChange={setActiveTab as (value: string) => void} className="w-full">
             <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="create">Create</TabsTrigger>
               <TabsTrigger value="drafts">Drafts ({drafts.length})</TabsTrigger>
@@ -747,18 +754,18 @@ export default function AdminPanel({ isOpen, onClose, onSuccess }: AdminPanelPro
                     
                     // 12 ULTRA-PRECISE AI DESCRIPTION TEMPLATES (shorter is better, max 6-13)
                     const aiTemplates = [
-                      (text) => `Premium ${text} engineered for exceptional performance.`,
-                      (text) => `Advanced ${text} designed to exceed expectations.`,
-                      (text) => `Professional-grade ${text} built for superior results.`,
-                      (text) => `High-performance ${text} crafted with precision engineering.`,
-                      (text) => `Superior ${text} featuring innovative design standards.`,
-                      (text) => `Elite-quality ${text} delivering consistent results.`,
-                      (text) => `Precision-crafted ${text} engineered for reliability.`,
-                      (text) => `Professional ${text} built to industry standards.`,
-                      (text) => `Advanced ${text} featuring premium construction.`,
-                      (text) => `High-grade ${text} designed for optimal performance.`,
-                      (text) => `Superior-quality ${text} engineered with precision.`,
-                      (text) => `Premium ${text} delivering exceptional results.`
+                      (text: string) => `Premium ${text} engineered for exceptional performance.`,
+                      (text: string) => `Advanced ${text} designed to exceed expectations.`,
+                      (text: string) => `Professional-grade ${text} built for superior results.`,
+                      (text: string) => `High-performance ${text} crafted with precision engineering.`,
+                      (text: string) => `Superior ${text} featuring innovative design standards.`,
+                      (text: string) => `Elite-quality ${text} delivering consistent results.`,
+                      (text: string) => `Precision-crafted ${text} engineered for reliability.`,
+                      (text: string) => `Professional ${text} built to industry standards.`,
+                      (text: string) => `Advanced ${text} featuring premium construction.`,
+                      (text: string) => `High-grade ${text} designed for optimal performance.`,
+                      (text: string) => `Superior-quality ${text} engineered with precision.`,
+                      (text: string) => `Premium ${text} delivering exceptional results.`
                     ];
                     
                     // Extract key product type/category
@@ -846,18 +853,18 @@ export default function AdminPanel({ isOpen, onClose, onSuccess }: AdminPanelPro
                     
                     // 12 UNIQUE BATMAN-PRECISION TEMPLATES - detailed paragraphs, 30-40 words
                     const batmanTemplates = [
-                      (text) => `Professional-grade ${text} features advanced engineering and premium construction. Designed for serious performance in demanding applications with enhanced reliability and consistent results.`,
-                      (text) => `Industrial-strength ${text} delivers consistent results through rigorous testing and quality materials. Built with premium components for long-term reliability and demanding professional environments.`,
-                      (text) => `High-performance ${text} offers superior functionality through innovative design and cutting-edge technology. Engineered for maximum efficiency and durability in challenging applications and conditions.`,
-                      (text) => `Commercial-quality ${text} provides exceptional value with professional-grade construction and advanced features. Reliable performance for demanding applications with measurable improvements and enhanced functionality.`,
-                      (text) => `Laboratory-tested ${text} meets strict quality standards with advanced engineering and precision manufacturing. Delivers consistent performance through quality components and enhanced durability features.`,
-                      (text) => `Premium ${text} combines cutting-edge technology with robust construction for superior performance. Advanced features and quality materials ensure reliable operation in demanding professional applications.`,
-                      (text) => `Heavy-duty ${text} exceeds industry standards through rigorous testing and premium materials. Engineered for long-term reliability and consistent performance in challenging professional environments.`,
-                      (text) => `Precision-engineered ${text} offers advanced functionality with quality components and enhanced durability. Designed for consistent results and reliable performance in demanding applications and conditions.`,
-                      (text) => `Enterprise-grade ${text} provides professional performance with enhanced durability and advanced features. Built for demanding environments with quality materials and consistent reliable operation.`,
-                      (text) => `High-capacity ${text} delivers superior results through advanced engineering and quality materials. Designed for optimal performance and enhanced functionality in demanding professional applications.`,
-                      (text) => `Technical-grade ${text} features precision construction and tested reliability with enhanced performance capabilities. Engineered for consistent results and demanding applications with advanced functionality.`,
-                      (text) => `Professional ${text} offers enhanced functionality through quality engineering and advanced features. Designed to exceed expectations in demanding applications with reliable consistent performance.`
+                      (text: string) => `Professional-grade ${text} features advanced engineering and premium construction. Designed for serious performance in demanding applications with enhanced reliability and consistent results.`,
+                      (text: string) => `Industrial-strength ${text} delivers consistent results through rigorous testing and quality materials. Built with premium components for long-term reliability and demanding professional environments.`,
+                      (text: string) => `High-performance ${text} offers superior functionality through innovative design and cutting-edge technology. Engineered for maximum efficiency and durability in challenging applications and conditions.`,
+                      (text: string) => `Commercial-quality ${text} provides exceptional value with professional-grade construction and advanced features. Reliable performance for demanding applications with measurable improvements and enhanced functionality.`,
+                      (text: string) => `Laboratory-tested ${text} meets strict quality standards with advanced engineering and precision manufacturing. Delivers consistent performance through quality components and enhanced durability features.`,
+                      (text: string) => `Premium ${text} combines cutting-edge technology with robust construction for superior performance. Advanced features and quality materials ensure reliable operation in demanding professional applications.`,
+                      (text: string) => `Heavy-duty ${text} exceeds industry standards through rigorous testing and premium materials. Engineered for long-term reliability and consistent performance in challenging professional environments.`,
+                      (text: string) => `Precision-engineered ${text} offers advanced functionality with quality components and enhanced durability. Designed for consistent results and reliable performance in demanding applications and conditions.`,
+                      (text: string) => `Enterprise-grade ${text} provides professional performance with enhanced durability and advanced features. Built for demanding environments with quality materials and consistent reliable operation.`,
+                      (text: string) => `High-capacity ${text} delivers superior results through advanced engineering and quality materials. Designed for optimal performance and enhanced functionality in demanding professional applications.`,
+                      (text: string) => `Technical-grade ${text} features precision construction and tested reliability with enhanced performance capabilities. Engineered for consistent results and demanding applications with advanced functionality.`,
+                      (text: string) => `Professional ${text} offers enhanced functionality through quality engineering and advanced features. Designed to exceed expectations in demanding applications with reliable consistent performance.`
                     ];
                     
                     // Extract core product essence (remove common words)
@@ -1175,6 +1182,76 @@ export default function AdminPanel({ isOpen, onClose, onSuccess }: AdminPanelPro
             </TabsContent>
 
             <TabsContent value="manage">
+              {/* ── Card Style Picker ── */}
+              <Card className="mb-4">
+                <CardHeader>
+                  <CardTitle className="text-base">Product Card Style</CardTitle>
+                  <CardDescription>Choose how product cards look on the site</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 gap-3">
+                    {/* Classic card option */}
+                    <button
+                      type="button"
+                      onClick={() => setCardStyle("classic")}
+                      className={`relative rounded-xl border-2 p-3 text-left transition-all ${
+                        cardStyle === "classic"
+                          ? "border-blue-600 bg-blue-50 shadow-md"
+                          : "border-gray-200 bg-white hover:border-gray-400"
+                      }`}
+                    >
+                      {cardStyle === "classic" && (
+                        <span className="absolute top-2 right-2 w-4 h-4 bg-blue-600 rounded-full flex items-center justify-center">
+                          <span className="text-white text-[10px] font-bold">✓</span>
+                        </span>
+                      )}
+                      {/* Mini preview of classic card */}
+                      <div className="mb-2 rounded-lg overflow-hidden bg-gray-100 h-20 flex items-center justify-center">
+                        <div className="w-full bg-white rounded-lg p-2 shadow-sm mx-2">
+                          <div className="h-2 bg-gray-200 rounded w-3/4 mb-1" />
+                          <div className="h-1.5 bg-gray-100 rounded w-full mb-2" />
+                          <div className="grid grid-cols-2 gap-1 mb-1">
+                            <div className="h-4 bg-green-100 rounded text-[6px] flex items-center justify-center text-green-700 font-bold">976 bought</div>
+                            <div className="h-4 bg-blue-100 rounded text-[6px] flex items-center justify-center text-blue-700 font-bold">+72% demand</div>
+                          </div>
+                          <div className="h-4 w-full bg-blue-600 rounded text-[6px] text-white flex items-center justify-center font-bold">Claim Deal</div>
+                        </div>
+                      </div>
+                      <p className="text-xs font-semibold text-gray-800">Classic (White)</p>
+                      <p className="text-[10px] text-gray-500 mt-0.5">Light card with stats grid</p>
+                    </button>
+
+                    {/* Red card option */}
+                    <button
+                      type="button"
+                      onClick={() => setCardStyle("red")}
+                      className={`relative rounded-xl border-2 p-3 text-left transition-all ${
+                        cardStyle === "red"
+                          ? "border-blue-600 bg-blue-50 shadow-md"
+                          : "border-gray-200 bg-white hover:border-gray-400"
+                      }`}
+                    >
+                      {cardStyle === "red" && (
+                        <span className="absolute top-2 right-2 w-4 h-4 bg-blue-600 rounded-full flex items-center justify-center">
+                          <span className="text-white text-[10px] font-bold">✓</span>
+                        </span>
+                      )}
+                      {/* Mini preview of red card */}
+                      <div className="mb-2 rounded-lg overflow-hidden bg-gray-800 h-20 flex items-center justify-center">
+                        <div className="w-full rounded-lg p-2 mx-2">
+                          <div className="h-1.5 bg-red-500 rounded w-full mb-1" />
+                          <div className="h-2 bg-white/20 rounded w-3/4 mb-1" />
+                          <div className="h-1 bg-white/10 rounded w-full mb-1.5" />
+                          <div className="h-4 w-full bg-gradient-to-r from-red-500 to-red-700 rounded text-[6px] text-white flex items-center justify-center font-bold">🔥 Claim Deal</div>
+                        </div>
+                      </div>
+                      <p className="text-xs font-semibold text-gray-800">Dark / Red</p>
+                      <p className="text-[10px] text-gray-500 mt-0.5">Bold dark card with urgency</p>
+                    </button>
+                  </div>
+                </CardContent>
+              </Card>
+
               <Card>
                 <CardHeader>
                   <CardTitle>All Products ({allProducts.length})</CardTitle>

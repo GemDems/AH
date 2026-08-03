@@ -68,7 +68,7 @@ export default function Leaderboard() {
   const deviceId = getDeviceId();
 
   // Fetch real VIP users with 3+ invites and usernames
-  const { data: realVipUsers } = useQuery({
+  const { data: realVipUsers } = useQuery<{ topReferrers: Array<{ referralCount: number; username: string | null }> }>({
     queryKey: ["/api/leaderboard"],
     refetchInterval: 30000, // Check every 30 seconds for new VIP members
   });
@@ -101,7 +101,7 @@ export default function Leaderboard() {
         // Create updated leaderboard
         let updatedBoard = [...prev];
         
-        qualifyingUsers.forEach(realUser => {
+        qualifyingUsers.forEach((realUser: { referralCount: number; username: string | null }) => {
           // Check if user already exists in leaderboard
           const existingIndex = updatedBoard.findIndex(member => 
             member.name === realUser.username
@@ -117,7 +117,7 @@ export default function Leaderboard() {
             // Add new qualifying user, replace lowest member
             const randomState = vipStates[Math.floor(Math.random() * vipStates.length)];
             const newMember = {
-              name: realUser.username,
+              name: realUser.username ?? '',
               referrals: realUser.referralCount,
               earnings: realUser.referralCount * 30, // $30 per referral
               location: randomState

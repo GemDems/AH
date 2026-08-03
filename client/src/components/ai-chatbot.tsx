@@ -318,7 +318,7 @@ export default function AIChatbot() {
         const eliteBadge = topPick.isElitePick === 1 ? '🧠 **Elite Brain Pick**' : '';
         const verifiedBadge = topPick.isVerified === 1 ? '✅' : '';
         setTimeout(() => { setFoundProduct(topPick); setShowPitchButton(true); }, 100);
-        const stockText = topPick.stock > 0 ? `Only ${topPick.stock} left! ` : '';
+        const stockText = (topPick.stock ?? 0) > 0 ? `Only ${topPick.stock} left! ` : '';
         return `Stop. Feel that? That's **${topPick.title}** ${eliteBadge} ${verifiedBadge} calling your name. ${stockText}This was destined for someone exactly like you. <a href="${topPick.url}" target="_blank" rel="noopener noreferrer" style="color: #3b82f6; font-weight: bold; text-decoration: underline;">${topPick.title} →</a>`;
       } else {
         return "No deals are live right now — check back soon! New drops happen regularly 🔄";
@@ -334,7 +334,7 @@ export default function AIChatbot() {
       if (topProduct) {
         setTimeout(() => { setFoundProduct(topProduct); setShowPitchButton(true); }, 100);
         const description = topProduct.description ? ` ${topProduct.description.substring(0, 100)}` : '';
-        const stockInfo = topProduct.stock > 0 ? ` Only ${topProduct.stock} left!` : '';
+        const stockInfo = (topProduct.stock ?? 0) > 0 ? ` Only ${topProduct.stock} left!` : '';
         return `We've got some great deals live right now! Featured: **${topProduct.title}**${description}${stockInfo} <a href="${topProduct.url}" target="_blank" rel="noopener noreferrer" style="color: #3b82f6; font-weight: bold; text-decoration: underline;">${topProduct.title} →</a>`;
       } else if (categories.length > 0) {
         return `We have products in these categories: ${categories.join(', ')}. What are you looking for specifically?`;
@@ -392,7 +392,7 @@ What specific type of product are you looking for? I can show you the newest opt
     // ALWAYS SEARCH PRODUCTS when user provides any specific input
     if (hasSpecificRequest && lowerQuery.trim().length > 3) {
       // DEEP ANALYSIS of ALL products - find MULTIPLE relevant matches
-      let productMatches = [];
+      let productMatches: Array<{ product: AffiliateLink; score: number; reasons: string }> = [];
 
       affiliateLinks.forEach(product => {
         let score = 0;
@@ -402,7 +402,7 @@ What specific type of product are you looking for? I can show you the newest opt
         const title = product.title?.toLowerCase() || '';
         const description = product.description?.toLowerCase() || '';
         const category = product.category?.toLowerCase() || '';
-        const price = parseInt(product.price) || 0;
+        const price = parseInt(product.price ?? '0') || 0;
         const clicks = product.clicks || 0;
         const stock = product.stock || 0;
         const isElite = product.isElitePick === 1;
@@ -521,7 +521,7 @@ What specific type of product are you looking for? I can show you the newest opt
       // Handle no matches found - graceful responses without random products
       if (topMatches.length === 0) {
         // Try broader keyword matching first
-        let broadMatches = [];
+        let broadMatches: Array<{ product: AffiliateLink; score: number }> = [];
         
         // Enhanced similarity matching - find most related products based on keywords and context
         const userKeywords = lowerQuery.split(' ').filter(word => word.length > 2);
@@ -2504,7 +2504,7 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
         <div className="border-t border-gray-700 p-4 mt-auto">
           {/* Recommended Questions - Dynamic based on conversation */}
           {(() => {
-            const aiMessages = messages.filter(msg => msg.role === 'assistant');
+            const aiMessages = messages.filter(msg => msg.isBot);
             const lastAiMessage = aiMessages[aiMessages.length - 1]?.content.toLowerCase() || '';
             
             let suggestedQuestions = [];

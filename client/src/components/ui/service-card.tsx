@@ -38,11 +38,11 @@ export interface ServiceCardProps
 const ServiceCard = React.forwardRef<HTMLDivElement, ServiceCardProps>(
   ({ className, variant, title, description, href, imgSrc, imgAlt, linkLabel = "LEARN MORE", onLinkClick, ...props }, ref) => {
 
-    const cardAnimation = {
+    const cardAnimation: import("motion/react").Variants = {
       hover: { scale: 1.02, transition: { duration: 0.3 } },
     };
 
-    const imageAnimation = {
+    const imageAnimation: import("motion/react").Variants = {
       hover: {
         scale: 1.1,
         rotate: 3,
@@ -51,10 +51,10 @@ const ServiceCard = React.forwardRef<HTMLDivElement, ServiceCardProps>(
       },
     };
 
-    const arrowAnimation = {
+    const arrowAnimation: import("motion/react").Variants = {
       hover: {
         x: 5,
-        transition: { duration: 0.3, ease: "easeInOut", repeat: Infinity, repeatType: "reverse" as const },
+        transition: { duration: 0.3, ease: "easeInOut", repeat: Infinity, repeatType: "reverse" },
       },
     };
 
@@ -71,7 +71,7 @@ const ServiceCard = React.forwardRef<HTMLDivElement, ServiceCardProps>(
         ref={ref}
         variants={cardAnimation}
         whileHover="hover"
-        {...(props as React.HTMLAttributes<HTMLDivElement>)}
+        {...(props as any)}
       >
         <div className="relative z-10 flex flex-col h-full">
           <h3 className="text-xl font-bold tracking-tight mb-1">{title}</h3>

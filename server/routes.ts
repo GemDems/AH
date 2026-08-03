@@ -107,6 +107,13 @@ setInterval(() => {
   }
 }, 5 * 60_000);
 
+setInterval(() => {
+  const nowWin = Date.now();
+  for (const [key, _rec] of lastIpRequestTime) {
+    if (nowWin - (_rec as number) > 60_000) lastIpRequestTime.delete(key);
+  }
+}, 5 * 60_000);
+
 function enforceBurstLimit(req: Request, res: Response, next: NextFunction) {
   const deviceId: string = (req.body?.deviceId as string) || "unknown";
   const now = Date.now();
@@ -353,8 +360,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // AI Description Enhancement - 1000%+ Conversion Optimization
   app.post("/api/ai/enhance-description", async (req, res) => {
     console.log('AI Enhancement Route Hit:', req.body);
+    const { description, title, category } = req.body;
     try {
-      const { description, title, category } = req.body;
       
       if (!description || !description.trim()) {
         return res.status(400).json({ error: "Description is required" });
@@ -828,7 +835,7 @@ Transform now with maximum conversion power in minimal words:`;
       const newIdea = await storage.submitUserIdea(deviceId, idea.trim());
       res.json(newIdea);
     } catch (error) {
-      if (error.message === "Device has already submitted an idea") {
+      if (error instanceof Error && error.message === "Device has already submitted an idea") {
         return res.status(409).json({ message: "You have already submitted an idea" });
       }
       console.error("Error submitting idea:", error);
