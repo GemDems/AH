@@ -425,7 +425,7 @@ export default function Header({ onSearch, onScanClick }: HeaderProps) {
   return (
     <header style={{ background: "#0d0f1a" }} className="w-full">
       {/* Flash sale ticker */}
-      <div style={{ background: "linear-gradient(90deg,#e63946,#b91c2c)" }} className="w-full py-2.5 text-center text-xs font-semibold tracking-widest text-white opacity-[0.01]">
+      <div style={{ background: "linear-gradient(90deg,#e63946,#9b2dca)" }} className="w-full py-2.5 text-center text-xs font-semibold tracking-widest text-white opacity-[0.01]">
         ⚡ FLASH SALE ENDING SOON — {viewers.toLocaleString()} MEMBERS ACTIVE TODAY &nbsp;|&nbsp; SPOTS FILLING FAST ⚡
       </div>
       {/* Search bar */}
@@ -473,7 +473,7 @@ export default function Header({ onSearch, onScanClick }: HeaderProps) {
         </div>
         <h1 className="font-extrabold leading-none tracking-tight text-white" style={{ fontSize: "clamp(64px,9vw,88px)", letterSpacing: "-0.02em" }}>
           ELITE<br />
-          <span style={{ color: "var(--conversion-blue)" }}>DEALS</span>
+          <span style={{ color: "#2563eb" }}>DEALS</span>
         </h1>
         <div
           className="mt-2 text-sm font-normal tracking-[0.2em] cursor-pointer select-none transition-colors duration-200"
@@ -486,9 +486,9 @@ export default function Header({ onSearch, onScanClick }: HeaderProps) {
         </div>
         {/* Trust pills */}
         <div className="flex flex-wrap justify-center gap-2 mt-5 max-w-lg mx-auto">
-          <span className="px-3.5 py-1 rounded-full text-xs font-semibold border" style={{ background: "rgba(251,191,36,0.1)", borderColor: "rgba(251,191,36,0.3)", color: "var(--premium-gold)" }}></span>
-          <span className="px-3.5 py-1 rounded-full text-xs font-semibold border" style={{ background: "rgba(34,197,94,0.1)", borderColor: "rgba(34,197,94,0.3)", color: "var(--trust-green-light)" }}></span>
-          <span className="px-3.5 py-1 rounded-full text-xs font-semibold border" style={{ background: "rgba(37,99,235,0.1)", borderColor: "rgba(37,99,235,0.3)", color: "var(--conversion-blue-light)" }}></span>
+          <span className="px-3.5 py-1 rounded-full text-xs font-semibold border" style={{ background: "rgba(251,191,36,0.1)", borderColor: "rgba(251,191,36,0.3)", color: "#fbbf24" }}></span>
+          <span className="px-3.5 py-1 rounded-full text-xs font-semibold border" style={{ background: "rgba(34,197,94,0.1)", borderColor: "rgba(34,197,94,0.3)", color: "#22c55e" }}></span>
+          <span className="px-3.5 py-1 rounded-full text-xs font-semibold border" style={{ background: "rgba(96,165,250,0.1)", borderColor: "rgba(96,165,250,0.3)", color: "#60a5fa" }}></span>
         </div>
       </div>
       {/* Stats grid */}
@@ -503,8 +503,8 @@ export default function Header({ onSearch, onScanClick }: HeaderProps) {
             flipped: { icon: "⭐", label: "4.9/5 Rating", desc: "78K+ reviews", color: "#fbbf24", bg: "rgba(251,191,36,0.15)" },
           },
           {
-            default: { icon: "🔓", label: "No Signup", desc: "Browse without an account", color: "#60a5fa", bg: "rgba(37,99,235,0.15)" },
-            flipped: { icon: "🏆", label: "#1 Marketplace", desc: "Industry leader", color: "#60a5fa", bg: "rgba(37,99,235,0.15)" },
+            default: { icon: "🔓", label: "No Signup", desc: "Browse without an account", color: "#a78bfa", bg: "rgba(139,92,246,0.15)" },
+            flipped: { icon: "🏆", label: "#1 Marketplace", desc: "Industry leader", color: "#a78bfa", bg: "rgba(139,92,246,0.15)" },
           },
           {
             default: { icon: "📋", label: "Always Disclosed", desc: "Affiliate links marked, every time", color: "#60a5fa", bg: "rgba(96,165,250,0.15)" },

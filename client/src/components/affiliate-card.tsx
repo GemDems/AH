@@ -220,7 +220,7 @@ export default function AffiliateCard({ link }: AffiliateCardProps) {
 
         {isElitePick && alerts[alertIdx] ? (
           <div className="absolute top-[0px] left-[0px] right-[0px] z-30">
-            <div className="bg-gradient-to-r from-premium-gold to-premium-gold-dark text-amber-950 text-xs font-bold text-center py-1">
+            <div className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-yellow-900 text-xs font-bold text-center py-1">
               <Users className="w-3 h-3 inline mr-1" />
               {alerts[alertIdx]}
             </div>
@@ -229,7 +229,7 @@ export default function AffiliateCard({ link }: AffiliateCardProps) {
 
         {stock > 0 ? (
           <div className={`absolute ${isElitePick ? 'top-6' : 'top-[0px]'} left-[0px] right-[0px] z-10`}>
-            <div className="bg-gradient-to-r from-urgency-red to-urgency-red-dark text-white text-xs font-bold text-center py-1">
+            <div className="bg-gradient-to-r from-urgency-red to-red-600 text-white text-xs font-bold text-center py-1">
               <AlertCircle className="w-3 h-3 inline mr-1" />
               ONLY {stock} LEFT IN STOCK
             </div>
@@ -246,13 +246,13 @@ export default function AffiliateCard({ link }: AffiliateCardProps) {
           data-testid={`container-image-quickview-${link.id}`}
         >
           <div className="absolute top-3 left-3 z-10">
-            <div className="bg-gradient-to-r from-urgency-red to-urgency-red-dark text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+            <div className="bg-gradient-to-r from-urgency-red to-red-600 text-gray-900 text-xs font-bold px-3 py-1 rounded-full shadow-lg">
               {getCategoryEmoji(link.category || '')} BESTSELLER
             </div>
           </div>
 
           <div className="absolute top-3 right-3 z-10 flex flex-col gap-1">
-            <div className={`text-xs font-bold px-3 py-1 rounded-full shadow-lg flex items-center ${timerCritical ? 'timer-critical' : 'bg-gradient-to-r from-urgency-red to-urgency-red-dark text-white'}`}>
+            <div className={`text-xs font-bold px-3 py-1 rounded-full shadow-lg flex items-center ${timerCritical ? 'timer-critical' : 'bg-gradient-to-r from-action-orange to-orange-600 text-gray-900'}`}>
               <Clock className="w-3 h-3 mr-1 inline" />
               {fmtTime(secsLeft)}
             </div>
@@ -282,7 +282,7 @@ export default function AffiliateCard({ link }: AffiliateCardProps) {
             {link.description}
           </p>
 
-          <div className="bg-gradient-to-br from-trust-green/5 via-white to-conversion-blue/5 p-4 rounded-xl border-2 border-trust-green/20 shadow-inner mb-4">
+          <div className="bg-gradient-to-br from-trust-green/5 via-blue-50 to-purple-50 p-4 rounded-xl border-2 border-trust-green/20 shadow-inner mb-4">
             <div className="grid grid-cols-2 gap-3">
               <div className="bg-green-50 rounded-lg p-2 border border-green-200">
                 <div className="flex items-center">
@@ -305,10 +305,10 @@ export default function AffiliateCard({ link }: AffiliateCardProps) {
                 </div>
                 <div className="text-xs text-gray-700">{reviews.toLocaleString()} reviews</div>
               </div>
-              <div className="bg-red-50 rounded-lg p-2 border border-red-200">
+              <div className="bg-pink-50 rounded-lg p-2 border border-pink-200">
                 <div className="flex items-center">
-                  <Heart className="w-4 h-4 text-red-600 mr-1" />
-                  <span className="text-xs font-bold text-red-800">{wishlists}</span>
+                  <Heart className="w-4 h-4 text-pink-600 mr-1" />
+                  <span className="text-xs font-bold text-pink-800">{wishlists}</span>
                 </div>
                 <div className="text-xs text-gray-700">wishlists</div>
               </div>
@@ -332,7 +332,7 @@ export default function AffiliateCard({ link }: AffiliateCardProps) {
             <span className="text-xs text-gray-500 flex items-center gap-1">
               <Award className="w-3 h-3" /> vs retail elsewhere
             </span>
-            <span className="text-xs font-bold text-gray-400 line-through">${retailPrice}</span>
+            <span className="text-xs font-bold text-red-500 line-through">${retailPrice}</span>
           </div>
 
           <div className="text-center text-xs text-gray-500 italic mb-1">
@@ -344,7 +344,7 @@ export default function AffiliateCard({ link }: AffiliateCardProps) {
               <Button
                 onClick={(e) => handleClick(e)}
                 disabled={trackClickMutation.isPending}
-                className={`w-full bg-gradient-to-r from-action-orange to-action-orange-dark hover:from-action-orange-dark hover:to-orange-800 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 shadow-lg relative overflow-hidden cta-heartbeat ${link.isVerified ? 'verified-glow-button' : ''}`}
+                className={`w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 shadow-lg relative overflow-hidden cta-heartbeat ${link.isVerified ? 'verified-glow-button' : ''}`}
               >
                 <span className="relative z-10 flex items-center justify-center text-lg">
                   {trackClickMutation.isPending ? (
@@ -416,7 +416,7 @@ export default function AffiliateCard({ link }: AffiliateCardProps) {
                   style={{ background: "linear-gradient(135deg,#fef9c3,#fde68a)", borderColor: "#ca8a04", color: "#92400e" }}>
                 </span>
                 <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border"
-                  style={{ background: "linear-gradient(135deg,#dbeafe,#bfdbfe)", borderColor: "#2563eb", color: "#1e3a8a" }}>
+                  style={{ background: "linear-gradient(135deg,#ede9fe,#ddd6fe)", borderColor: "#7c3aed", color: "#5b21b6" }}>
                 </span>
               </div>
             </div>
