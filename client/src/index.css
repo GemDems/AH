@@ -24,7 +24,7 @@
 html {
   overflow-y: auto !important;
   min-height: 100%;
-  background-color: #080D1A !important;
+  background-color: #111827 !important;
   overscroll-behavior-y: none;
 }
 
@@ -35,7 +35,7 @@ body, html {
   user-select: none !important;
   -webkit-touch-callout: none !important;
   -webkit-tap-highlight-color: transparent !important;
-  background-color: #080D1A !important;
+  background-color: #111827 !important;
   overscroll-behavior-y: none;
 }
 
@@ -254,33 +254,34 @@ input, textarea, [contenteditable="true"] {
   --radius: 0.5rem;
 
   /* ==========================================================================
-     CONVERSION COLOR SYSTEM — L99 maximum-saturation complementary wheel pairs.
-     Blue (222°) and Orange (22°) sit exactly 180° apart on the Itten 24-step
-     wheel — perfect complementaries. The brain registers the one "different"
-     color as the focal point; orange CTA on a blue-dominant page = maximum
-     visual tension → maximum click-through. Red ↔ Green is the second
-     complementary pair (FOMO vs money/success). Gold anchors premium/status.
-     All hues at 100 % saturation ("L99") for maximum pop on the deep-navy bg.
-     Use the semantic token, never a raw hex. */
-  --conversion-blue: hsl(222, 100%, 55%);       /* #1A64FF — Trust/authority; Royal Blue, exact complement to action-orange */
-  --conversion-blue-light: hsl(218, 100%, 68%); /* #5BA3FF — on-dark icons, tints */
-  --conversion-blue-dark: hsl(222, 100%, 39%);  /* #0041C7 — hover/pressed */
+     CONVERSION COLOR SYSTEM — built on a true complementary color-wheel pair.
+     Trust Blue and Action Orange sit directly opposite each other on the
+     wheel (221° and 25°, ~180° apart), so the CTA always reads as the one
+     "different" color against an otherwise blue/neutral page — contrast,
+     not the hue itself, is what actually drives clicks (per CRO research).
+     Red = urgency/scarcity, Green = money/trust/success, Gold = premium/VIP.
+     Each has a "-light"/"-dark" step for hover states and on-dark-bg tints.
+     Every hue is checked for readable contrast on both white cards and the
+     site's near-black background. Use the semantic name, not a raw hex. */
+  --conversion-blue: hsl(221, 83%, 53%);       /* Trust — brand, security, headers, verified checks */
+  --conversion-blue-light: hsl(221, 90%, 68%); /* tints, icons/text on dark backgrounds */
+  --conversion-blue-dark: hsl(221, 75%, 38%);  /* hover/pressed, gradients */
 
-  --action-orange: hsl(22, 100%, 50%);           /* #FF5E00 — Excitement/impulse CTA; pure orange exact complement to blue */
-  --action-orange-light: hsl(26, 100%, 60%);     /* #FF7E33 — hover highlight */
-  --action-orange-dark: hsl(19, 100%, 40%);      /* #CC3D00 — pressed state */
+  --action-orange: hsl(25, 95%, 53%);          /* Action — complementary to blue; the ONLY color used for primary buy/CTA buttons */
+  --action-orange-light: hsl(28, 96%, 64%);    /* hover highlight, badges on dark bg */
+  --action-orange-dark: hsl(21, 90%, 45%);     /* hover/pressed CTA state */
 
-  --urgency-red: hsl(353, 100%, 50%);            /* #FF0422 — Maximum urgency/FOMO; pure crimson */
-  --urgency-red-light: hsl(353, 100%, 61%);      /* #FF3F56 — badge on dark */
-  --urgency-red-dark: hsl(353, 100%, 38%);       /* #C2001A — deep alarm */
+  --urgency-red: hsl(352, 85%, 51%);           /* Urgency — scarcity, countdowns, low-stock, sale tags */
+  --urgency-red-light: hsl(352, 90%, 68%);
+  --urgency-red-dark: hsl(352, 80%, 40%);
 
-  --trust-green: hsl(145, 100%, 36%);            /* #00B849 — Money/success/GO; pure emerald, max saturation, complement to red */
-  --trust-green-light: hsl(145, 100%, 46%);      /* #00EB5E — on-dark vivid text */
-  --trust-green-dark: hsl(145, 100%, 26%);       /* #008533 — deep pressed */
+  --trust-green: hsl(142, 65%, 40%);           /* Trust/success — savings, verified, in-stock, money */
+  --trust-green-light: hsl(142, 60%, 56%);
+  --trust-green-dark: hsl(142, 70%, 28%);
 
-  --premium-gold: hsl(43, 100%, 50%);            /* #FFB800 — Pure amber gold; VIP/elite/luxury/status */
-  --premium-gold-light: hsl(43, 100%, 63%);      /* #FFCE47 — on-dark glow */
-  --premium-gold-dark: hsl(43, 100%, 38%);       /* #C28C00 — deep pressed */
+  --premium-gold: hsl(43, 96%, 56%);           /* Premium/VIP — elite badges, leaderboard, "#1 marketplace" cues (matches the amber already used site-wide) */
+  --premium-gold-light: hsl(43, 96%, 70%);
+  --premium-gold-dark: hsl(38, 90%, 45%);
 }
 
 .dark {
@@ -621,11 +622,11 @@ input, textarea, [contenteditable="true"] {
 
 /* CTA Heartbeat Pulse - draws eye to button like a heartbeat */
 @keyframes cta-heartbeat {
-  0%, 100% { transform: scale(1); box-shadow: 0 4px 18px rgba(255,94,0,0.45); }
-  14% { transform: scale(1.04); box-shadow: 0 6px 32px rgba(255,94,0,0.8); }
-  28% { transform: scale(1); box-shadow: 0 4px 18px rgba(255,94,0,0.45); }
-  42% { transform: scale(1.03); box-shadow: 0 5px 25px rgba(255,94,0,0.65); }
-  70% { transform: scale(1); box-shadow: 0 4px 18px rgba(255,94,0,0.45); }
+  0%, 100% { transform: scale(1); box-shadow: 0 4px 15px rgba(37,99,235,0.4); }
+  14% { transform: scale(1.04); box-shadow: 0 6px 25px rgba(37,99,235,0.7); }
+  28% { transform: scale(1); box-shadow: 0 4px 15px rgba(37,99,235,0.4); }
+  42% { transform: scale(1.03); box-shadow: 0 5px 20px rgba(37,99,235,0.6); }
+  70% { transform: scale(1); box-shadow: 0 4px 15px rgba(37,99,235,0.4); }
 }
 
 .cta-heartbeat {
@@ -634,8 +635,8 @@ input, textarea, [contenteditable="true"] {
 
 /* Urgency border breathing - keeps urgency elements alive */
 @keyframes urgency-breathe {
-  0%, 100% { border-color: rgba(255,4,34,0.3); box-shadow: 0 0 0 0 rgba(255,4,34,0); }
-  50% { border-color: rgba(255,4,34,0.85); box-shadow: 0 0 14px 5px rgba(255,4,34,0.22); }
+  0%, 100% { border-color: rgba(220,38,38,0.3); box-shadow: 0 0 0 0 rgba(220,38,38,0); }
+  50% { border-color: rgba(220,38,38,0.8); box-shadow: 0 0 12px 4px rgba(220,38,38,0.2); }
 }
 
 .urgency-breathe {

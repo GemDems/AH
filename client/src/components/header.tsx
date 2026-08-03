@@ -33,7 +33,7 @@ function GuaranteeInfoIcon() {
         onMouseLeave={() => setOpen(false)}
         onClick={() => setOpen(v => !v)}
         className="inline-flex items-center justify-center w-[13px] h-[13px] rounded-full border transition-colors duration-200 leading-none"
-        style={{ fontSize: 8, fontWeight: 700, fontStyle: "italic", verticalAlign: "middle", borderColor: "var(--premium-gold)", color: "var(--premium-gold)" }}
+        style={{ fontSize: 8, fontWeight: 700, fontStyle: "italic", verticalAlign: "middle", borderColor: "#fbbf24", color: "#fbbf24" }}
       >
         i
       </button>
@@ -85,7 +85,7 @@ function TrustInfoIcon() {
         onMouseEnter={() => setOpen(true)}
         onMouseLeave={() => setOpen(false)}
         onClick={() => setOpen(v => !v)}
-        className="inline-flex items-center justify-center w-[14px] h-[14px] rounded-full border border-gray-400 text-gray-400 hover:border-trust-green hover:text-trust-green transition-colors duration-200 leading-none"
+        className="inline-flex items-center justify-center w-[14px] h-[14px] rounded-full border border-gray-400 text-gray-400 hover:border-green-400 hover:text-green-400 transition-colors duration-200 leading-none"
         style={{ fontSize: 9, fontWeight: 700, fontStyle: "italic", verticalAlign: "middle" }}
       >
         i
@@ -139,7 +139,7 @@ function EstimateInfoIcon({ label, pulse, blue }: { label: string; pulse?: boole
         onMouseEnter={() => setOpen(true)}
         onMouseLeave={() => setOpen(false)}
         onClick={() => setOpen(v => !v)}
-        className={`inline-flex items-center justify-center w-[13px] h-[13px] rounded-full border transition-colors duration-200 leading-none ${blue ? "border-conversion-blue-light text-conversion-blue-light hover:border-conversion-blue hover:text-conversion-blue" : "border-gray-500 text-gray-400 hover:border-conversion-blue-light hover:text-conversion-blue-light"}`}
+        className={`inline-flex items-center justify-center w-[13px] h-[13px] rounded-full border transition-colors duration-200 leading-none ${blue ? "border-sky-400 text-sky-400 hover:border-sky-300 hover:text-sky-300" : "border-gray-500 text-gray-400 hover:border-blue-400 hover:text-blue-400"}`}
         style={{ fontSize: 8, fontWeight: 700, fontStyle: "italic", verticalAlign: "middle" }}
       >
         i
@@ -157,7 +157,7 @@ function EstimateInfoIcon({ label, pulse, blue }: { label: string; pulse?: boole
             href="/about"
             onClick={() => setOpen(false)}
             className="inline-block mt-2 text-[11px] font-semibold hover:opacity-80 transition-opacity"
-            style={{ color: "var(--conversion-blue-light)", textDecoration: "none" }}
+            style={{ color: "#93c5fd", textDecoration: "none" }}
           >
             Learn more →
           </Link>
@@ -219,7 +219,7 @@ function LiveDealsTracker({ onClick }: { onClick?: () => void }) {
         }
       }}
       className="h-full rounded-xl px-6 py-3 flex items-center gap-3.5 cursor-pointer transition-transform duration-150 hover:scale-[1.015] active:scale-[0.985]"
-      style={{ background: "#0E1428", border: "1px solid rgba(124,58,237,0.35)" }}
+      style={{ background: "#151929", border: "1px solid rgba(124,58,237,0.3)" }}
     >
       {/* BarLoader animation for the deals scanned icon */}
       <div className="relative flex-shrink-0 flex items-end justify-center" style={{ width: 36, height: 36 }}>
@@ -423,9 +423,9 @@ export default function Header({ onSearch, onScanClick }: HeaderProps) {
   }, []);
 
   return (
-    <header style={{ background: "#080D1A" }} className="w-full">
+    <header style={{ background: "#0d0f1a" }} className="w-full">
       {/* Flash sale ticker */}
-      <div style={{ background: "linear-gradient(90deg,var(--urgency-red),var(--urgency-red-dark))" }} className="w-full py-2.5 text-center text-xs font-semibold tracking-widest text-white opacity-[0.01]">
+      <div style={{ background: "linear-gradient(90deg,#e63946,#b91c2c)" }} className="w-full py-2.5 text-center text-xs font-semibold tracking-widest text-white opacity-[0.01]">
         ⚡ FLASH SALE ENDING SOON — {viewers.toLocaleString()} MEMBERS ACTIVE TODAY &nbsp;|&nbsp; SPOTS FILLING FAST ⚡
       </div>
       {/* Search bar */}
@@ -495,20 +495,20 @@ export default function Header({ onSearch, onScanClick }: HeaderProps) {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl mx-auto px-4 mt-5">
         {[
           {
-            default: { icon: "✅", label: "Hand-Checked", desc: "Every link opened and tested", color: "var(--trust-green-light)", bg: "rgba(34,197,94,0.15)" },
-            flipped: { icon: "✅", label: "Verified", desc: "Every product vetted", color: "var(--trust-green-light)", bg: "rgba(34,197,94,0.15)" },
+            default: { icon: "✅", label: "Hand-Checked", desc: "Every link opened and tested", color: "#4ade80", bg: "rgba(34,197,94,0.15)" },
+            flipped: { icon: "✅", label: "Verified", desc: "Every product vetted", color: "#4ade80", bg: "rgba(34,197,94,0.15)" },
           },
           {
-            default: { icon: "💲", label: "Honest Pricing", desc: "Price shown as of posting date", color: "var(--premium-gold)", bg: "rgba(251,191,36,0.15)" },
-            flipped: { icon: "⭐", label: "4.9/5 Rating", desc: "78K+ reviews", color: "var(--premium-gold)", bg: "rgba(251,191,36,0.15)" },
+            default: { icon: "💲", label: "Honest Pricing", desc: "Price shown as of posting date", color: "#fbbf24", bg: "rgba(251,191,36,0.15)" },
+            flipped: { icon: "⭐", label: "4.9/5 Rating", desc: "78K+ reviews", color: "#fbbf24", bg: "rgba(251,191,36,0.15)" },
           },
           {
-            default: { icon: "🔓", label: "No Signup", desc: "Browse without an account", color: "var(--conversion-blue-light)", bg: "rgba(37,99,235,0.15)" },
-            flipped: { icon: "🏆", label: "#1 Marketplace", desc: "Industry leader", color: "var(--conversion-blue-light)", bg: "rgba(37,99,235,0.15)" },
+            default: { icon: "🔓", label: "No Signup", desc: "Browse without an account", color: "#60a5fa", bg: "rgba(37,99,235,0.15)" },
+            flipped: { icon: "🏆", label: "#1 Marketplace", desc: "Industry leader", color: "#60a5fa", bg: "rgba(37,99,235,0.15)" },
           },
           {
-            default: { icon: "📋", label: "Always Disclosed", desc: "Affiliate links marked, every time", color: "var(--conversion-blue-light)", bg: "rgba(96,165,250,0.15)" },
-            flipped: { icon: "🔒", label: "Bank-Level", desc: "256-bit encryption", color: "var(--conversion-blue-light)", bg: "rgba(96,165,250,0.15)" },
+            default: { icon: "📋", label: "Always Disclosed", desc: "Affiliate links marked, every time", color: "#60a5fa", bg: "rgba(96,165,250,0.15)" },
+            flipped: { icon: "🔒", label: "Bank-Level", desc: "256-bit encryption", color: "#60a5fa", bg: "rgba(96,165,250,0.15)" },
           },
         ].map((card, i) => {
           const s = flippedCards[i] ? card.flipped : card.default;
@@ -516,7 +516,7 @@ export default function Header({ onSearch, onScanClick }: HeaderProps) {
             <div
               key={i}
               className="rounded-xl p-4 text-center cursor-pointer select-none transition-transform duration-150 active:scale-95"
-              style={{ background: "#0E1428", border: "1px solid rgba(255,255,255,0.09)" }}
+              style={{ background: "#151929", border: "1px solid rgba(255,255,255,0.07)" }}
               onClick={() => toggleCard(i)}
             >
               <div className="w-11 h-11 rounded-full flex items-center justify-center mx-auto mb-2 text-xl" style={{ background: s.bg }}>
@@ -534,8 +534,8 @@ export default function Header({ onSearch, onScanClick }: HeaderProps) {
           <div
             className="absolute inset-0 rounded-xl px-6 py-3.5 flex justify-around items-center"
             style={{
-              background: "#0E1428",
-              border: "1px solid rgba(255,255,255,0.09)",
+              background: "#151929",
+              border: "1px solid rgba(255,255,255,0.07)",
               opacity: showTracker ? 0 : 1,
               filter: showTracker ? "blur(8px)" : "blur(0px)",
               pointerEvents: showTracker ? "none" : "auto",
@@ -543,7 +543,7 @@ export default function Header({ onSearch, onScanClick }: HeaderProps) {
             }}
           >
             <div className="flex items-center gap-2 text-sm">
-              <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: "var(--trust-green)" }}></div>
+              <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#22c55e" }}></div>
               <NumberTicker
                 value={viewers}
                 locale
@@ -555,7 +555,7 @@ export default function Header({ onSearch, onScanClick }: HeaderProps) {
             </div>
             <div style={{ width: 1, background: "rgba(255,255,255,0.07)", height: 28 }}></div>
             <div className="flex items-center gap-2 text-sm">
-              <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: "var(--conversion-blue-light)", animationDelay: "0.4s" }}></div>
+              <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#60a5fa", animationDelay: "0.4s" }}></div>
               <NumberTicker
                 value={orders}
                 locale
@@ -582,20 +582,20 @@ export default function Header({ onSearch, onScanClick }: HeaderProps) {
       {/* CTA */}
       <div className="text-center px-4 mt-7 pb-2">
         {/* Community savings goal */}
-        <div className="relative max-w-sm mx-auto mb-4 rounded-xl px-5 py-4" style={{ background: "#0B1020", border: "1px solid rgba(0,235,94,0.28)" }}>
+        <div className="relative max-w-sm mx-auto mb-4 rounded-xl px-5 py-4" style={{ background: "#111827", border: "1px solid rgba(34,197,94,0.25)" }}>
           {/* Live pulse — bottom-left corner */}
           <span className="absolute bottom-2.5 left-3 flex items-center gap-1 pointer-events-none">
             <span className="relative flex h-[6px] w-[6px]">
               <span className="absolute inline-flex h-full w-full rounded-full animate-ping" style={{ background: "rgba(74,222,128,0.5)", animationDuration: "2s" }} />
-              <span className="relative inline-flex h-[6px] w-[6px] rounded-full" style={{ background: "var(--trust-green-light)" }} />
+              <span className="relative inline-flex h-[6px] w-[6px] rounded-full" style={{ background: "#4ade80" }} />
             </span>
           </span>
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-semibold inline-flex items-center" style={{ color: "var(--trust-green-light)" }}>
+            <span className="text-xs font-semibold inline-flex items-center" style={{ color: "#4ade80" }}>
               Community savings goal
               <EstimateInfoIcon label="community savings goal" pulse blue />
             </span>
-            <span className="text-xs font-bold" style={{ color: "var(--trust-green-light)" }}>
+            <span className="text-xs font-bold" style={{ color: "#4ade80" }}>
               $6.2k–$13.8k&nbsp;/&nbsp;
               <span
                 style={{
@@ -610,13 +610,13 @@ export default function Header({ onSearch, onScanClick }: HeaderProps) {
               </span>
             </span>
           </div>
-          <div style={{ "--flux-from": "var(--trust-green)", "--flux-to": "var(--trust-green-light)" } as React.CSSProperties}>
+          <div style={{ "--flux-from": "#16a34a", "--flux-to": "#4ade80" } as React.CSSProperties}>
             <ProgressiveFluxLoader
               value={92}
               showLabel={false}
               className="w-full gap-0"
               barClassName="h-[10px] shadow-none dark:shadow-none"
-              gradient="linear-gradient(90deg, var(--trust-green-dark) 0%, var(--trust-green) 35%, var(--trust-green-light) 55%, var(--trust-green) 78%, var(--trust-green-dark) 100%)"
+              gradient="linear-gradient(90deg, #16a34a 0%, #22c55e 35%, #4ade80 55%, #22c55e 78%, #16a34a 100%)"
             />
           </div>
           <div className="mt-2 text-xs text-center" style={{ color: "#6b7280" }}>Be a founding member</div>
@@ -631,7 +631,7 @@ export default function Header({ onSearch, onScanClick }: HeaderProps) {
           CLAIM MY EXCLUSIVE ACCESS →
         </ShinyButton>
         <div className="mt-3 text-xs" style={{ color: "#6b7280" }}>
-          <span style={{ color: "var(--trust-green-light)" }}>98.7%</span> of members got more than they expected &nbsp;|&nbsp; No credit card required
+          <span style={{ color: "#4ade80" }}>98.7%</span> of members got more than they expected &nbsp;|&nbsp; No credit card required
           <TrustInfoIcon />
         </div>
       </div>
@@ -648,7 +648,7 @@ export default function Header({ onSearch, onScanClick }: HeaderProps) {
         >
           <div className="text-3xl flex-shrink-0 mt-0.5">🏅</div>
           <div>
-            <div className="text-sm font-bold mb-1 flex items-center" style={{ color: "var(--premium-gold)" }}>100% Satisfaction Guarantee<GuaranteeInfoIcon /></div>
+            <div className="text-sm font-bold mb-1 flex items-center" style={{ color: "#fbbf24" }}>100% Satisfaction Guarantee<GuaranteeInfoIcon /></div>
             <div className="text-xs leading-relaxed" style={{ color: "#9ca3af" }}>Not happy? We'll make it right — If the deal isn't real, I'll personally find you a better one — or send it to you for free. We're so confident in Elite Deals that we take on all the risk so you don't have to. —contact@elitedeals.us</div>
           </div>
         </BorderRotate>
@@ -672,9 +672,9 @@ export default function Header({ onSearch, onScanClick }: HeaderProps) {
               glowColor="purple"
               customSize
               className="p-4"
-              style={{ background: "#0E1428", border: "1px solid rgba(255,255,255,0.08)" }}
+              style={{ background: "#151929", border: "1px solid rgba(255,255,255,0.06)" }}
             >
-              <div className="text-xs mb-1.5" style={{ color: "var(--premium-gold)" }}>★★★★★</div>
+              <div className="text-xs mb-1.5" style={{ color: "#fbbf24" }}>★★★★★</div>
               <div className="text-xs leading-relaxed mb-2" style={{ color: "#d1d5db" }}>{r.text}</div>
               <div className="text-xs font-medium" style={{ color: "#6b7280" }}>{r.author} — {r.badge}</div>
             </GlowCard>
@@ -702,9 +702,9 @@ export default function Header({ onSearch, onScanClick }: HeaderProps) {
       {/* Footer strip */}
       <div
         className="relative text-center py-3 text-xs group cursor-default"
-        style={{ background: "#060914", borderTop: "1px solid rgba(255,255,255,0.06)", color: "#4b5563" }}
+        style={{ background: "#0a0c14", borderTop: "1px solid rgba(255,255,255,0.05)", color: "#4b5563" }}
       >
-        <span style={{ color: "var(--trust-green)" }}>✓</span> Every Deal Verified &nbsp;•&nbsp; No Fake Offers &nbsp;•&nbsp; Support
+        <span style={{ color: "#22c55e" }}>✓</span> Every Deal Verified &nbsp;•&nbsp; No Fake Offers &nbsp;•&nbsp; Support
 
         {/* Hover tooltip */}
         <div
@@ -714,13 +714,13 @@ export default function Header({ onSearch, onScanClick }: HeaderProps) {
           <div
             className="rounded-xl px-4 py-3 text-left whitespace-nowrap shadow-2xl"
             style={{
-              background: "#0B1020",
+              background: "#131626",
               border: "1px solid rgba(255,255,255,0.1)",
               boxShadow: "0 8px 32px rgba(0,0,0,0.6)",
             }}
           >
             <div className="flex items-start gap-2 mb-1.5">
-              <span style={{ color: "var(--trust-green)", fontSize: 13 }}>🔒</span>
+              <span style={{ color: "#22c55e", fontSize: 13 }}>🔒</span>
               <span className="font-semibold" style={{ color: "#f9fafb", fontSize: 12 }}>
                 All purchases happen directly on official retailer sites
               </span>

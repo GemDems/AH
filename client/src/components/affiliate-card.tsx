@@ -397,8 +397,8 @@ export default function AffiliateCard({ link }: AffiliateCardProps) {
                     <path d="M6 10L8 12.5L12.5 7.5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
                     <defs>
                       <linearGradient id="shield-gradient" x1="9" y1="1" x2="9" y2="19.5" gradientUnits="userSpaceOnUse">
-                        <stop offset="0%" stopColor="#1A64FF"/>
-                        <stop offset="100%" stopColor="#0041C7"/>
+                        <stop offset="0%" stopColor="#1d4ed8"/>
+                        <stop offset="100%" stopColor="#1e3a8a"/>
                       </linearGradient>
                     </defs>
                   </svg>
@@ -410,13 +410,13 @@ export default function AffiliateCard({ link }: AffiliateCardProps) {
               </div>
               <div className="flex items-center justify-center gap-1.5 flex-wrap">
                 <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border"
-                  style={{ background: "linear-gradient(135deg,#EDFFF4,#A3F7C4)", borderColor: "var(--trust-green)", color: "var(--trust-green-dark)" }}>
+                  style={{ background: "linear-gradient(135deg,#dcfce7,#bbf7d0)", borderColor: "#16a34a", color: "#15803d" }}>
                 </span>
                 <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border"
-                  style={{ background: "linear-gradient(135deg,#FFFBEB,#FFE99A)", borderColor: "var(--premium-gold)", color: "var(--premium-gold-dark)" }}>
+                  style={{ background: "linear-gradient(135deg,#fef9c3,#fde68a)", borderColor: "#ca8a04", color: "#92400e" }}>
                 </span>
                 <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border"
-                  style={{ background: "linear-gradient(135deg,#EEF3FF,#B8D2FF)", borderColor: "var(--conversion-blue)", color: "var(--conversion-blue-dark)" }}>
+                  style={{ background: "linear-gradient(135deg,#dbeafe,#bfdbfe)", borderColor: "#2563eb", color: "#1e3a8a" }}>
                 </span>
               </div>
             </div>
