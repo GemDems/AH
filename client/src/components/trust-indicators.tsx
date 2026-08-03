@@ -108,7 +108,7 @@ export default function TrustIndicators() {
             <p className="text-gray-600 text-sm">Deals updated every few minutes to ensure availability.</p>
           </div>
           <div className="text-center">
-            <div className="w-16 h-16 bg-action-orange rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-[#F54927] rounded-full flex items-center justify-center mx-auto mb-4">
               <Percent className="text-white text-2xl w-8 h-8" />
             </div>
             <h4 className="font-semibold text-gray-900 mb-2">Maximum Savings</h4>
