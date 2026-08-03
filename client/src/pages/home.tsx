@@ -616,23 +616,37 @@ export default function Home() {
 
         <CategoryFilter categories={categories} activeCategories={activeCategories} onCategoryToggle={toggleCategory} activeFilters={activeFilters} onFilterToggle={toggleFilter} />
 
-        {/* ── FTC / Affiliate Disclosure ── */}
-        <div className="flex items-center justify-center gap-1.5 py-1.5 px-3 mb-4 rounded-lg text-center flex-wrap"
-          style={{ background: "rgba(239,246,255,0.7)", border: "1px solid rgba(147,197,253,0.35)" }}>
-          <span className="text-[10px]" style={{ color: "#6b7280" }}>
-            📋 <strong style={{ color: "#374151" }}>Affiliate Disclosure:</strong> Links on this page may earn us a commission at no extra cost to you. Prices shown at time of listing and may vary.
+        {/* ── FTC / Affiliate Disclosure ──
+            FTC's ".com Disclosures" guidance requires this to be "clear and
+            conspicuous": legible on mobile without zooming, high enough
+            contrast to notice (not to blend into the background), and
+            positioned before the consumer acts on any deal claim below.
+            10px/#6b7280-on-pale-blue was borderline unreadable on small
+            screens — bumped size, weight, and contrast so it actually reads
+            as a real disclosure rather than legal fine print people skip. */}
+        <div className="flex items-center justify-center gap-2 py-2.5 px-4 mb-4 rounded-lg text-center flex-wrap"
+          style={{ background: "#eff6ff", border: "1px solid #bfdbfe" }}>
+          <span className="text-xs sm:text-[13px] leading-snug" style={{ color: "#1f2937" }}>
+            📋 <strong style={{ color: "#111827" }}>Affiliate Disclosure:</strong> Links on this page may earn us a commission at no extra cost to you. Prices shown at time of listing and may vary.
           </span>
-          <Link href="/about" className="text-[10px] font-semibold hover:underline" style={{ color: "#3b82f6", textDecoration: "none" }}>
+          <Link href="/about" className="text-xs sm:text-[13px] font-semibold hover:underline whitespace-nowrap" style={{ color: "#2563eb", textDecoration: "none" }}>
             Full Legal Disclosure →
           </Link>
         </div>
 
-        {/* ── Temporary "more deals coming" notice — text-only, no button/CTA ── */}
-        <div className="text-center mb-6 px-4">
-          <p className="text-sm font-medium text-gray-800">
-            🚧 More deals coming soon — I'm personally reaching out to major affiliate brands and retailers to bring on new partners and real products.
+        {/* ── Temporary "more deals coming" notice ──
+            Bounded in its own card (border + subtle shadow) instead of loose
+            text, so on narrow/iPhone widths it reads as a deliberate status
+            panel rather than an unstyled paragraph sitting awkwardly between
+            the disclosure bar and the deal grid. */}
+        <div className="text-center mb-6 mx-auto max-w-lg rounded-xl border border-gray-200 bg-white px-4 py-5 sm:px-6 shadow-sm">
+          <p className="text-sm sm:text-[15px] font-semibold text-gray-900">
+            🚧 More deals coming soon
           </p>
-          <p className="text-xs text-gray-500 mt-1 mb-4">
+          <p className="text-sm text-gray-600 mt-1.5 leading-snug">
+            I'm personally reaching out to major affiliate brands and retailers to bring on new partners and real products.
+          </p>
+          <p className="text-xs text-gray-500 mt-1 mb-4 leading-snug">
             New brands, companies, and deals are being added as partnerships close. Check back shortly — the good stuff is on its way.
           </p>
           <div style={{ "--flux-from": "#2563eb", "--flux-to": "#38bdf8" } as React.CSSProperties}>
@@ -645,7 +659,7 @@ export default function Home() {
                 markDealsLoaderSeen();
                 setDealsLoaderSeen(true);
               }}
-              className="max-w-sm gap-3"
+              className="max-w-sm mx-auto gap-3"
               barClassName="h-[10px] shadow-none dark:shadow-none"
               textClassName="text-sm sm:text-base text-gray-600 font-medium"
             />
