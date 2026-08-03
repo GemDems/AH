@@ -687,7 +687,7 @@ export default function Home() {
                 I'm personally reaching out to major affiliate brands and retailers to bring on new partners and real products.
               </p>
               <p className="text-xs text-gray-500 mt-1 mb-4 leading-snug">
-                New brands, companies, and deals are being added as partnerships close. Check back shortly — the good stuff is on its way.
+                New brands, companies, and deals are being added as partnerships close. <span className="font-semibold">Check back shortly</span> — the good stuff is on its way.
               </p>
               <div style={{ "--flux-from": "#2563eb", "--flux-to": "#38bdf8" } as React.CSSProperties}>
                 <ProgressiveFluxLoader
