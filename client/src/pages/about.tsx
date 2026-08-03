@@ -71,9 +71,9 @@ export default function About() {
           <section className="rounded-xl p-5 space-y-2" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
             <h2 className="font-bold text-white text-base">Contact</h2>
             <p>For questions, deal removal requests, partnership enquiries, or any concerns:</p>
-            <a href="mailto:elitedeals.edh@gmail.com" className="inline-flex items-center gap-1.5 font-medium hover:opacity-80 transition-opacity" style={{ color: "#60a5fa", textDecoration: "none" }}>
+            <a href="mailto:contact@elitedeals.us" className="inline-flex items-center gap-1.5 font-medium hover:opacity-80 transition-opacity" style={{ color: "#60a5fa", textDecoration: "none" }}>
               <ExternalLink className="w-3.5 h-3.5" />
-              elitedeals.edh@gmail.com
+              contact@elitedeals.us
             </a>
             <p className="text-xs">We aim to respond to all enquiries within 24 hours.</p>
           </section>

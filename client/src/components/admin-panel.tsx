@@ -78,11 +78,11 @@ export default function AdminPanel({ isOpen, onClose, onSuccess }: AdminPanelPro
   });
 
   const MSG_KEYWORDS: { keywords: string[]; response: string; unresolvable?: boolean }[] = [
-    { keywords: ["refund","money back","return","reimburse"], response: "We understand your concern. For refund requests, please ask the customer to email elitedeals.edh@gmail.com with their order details and device reference.", unresolvable: true },
-    { keywords: ["scam","fake","fraud","not real"], response: "Thank you for reporting this. We're investigating immediately. Please ask the customer to email elitedeals.edh@gmail.com with full details and their device reference.", unresolvable: true },
-    { keywords: ["broken","error","bug","not working","issue","problem","glitch"], response: "Thanks for flagging this! We're looking into the technical issue. Please ask the customer to clear their cache and try again. If it persists, email elitedeals.edh@gmail.com with their device info." },
-    { keywords: ["cancel","unsubscribe","stop","remove"], response: "No action needed on your end — there are no subscriptions on the platform. If the customer has a specific account concern, ask them to email elitedeals.edh@gmail.com." },
-    { keywords: ["help","how","what","where","explain"], response: "Auto-reply sent to customer with how-to information. If they need further help, they can use the AI chatbot on the main page or email elitedeals.edh@gmail.com." },
+    { keywords: ["refund","money back","return","reimburse"], response: "We understand your concern. For refund requests, please ask the customer to email contact@elitedeals.us with their order details and device reference.", unresolvable: true },
+    { keywords: ["scam","fake","fraud","not real"], response: "Thank you for reporting this. We're investigating immediately. Please ask the customer to email contact@elitedeals.us with full details and their device reference.", unresolvable: true },
+    { keywords: ["broken","error","bug","not working","issue","problem","glitch"], response: "Thanks for flagging this! We're looking into the technical issue. Please ask the customer to clear their cache and try again. If it persists, email contact@elitedeals.us with their device info." },
+    { keywords: ["cancel","unsubscribe","stop","remove"], response: "No action needed on your end — there are no subscriptions on the platform. If the customer has a specific account concern, ask them to email contact@elitedeals.us." },
+    { keywords: ["help","how","what","where","explain"], response: "Auto-reply sent to customer with how-to information. If they need further help, they can use the AI chatbot on the main page or email contact@elitedeals.us." },
   ];
 
   function generateAiReply(message: string, deviceId?: string): string {
@@ -97,7 +97,7 @@ export default function AdminPanel({ isOpen, onClose, onSuccess }: AdminPanelPro
       }
     }
     const deviceRef = deviceId ? `...${deviceId.slice(-8)}` : "unknown";
-    return `Message received from device ref ${deviceRef}. This appears to be a general enquiry. If it needs a personal response, ask the customer to email elitedeals.edh@gmail.com with reference to their device (${deviceRef}).`;
+    return `Message received from device ref ${deviceRef}. This appears to be a general enquiry. If it needs a personal response, ask the customer to email contact@elitedeals.us with reference to their device (${deviceRef}).`;
   }
 
   const addImageField = () => {
