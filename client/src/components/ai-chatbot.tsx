@@ -2079,7 +2079,7 @@ ${product.stock > 0 ? `📦 **In Stock:** ${product.stock} units available` : ''
             isButtonFading && !isSlideUp ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
           } ${isSlideUp ? 'transform translate-y-32' : 'transform translate-y-0'}`}
           style={{
-            boxShadow: '0 10px 30px rgba(59, 130, 246, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1) inset',
+            boxShadow: '0 10px 30px rgba(59, 130, 246, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1) inset, 0 0 28px 6px rgba(255, 210, 60, 0.13)',
             background: 'linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #8b5cf6 100%)'
           }}
         >
