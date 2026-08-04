@@ -118,9 +118,18 @@ function FluxLabel({ label, reduced, className }: FluxLabelProps) {
     className,
   );
 
+  // "almost live" gets a soft yellow glow to pop against the blue flux bar —
+  // conversion-focused emphasis on the final phase only. Every other phase
+  // label is untouched. Kept very subtle so it reads as a clean tint, not a
+  // heavy glow.
+  const style =
+    label === "almost live"
+      ? { textShadow: "0 0 5px rgba(250, 204, 21, 0.2)" }
+      : undefined;
+
   if (reduced) {
     return (
-      <div aria-hidden className={base}>
+      <div aria-hidden className={base} style={style}>
         {label}
       </div>
     );
@@ -132,7 +141,7 @@ function FluxLabel({ label, reduced, className }: FluxLabelProps) {
         key={label}
         aria-hidden
         className={base}
-        style={{ transformStyle: "preserve-3d" }}
+        style={{ transformStyle: "preserve-3d", ...style }}
         // NOTE: intentionally no `filter` on this node. Animating `filter`
         // together with a 3D `z` transform inside a `perspective` parent is a
         // well-known WebKit/Safari (incl. iOS) fragility — it can clip,
