@@ -124,7 +124,7 @@ function FluxLabel({ label, reduced, className }: FluxLabelProps) {
   // heavy glow.
   const style =
     label === "almost live"
-      ? { textShadow: "0 0 5px rgba(250, 204, 21, 0.2)" }
+      ? { textShadow: "0 0 5px rgba(250, 204, 21, 0.01)" }
       : undefined;
 
   if (reduced) {
