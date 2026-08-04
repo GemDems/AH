@@ -25,6 +25,10 @@ export const affiliateLinks = pgTable("affiliate_links", {
   isDraft: integer("is_draft").default(0), // Draft status - 0 = published, 1 = draft
   scheduledPublishAt: timestamp("scheduled_publish_at"), // When to auto-publish draft
   scheduledDeleteAt: timestamp("scheduled_delete_at"), // When to auto-delete product
+  // Which product card design renders this product on the site.
+  // "classic" = current/original card layout (always the default).
+  // "conversion" = conversion-optimized variant (red urgency banner, green pricing, yellow accents).
+  cardStyle: text("card_style").default("classic"),
   // Private field for AI - not shown to users anywhere, only for AI analysis
   aiPrivateInfo: text("ai_private_info"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -147,6 +151,7 @@ export const insertAffiliateLinkSchema = z.object({
   scheduledPublishAt: z.date().optional().or(z.null()),
   scheduledDeleteAt: z.date().optional().or(z.null()),
   aiPrivateInfo: z.string().optional().or(z.null()),
+  cardStyle: z.enum(["classic", "conversion"]).optional().default("classic"),
 });
 
 // Zod schemas for AI and SMS tables

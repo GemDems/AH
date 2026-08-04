@@ -41,6 +41,7 @@ export default function AdminPanel({ isOpen, onClose, onSuccess }: AdminPanelPro
     scheduledPublishAt: undefined,
     scheduledDeleteAt: undefined,
     aiPrivateInfo: "",
+    cardStyle: "classic",
   });
 
   const [schedulingProduct, setSchedulingProduct] = useState<{ id: number; title: string; type: 'publish' | 'delete' } | null>(null);
@@ -460,7 +461,8 @@ export default function AdminPanel({ isOpen, onClose, onSuccess }: AdminPanelPro
       isVerified: formData.isVerified ? 1 : 0,
       isElitePick: formData.isElitePick ? 1 : 0,
       stock: formData.stock || 0,
-      aiPrivateInfo: formData.aiPrivateInfo || null
+      aiPrivateInfo: formData.aiPrivateInfo || null,
+      cardStyle: formData.cardStyle === "conversion" ? "conversion" : "classic"
     };
     createLinkMutation.mutate(submissionData);
   };
@@ -480,6 +482,7 @@ export default function AdminPanel({ isOpen, onClose, onSuccess }: AdminPanelPro
       scheduledPublishAt: undefined,
       scheduledDeleteAt: undefined,
       aiPrivateInfo: "",
+      cardStyle: "classic",
     });
     setAdditionalImages([]);
   };
@@ -1074,6 +1077,37 @@ export default function AdminPanel({ isOpen, onClose, onSuccess }: AdminPanelPro
             <Label htmlFor="verified-badge" className="text-sm font-medium cursor-pointer">
               🔒 Verified Source Badge (Amazon/Walmart/etc)
             </Label>
+          </div>
+
+          {/* Product Card Style — choose which card design this product renders with on the site */}
+          <div className="p-3 border rounded-lg space-y-2">
+            <Label className="text-sm font-medium">Product Card Style</Label>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, cardStyle: "classic" })}
+                className={`text-left p-3 rounded-lg border-2 transition-colors ${
+                  (formData.cardStyle || "classic") === "classic"
+                    ? "border-blue-500 bg-blue-50"
+                    : "border-gray-200 bg-white hover:border-gray-300"
+                }`}
+              >
+                <div className="text-sm font-semibold">Classic</div>
+                <div className="text-xs text-gray-500">Current card design (default)</div>
+              </button>
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, cardStyle: "conversion" })}
+                className={`text-left p-3 rounded-lg border-2 transition-colors ${
+                  formData.cardStyle === "conversion"
+                    ? "border-green-500 bg-green-50"
+                    : "border-gray-200 bg-white hover:border-gray-300"
+                }`}
+              >
+                <div className="text-sm font-semibold">Conversion Optimized</div>
+                <div className="text-xs text-gray-500">Red alerts, green pricing, yellow rating</div>
+              </button>
+            </div>
           </div>
 
           <div className="space-y-4 border-t pt-4">
