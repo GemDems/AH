@@ -49,6 +49,8 @@ export interface ProgressiveFluxLoaderProps {
   barClassName?: string;
   /** Classes for the phase label. */
   textClassName?: string;
+  /** Per-label inline styles — keyed by exact label string. */
+  phaseStyles?: Record<string, React.CSSProperties>;
 }
 
 /* ── constants ───────────────────────────────────────────────── */
@@ -108,11 +110,12 @@ interface FluxLabelProps {
   /** Render plain, static text instead of the 3D fly-in (reduced motion). */
   reduced: boolean;
   className?: string;
+  style?: React.CSSProperties;
 }
 
 // The label is decorative and `aria-hidden`; the progressbar carries the spoken
 // progress via `aria-valuetext`. Under reduced motion it is plain static text.
-function FluxLabel({ label, reduced, className }: FluxLabelProps) {
+function FluxLabel({ label, reduced, className, style }: FluxLabelProps) {
   const base = cn(
     "absolute inset-0 flex items-center justify-center text-center text-3xl font-semibold tracking-tight text-muted-foreground sm:text-4xl",
     className,
@@ -120,7 +123,7 @@ function FluxLabel({ label, reduced, className }: FluxLabelProps) {
 
   if (reduced) {
     return (
-      <div aria-hidden className={base}>
+      <div aria-hidden className={base} style={style}>
         {label}
       </div>
     );
@@ -132,7 +135,7 @@ function FluxLabel({ label, reduced, className }: FluxLabelProps) {
         key={label}
         aria-hidden
         className={base}
-        style={{ transformStyle: "preserve-3d" }}
+        style={{ transformStyle: "preserve-3d", ...style }}
         // NOTE: intentionally no `filter` on this node. Animating `filter`
         // together with a 3D `z` transform inside a `perspective` parent is a
         // well-known WebKit/Safari (incl. iOS) fragility — it can clip,
@@ -184,6 +187,7 @@ export function ProgressiveFluxLoader({
   className,
   barClassName,
   textClassName,
+  phaseStyles,
 }: ProgressiveFluxLoaderProps) {
   const reduced = !!useReducedMotion();
   const isControlled = typeof value === "number";
@@ -275,6 +279,7 @@ export function ProgressiveFluxLoader({
             label={label}
             reduced={reduced}
             className={textClassName}
+            style={phaseStyles?.[label]}
           />
         </div>
       )}

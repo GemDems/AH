@@ -682,7 +682,7 @@ export default function Home() {
               >
                 <X className="w-4 h-4" />
               </button>
-              <p className="text-sm sm:text-[15px] font-semibold text-gray-900">🚧 Deals coming soon</p>
+              <p className="text-sm sm:text-[15px] font-semibold" style={{ color: "#C2185B" }}>🚧 Deals coming soon</p>
               <p className="text-sm text-gray-600 mt-1.5 leading-snug">
                 I'm personally reaching out to major affiliate brands and retailers to bring on new partners and real products.
               </p>
@@ -702,6 +702,7 @@ export default function Home() {
                   className="max-w-sm mx-auto gap-3"
                   barClassName="h-[10px] shadow-none dark:shadow-none"
                   textClassName="text-sm sm:text-base text-gray-600 font-medium"
+                  phaseStyles={{ "almost live": { color: "#D97706", fontWeight: "700" } }}
                 />
               </div>
             </motion.div>
