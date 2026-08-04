@@ -6,6 +6,7 @@ import StatsBar from "@/components/stats-bar";
 import SearchBar from "@/components/search-bar";
 import CategoryFilter, { SPECIAL_FILTERS } from "@/components/category-filter";
 import AffiliateCard from "@/components/affiliate-card";
+import ConversionAffiliateCard from "@/components/conversion-affiliate-card";
 import AdminPanel from "@/components/admin-panel";
 import TrustIndicators from "@/components/trust-indicators";
 import { ChevronDown, Dice6, Gift, Search, X } from "lucide-react";

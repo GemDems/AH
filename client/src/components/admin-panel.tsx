@@ -1080,33 +1080,108 @@ export default function AdminPanel({ isOpen, onClose, onSuccess }: AdminPanelPro
           </div>
 
           {/* Product Card Style — choose which card design this product renders with on the site */}
-          <div className="p-3 border rounded-lg space-y-2">
-            <Label className="text-sm font-medium">Product Card Style</Label>
-            <div className="grid grid-cols-2 gap-2">
+          <div className="p-4 border rounded-lg space-y-3">
+            <div>
+              <Label className="text-sm font-semibold">Product Card Style</Label>
+              <p className="text-xs text-gray-500 mt-0.5">Choose how this product appears to shoppers</p>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+
+              {/* ── Classic ── */}
               <button
                 type="button"
                 onClick={() => setFormData({ ...formData, cardStyle: "classic" })}
-                className={`text-left p-3 rounded-lg border-2 transition-colors ${
+                className={`text-left rounded-xl border-2 overflow-hidden transition-all duration-200 ${
                   (formData.cardStyle || "classic") === "classic"
-                    ? "border-blue-500 bg-blue-50"
-                    : "border-gray-200 bg-white hover:border-gray-300"
+                    ? "border-blue-500 shadow-md shadow-blue-100"
+                    : "border-gray-200 hover:border-gray-300 hover:shadow-sm"
                 }`}
               >
-                <div className="text-sm font-semibold">Classic</div>
-                <div className="text-xs text-gray-500">Current card design (default)</div>
+                {/* Mini card preview */}
+                <div className="bg-white p-2 space-y-1.5">
+                  {/* image placeholder */}
+                  <div className="w-full h-10 rounded bg-gray-100 flex items-center justify-center">
+                    <div className="w-6 h-6 rounded bg-gray-300" />
+                  </div>
+                  {/* title */}
+                  <div className="h-2 w-3/4 rounded bg-gray-300" />
+                  {/* price */}
+                  <div className="h-3 w-1/2 rounded bg-green-400" />
+                  {/* stats row */}
+                  <div className="flex gap-1">
+                    <div className="h-4 flex-1 rounded bg-green-50 border border-green-200" />
+                    <div className="h-4 flex-1 rounded bg-blue-50 border border-blue-200" />
+                  </div>
+                  {/* CTA */}
+                  <div className="h-5 w-full rounded bg-blue-600" />
+                </div>
+                {/* label */}
+                <div className={`px-2.5 py-2 ${(formData.cardStyle || "classic") === "classic" ? "bg-blue-50" : "bg-gray-50"}`}>
+                  <div className="flex items-center gap-1.5">
+                    <div className={`w-3 h-3 rounded-full border-2 flex-shrink-0 ${(formData.cardStyle || "classic") === "classic" ? "border-blue-500 bg-blue-500" : "border-gray-300"}`} />
+                    <span className="text-xs font-semibold text-gray-800">Classic</span>
+                    {(formData.cardStyle || "classic") === "classic" && (
+                      <span className="ml-auto text-[10px] font-bold text-blue-600 bg-blue-100 px-1.5 py-0.5 rounded-full">DEFAULT</span>
+                    )}
+                  </div>
+                  <p className="text-[10px] text-gray-500 mt-0.5 ml-4.5">Clean white design</p>
+                </div>
               </button>
+
+              {/* ── Conversion Optimized ── */}
               <button
                 type="button"
                 onClick={() => setFormData({ ...formData, cardStyle: "conversion" })}
-                className={`text-left p-3 rounded-lg border-2 transition-colors ${
+                className={`text-left rounded-xl border-2 overflow-hidden transition-all duration-200 ${
                   formData.cardStyle === "conversion"
-                    ? "border-green-500 bg-green-50"
-                    : "border-gray-200 bg-white hover:border-gray-300"
+                    ? "border-red-500 shadow-md shadow-red-100"
+                    : "border-gray-200 hover:border-gray-300 hover:shadow-sm"
                 }`}
               >
-                <div className="text-sm font-semibold">Conversion Optimized</div>
-                <div className="text-xs text-gray-500">Red alerts, green pricing, yellow rating</div>
+                {/* Mini card preview */}
+                <div style={{ background: "#0f0f0f" }} className="p-2 space-y-1.5">
+                  {/* red alert bar */}
+                  <div className="h-3 w-full rounded" style={{ background: "#dc2626" }}>
+                    <div className="h-full rounded flex items-center justify-center">
+                      <div className="h-1.5 w-4/5 rounded bg-red-300 opacity-60" />
+                    </div>
+                  </div>
+                  {/* image placeholder */}
+                  <div className="w-full h-8 rounded flex items-center justify-center" style={{ background: "#1a1a1a" }}>
+                    <div className="w-5 h-5 rounded bg-gray-600" />
+                  </div>
+                  {/* yellow stars */}
+                  <div className="flex gap-0.5">
+                    {[0,1,2,3,4].map(i => (
+                      <div key={i} className="w-2 h-2 rounded-sm bg-yellow-400" />
+                    ))}
+                  </div>
+                  {/* green price box */}
+                  <div className="h-5 w-full rounded flex items-center px-1 gap-1" style={{ background: "rgba(21,128,61,0.3)", border: "1px solid #16a34a" }}>
+                    <div className="h-2.5 w-1/3 rounded" style={{ background: "#4ade80" }} />
+                    <div className="h-1.5 w-1/4 rounded bg-gray-500 ml-auto" />
+                  </div>
+                  {/* stat grid */}
+                  <div className="grid grid-cols-2 gap-1">
+                    <div className="h-3.5 rounded" style={{ background: "rgba(220,38,38,0.3)", border: "1px solid rgba(220,38,38,0.4)" }} />
+                    <div className="h-3.5 rounded" style={{ background: "rgba(234,179,8,0.3)", border: "1px solid rgba(234,179,8,0.4)" }} />
+                  </div>
+                  {/* CTA */}
+                  <div className="h-5 w-full rounded" style={{ background: "linear-gradient(135deg,#dc2626,#ea580c)" }} />
+                </div>
+                {/* label */}
+                <div className={`px-2.5 py-2 ${formData.cardStyle === "conversion" ? "bg-red-50" : "bg-gray-50"}`}>
+                  <div className="flex items-center gap-1.5">
+                    <div className={`w-3 h-3 rounded-full border-2 flex-shrink-0 ${formData.cardStyle === "conversion" ? "border-red-500 bg-red-500" : "border-gray-300"}`} />
+                    <span className="text-xs font-semibold text-gray-800">Conversion</span>
+                    {formData.cardStyle === "conversion" && (
+                      <span className="ml-auto text-[10px] font-bold text-red-600 bg-red-100 px-1.5 py-0.5 rounded-full">SELECTED</span>
+                    )}
+                  </div>
+                  <p className="text-[10px] text-gray-500 mt-0.5 ml-4.5">🔴 alerts · 🟢 price · ⭐ stars</p>
+                </div>
               </button>
+
             </div>
           </div>
 

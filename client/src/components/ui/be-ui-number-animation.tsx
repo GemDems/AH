@@ -56,7 +56,6 @@ export function NumberTicker({
       : locale
         ? rounded.toLocaleString()
         : rounded.toString();
-
     return pad ? formatted.padStart(pad, "0") : formatted;
   }, [value, pad, format, locale]);
 
@@ -134,12 +133,8 @@ function Digit({
     const node = columnRef.current;
     const controls = animate(
       node,
-      { filter: ["blur(8px)", "blur(0px)"] },
-      {
-        duration: Math.min(duration * 0.75, 0.28),
-        delay,
-        ease: EASE_OUT,
-      },
+      { filter: ["blur(10px)", "blur(0px)"] },
+      { duration: Math.min(duration * 0.75, 0.32), delay, ease: EASE_OUT },
     );
     return () => {
       controls.stop();
@@ -156,16 +151,11 @@ function Digit({
         ref={columnRef}
         initial={{ y: 0 }}
         animate={{ y: `-${digit * DIGIT_HEIGHT_EM}em` }}
-        transition={
-          reduce ? { duration: 0 } : { duration, delay, ease: EASE_OUT }
-        }
+        transition={reduce ? { duration: 0 } : { duration, delay, ease: EASE_OUT }}
         className="absolute inset-x-0 top-0 flex flex-col items-center will-change-[transform,filter]"
       >
         {DIGITS.map((n) => (
-          <span
-            key={n}
-            className="flex h-[1.1em] items-center justify-center leading-none"
-          >
+          <span key={n} className="flex h-[1.1em] items-center justify-center leading-none">
             {n}
           </span>
         ))}
