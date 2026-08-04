@@ -10,9 +10,16 @@ export const DISCOVER_TABS = [
     id: "popular",
     label: "Popular",
     icon: Fire02Icon,
-    color: "text-red-500",
-    fill: "fill-red-500",
-    bg: "bg-red-50",
+    // #EBAD25 is the true colorimetric complement of the site's brand blue
+    // (#2563EB, used for the "DEALS" heading and search button) — same hue
+    // wheel position 180° opposite, matched saturation/lightness, landing in
+    // true "orange" hue territory (~41°, next to CSS orange's 38.8°). Blue
+    // and orange are opposites on the color wheel, so this reads as the
+    // maximum-contrast, most attention-grabbing choice against the rest of
+    // the page for the "Popular" tab.
+    color: "text-[#EBAD25]",
+    fill: "fill-[#EBAD25]",
+    bg: "bg-[#EBAD25]/10",
   },
   {
     id: "favorites",
